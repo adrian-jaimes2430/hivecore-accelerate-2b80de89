@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ function LoginPage() {
 
   useEffect(() => {
     if (!loading && user && profile) {
-      navigate({ to: profile.status === "approved" ? "/app" : "/pending" });
+      navigate({ to: "/app" });
     }
   }, [loading, user, profile, navigate]);
 
