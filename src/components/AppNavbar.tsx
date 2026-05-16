@@ -13,7 +13,7 @@ export function AppNavbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-8">
           <Link to="/app"><HiveLogo /></Link>
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav className="flex items-center gap-1 overflow-x-auto">
             <Link
               to="/app"
               className="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground [&.active]:text-foreground [&.active]:bg-white/5"
