@@ -1,11 +1,22 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ShieldCheck, Users, ShoppingBag, BarChart3, Check, Ban, Loader2 } from "lucide-react";
+import { ImageUploader } from "@/components/admin/ImageUploader";
+import {
+  ShieldCheck, Users, ShoppingBag, BarChart3, Check, Ban, Loader2,
+  Plus, Pencil, Trash2, Package, Tag, Sparkles, GripVertical,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
@@ -13,56 +24,33 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 interface ProfileRow { id: string; full_name: string | null; phone: string | null; status: string; created_at: string }
+interface Category { id: string; name: string; slug: string; description: string | null; color: string | null; icon: string | null; sort_order: number | null }
+interface FunnelSection { title: string; content: string; image?: string }
+interface Product {
+  id: string; slug: string; name: string; category_id: string | null;
+  price: number; upsell_price: number | null;
+  short_description: string | null; description: string | null;
+  benefits: string[]; images: string[]; funnel_sections: FunnelSection[];
+  cta_label: string | null;
+  is_active: boolean; is_featured: boolean; is_new: boolean;
+  is_bestseller: boolean; is_recommended: boolean; is_trending: boolean;
+}
+
+const slugify = (s: string) =>
+  s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 function AdminPage() {
   const { isAdmin, loading } = useAuth();
   const navigate = useNavigate();
-  const qc = useQueryClient();
 
   useEffect(() => {
     if (!loading && !isAdmin) navigate({ to: "/app" });
   }, [loading, isAdmin, navigate]);
 
-  const { data: profiles = [] } = useQuery({
-    queryKey: ["admin-profiles"],
-    enabled: isAdmin,
-    queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as ProfileRow[];
-    },
-  });
-
-  const { data: orderCount = 0 } = useQuery({
-    queryKey: ["admin-orders-count"],
-    enabled: isAdmin,
-    queryFn: async () => {
-      const { count } = await supabase.from("orders").select("*", { count: "exact", head: true });
-      return count ?? 0;
-    },
-  });
-
-  const { data: productCount = 0 } = useQuery({
-    queryKey: ["admin-products-count"],
-    enabled: isAdmin,
-    queryFn: async () => {
-      const { count } = await supabase.from("products").select("*", { count: "exact", head: true });
-      return count ?? 0;
-    },
-  });
-
-  const setStatus = async (id: string, status: "approved" | "blocked" | "pending") => {
-    const { error } = await supabase.from("profiles").update({ status }).eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success("Estado actualizado");
-    qc.invalidateQueries({ queryKey: ["admin-profiles"] });
-  };
-
-  if (!isAdmin) {
+  if (loading || !isAdmin) {
     return <div className="flex h-[50vh] items-center justify-center"><Loader2 className="h-5 w-5 animate-spin text-hive" /></div>;
   }
-
-  const pending = profiles.filter((p) => p.status === "pending");
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
@@ -71,55 +59,44 @@ function AdminPage() {
         <h1 className="font-display text-3xl font-bold">Panel administrativo</h1>
       </div>
 
-      <div className="mb-10 grid gap-4 sm:grid-cols-4">
-        <Metric icon={Users} label="Impulsadores" value={profiles.length} accent="text-hive" />
-        <Metric icon={Users} label="Pendientes" value={pending.length} accent="text-anma-orange" />
-        <Metric icon={ShoppingBag} label="Productos" value={productCount} accent="text-ao-red" />
-        <Metric icon={BarChart3} label="Pedidos" value={orderCount} accent="text-hive" />
-      </div>
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="bg-white/5 border border-border/40">
+          <TabsTrigger value="overview"><BarChart3 className="mr-1.5 h-4 w-4" />Resumen</TabsTrigger>
+          <TabsTrigger value="products"><Package className="mr-1.5 h-4 w-4" />Productos</TabsTrigger>
+          <TabsTrigger value="categories"><Tag className="mr-1.5 h-4 w-4" />Categorías</TabsTrigger>
+          <TabsTrigger value="users"><Users className="mr-1.5 h-4 w-4" />Impulsadores</TabsTrigger>
+        </TabsList>
 
-      <section>
-        <h2 className="mb-4 font-display text-xl font-semibold">Gestión de impulsadores</h2>
-        <div className="hive-card overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-white/5 text-left text-xs uppercase tracking-wider text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3">Nombre</th>
-                <th className="px-4 py-3">Teléfono</th>
-                <th className="px-4 py-3">Estado</th>
-                <th className="px-4 py-3">Fecha</th>
-                <th className="px-4 py-3 text-right">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {profiles.map((p) => (
-                <tr key={p.id} className="border-t border-border/40">
-                  <td className="px-4 py-3 font-medium">{p.full_name ?? "—"}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{p.phone ?? "—"}</td>
-                  <td className="px-4 py-3">
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${statusChip(p.status)}`}>
-                      {p.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</td>
-                  <td className="px-4 py-3 text-right">
-                    {p.status !== "approved" && (
-                      <Button size="sm" onClick={() => setStatus(p.id, "approved")} className="hive-btn-primary mr-2 h-8 border-0">
-                        <Check className="mr-1 h-3 w-3" /> Aprobar
-                      </Button>
-                    )}
-                    {p.status !== "blocked" && (
-                      <Button size="sm" variant="ghost" onClick={() => setStatus(p.id, "blocked")} className="h-8 border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20">
-                        <Ban className="mr-1 h-3 w-3" /> Bloquear
-                      </Button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+        <TabsContent value="overview"><Overview /></TabsContent>
+        <TabsContent value="products"><ProductsTab /></TabsContent>
+        <TabsContent value="categories"><CategoriesTab /></TabsContent>
+        <TabsContent value="users"><UsersTab /></TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+/* ─────────────── OVERVIEW ─────────────── */
+function Overview() {
+  const { data: stats } = useQuery({
+    queryKey: ["admin-stats"],
+    queryFn: async () => {
+      const [{ count: profilesCount }, { count: pendingCount }, { count: products }, { count: orders }] = await Promise.all([
+        supabase.from("profiles").select("*", { count: "exact", head: true }),
+        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("status", "pending"),
+        supabase.from("products").select("*", { count: "exact", head: true }),
+        supabase.from("orders").select("*", { count: "exact", head: true }),
+      ]);
+      return { profiles: profilesCount ?? 0, pending: pendingCount ?? 0, products: products ?? 0, orders: orders ?? 0 };
+    },
+  });
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-4">
+      <Metric icon={Users} label="Impulsadores" value={stats?.profiles ?? 0} accent="text-hive" />
+      <Metric icon={Users} label="Pendientes" value={stats?.pending ?? 0} accent="text-anma-orange" />
+      <Metric icon={ShoppingBag} label="Productos" value={stats?.products ?? 0} accent="text-ao-red" />
+      <Metric icon={BarChart3} label="Pedidos" value={stats?.orders ?? 0} accent="text-hive" />
     </div>
   );
 }
@@ -134,8 +111,478 @@ function Metric({ icon: Icon, label, value, accent }: { icon: any; label: string
   );
 }
 
+/* ─────────────── USERS ─────────────── */
+function UsersTab() {
+  const qc = useQueryClient();
+  const { data: profiles = [] } = useQuery({
+    queryKey: ["admin-profiles"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as ProfileRow[];
+    },
+  });
+
+  const setStatus = async (id: string, status: "approved" | "blocked" | "pending") => {
+    const { error } = await supabase.from("profiles").update({ status }).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Estado actualizado");
+    qc.invalidateQueries({ queryKey: ["admin-profiles"] });
+  };
+
+  return (
+    <div className="hive-card overflow-hidden">
+      <table className="w-full text-sm">
+        <thead className="bg-white/5 text-left text-xs uppercase tracking-wider text-muted-foreground">
+          <tr>
+            <th className="px-4 py-3">Nombre</th>
+            <th className="px-4 py-3">Teléfono</th>
+            <th className="px-4 py-3">Estado</th>
+            <th className="px-4 py-3">Fecha</th>
+            <th className="px-4 py-3 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {profiles.map((p) => (
+            <tr key={p.id} className="border-t border-border/40">
+              <td className="px-4 py-3 font-medium">{p.full_name ?? "—"}</td>
+              <td className="px-4 py-3 text-muted-foreground">{p.phone ?? "—"}</td>
+              <td className="px-4 py-3">
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${statusChip(p.status)}`}>
+                  {p.status}
+                </span>
+              </td>
+              <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</td>
+              <td className="px-4 py-3 text-right">
+                {p.status !== "approved" && (
+                  <Button size="sm" onClick={() => setStatus(p.id, "approved")} className="hive-btn-primary mr-2 h-8 border-0">
+                    <Check className="mr-1 h-3 w-3" /> Aprobar
+                  </Button>
+                )}
+                {p.status !== "blocked" && (
+                  <Button size="sm" variant="ghost" onClick={() => setStatus(p.id, "blocked")} className="h-8 border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20">
+                    <Ban className="mr-1 h-3 w-3" /> Bloquear
+                  </Button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function statusChip(s: string) {
   if (s === "approved") return "bg-hive/15 text-hive";
   if (s === "blocked") return "bg-destructive/15 text-destructive";
   return "bg-anma-orange/15 text-anma-orange";
+}
+
+/* ─────────────── CATEGORIES ─────────────── */
+function CategoriesTab() {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [edit, setEdit] = useState<Category | null>(null);
+
+  const { data: cats = [] } = useQuery({
+    queryKey: ["admin-categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("categories").select("*").order("sort_order");
+      if (error) throw error;
+      return data as Category[];
+    },
+  });
+
+  const remove = async (id: string) => {
+    if (!confirm("¿Eliminar esta categoría?")) return;
+    const { error } = await supabase.from("categories").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Categoría eliminada");
+    qc.invalidateQueries({ queryKey: ["admin-categories"] });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button onClick={() => { setEdit(null); setOpen(true); }} className="hive-btn-primary border-0">
+          <Plus className="mr-1 h-4 w-4" /> Nueva categoría
+        </Button>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {cats.map((c) => (
+          <div key={c.id} className="hive-card p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="font-display text-lg font-bold">{c.name}</p>
+                <p className="text-xs text-muted-foreground">/{c.slug}</p>
+              </div>
+              <div className="flex gap-1">
+                <Button size="icon" variant="ghost" onClick={() => { setEdit(c); setOpen(true); }} className="h-7 w-7">
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+                <Button size="icon" variant="ghost" onClick={() => remove(c.id)} className="h-7 w-7 text-destructive">
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+            {c.description && <p className="mt-2 text-xs text-muted-foreground line-clamp-2">{c.description}</p>}
+          </div>
+        ))}
+      </div>
+
+      <CategoryDialog open={open} onOpenChange={setOpen} category={edit} />
+    </div>
+  );
+}
+
+function CategoryDialog({ open, onOpenChange, category }: { open: boolean; onOpenChange: (o: boolean) => void; category: Category | null }) {
+  const qc = useQueryClient();
+  const [form, setForm] = useState({ name: "", slug: "", description: "", color: "green", icon: "", sort_order: 0 });
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setForm(category
+        ? { name: category.name, slug: category.slug, description: category.description ?? "", color: category.color ?? "green", icon: category.icon ?? "", sort_order: category.sort_order ?? 0 }
+        : { name: "", slug: "", description: "", color: "green", icon: "", sort_order: 0 });
+    }
+  }, [open, category]);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    const payload = { ...form, slug: form.slug || slugify(form.name) };
+    const { error } = category
+      ? await supabase.from("categories").update(payload).eq("id", category.id)
+      : await supabase.from("categories").insert(payload);
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(category ? "Categoría actualizada" : "Categoría creada");
+    qc.invalidateQueries({ queryKey: ["admin-categories"] });
+    onOpenChange(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-surface-elevated border-border/60">
+        <DialogHeader><DialogTitle>{category ? "Editar" : "Nueva"} categoría</DialogTitle></DialogHeader>
+        <form onSubmit={submit} className="space-y-3">
+          <div><Label>Nombre</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value, slug: form.slug || slugify(e.target.value) })} className="bg-white/5" /></div>
+          <div><Label>Slug</Label><Input value={form.slug} onChange={(e) => setForm({ ...form, slug: slugify(e.target.value) })} className="bg-white/5" /></div>
+          <div><Label>Descripción</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="bg-white/5" /></div>
+          <div className="grid grid-cols-3 gap-3">
+            <div><Label>Color</Label><Input value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="bg-white/5" /></div>
+            <div><Label>Icono</Label><Input value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} className="bg-white/5" /></div>
+            <div><Label>Orden</Label><Input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: Number(e.target.value) })} className="bg-white/5" /></div>
+          </div>
+          <DialogFooter>
+            <Button type="submit" disabled={busy} className="hive-btn-primary border-0">
+              {busy && <Loader2 className="mr-1 h-4 w-4 animate-spin" />} Guardar
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ─────────────── PRODUCTS ─────────────── */
+function ProductsTab() {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [edit, setEdit] = useState<Product | null>(null);
+
+  const { data: products = [] } = useQuery({
+    queryKey: ["admin-products"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []).map((p: any) => ({
+        ...p,
+        benefits: Array.isArray(p.benefits) ? p.benefits : [],
+        images: Array.isArray(p.images) ? p.images : [],
+        funnel_sections: Array.isArray(p.funnel_sections) ? p.funnel_sections : [],
+      })) as Product[];
+    },
+  });
+
+  const { data: cats = [] } = useQuery({
+    queryKey: ["admin-categories"],
+    queryFn: async () => {
+      const { data } = await supabase.from("categories").select("*").order("sort_order");
+      return (data ?? []) as Category[];
+    },
+  });
+
+  const remove = async (p: Product) => {
+    if (!confirm(`¿Eliminar "${p.name}"? Esto no se puede deshacer.`)) return;
+    const { error } = await supabase.from("products").delete().eq("id", p.id);
+    if (error) return toast.error(error.message);
+    toast.success("Producto eliminado");
+    qc.invalidateQueries({ queryKey: ["admin-products"] });
+  };
+
+  const toggleActive = async (p: Product) => {
+    const { error } = await supabase.from("products").update({ is_active: !p.is_active }).eq("id", p.id);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["admin-products"] });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button onClick={() => { setEdit(null); setOpen(true); }} className="hive-btn-primary border-0">
+          <Plus className="mr-1 h-4 w-4" /> Nuevo producto
+        </Button>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {products.map((p) => (
+          <div key={p.id} className="hive-card overflow-hidden">
+            <div className="aspect-video bg-gradient-to-br from-hive/20 to-ao-red/10 relative">
+              {p.images[0] ? (
+                <img src={p.images[0]} alt={p.name} className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full items-center justify-center font-display text-5xl font-black opacity-30">{p.name.charAt(0)}</div>
+              )}
+              {!p.is_active && (
+                <div className="absolute top-2 left-2 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-bold uppercase">Inactivo</div>
+              )}
+            </div>
+            <div className="p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="font-display text-base font-bold truncate">{p.name}</p>
+                  <p className="text-xs text-muted-foreground truncate">S/ {Number(p.price).toFixed(2)} · /{p.slug}</p>
+                </div>
+                <Switch checked={p.is_active} onCheckedChange={() => toggleActive(p)} />
+              </div>
+              <div className="mt-3 flex flex-wrap gap-1">
+                {p.is_featured && <Tag2 label="Destacado" />}
+                {p.is_new && <Tag2 label="Nuevo" />}
+                {p.is_bestseller && <Tag2 label="Bestseller" />}
+                {p.is_trending && <Tag2 label="Trending" />}
+              </div>
+              <div className="mt-3 flex gap-1">
+                <Button size="sm" variant="ghost" onClick={() => { setEdit(p); setOpen(true); }} className="h-8 flex-1 border border-border/60">
+                  <Pencil className="mr-1 h-3 w-3" /> Editar
+                </Button>
+                <Button size="icon" variant="ghost" onClick={() => remove(p)} className="h-8 w-8 text-destructive border border-destructive/30">
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <ProductDialog open={open} onOpenChange={setOpen} product={edit} categories={cats} />
+    </div>
+  );
+}
+
+function Tag2({ label }: { label: string }) {
+  return <span className="rounded-full bg-hive/15 px-2 py-0.5 text-[10px] font-semibold text-hive">{label}</span>;
+}
+
+function ProductDialog({ open, onOpenChange, product, categories }: {
+  open: boolean; onOpenChange: (o: boolean) => void; product: Product | null; categories: Category[];
+}) {
+  const qc = useQueryClient();
+  const [busy, setBusy] = useState(false);
+  const empty: Product = {
+    id: "", slug: "", name: "", category_id: null, price: 0, upsell_price: null,
+    short_description: "", description: "", benefits: [], images: [], funnel_sections: [],
+    cta_label: "Pedir ahora",
+    is_active: true, is_featured: false, is_new: false, is_bestseller: false, is_recommended: false, is_trending: false,
+  };
+  const [form, setForm] = useState<Product>(empty);
+  const [benefitsText, setBenefitsText] = useState("");
+
+  useEffect(() => {
+    if (open) {
+      const p = product ?? empty;
+      setForm(p);
+      setBenefitsText((p.benefits ?? []).join("\n"));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, product]);
+
+  const update = <K extends keyof Product>(k: K, v: Product[K]) => setForm((f) => ({ ...f, [k]: v }));
+
+  const addFunnel = () => update("funnel_sections", [...form.funnel_sections, { title: "", content: "", image: "" }]);
+  const updateFunnel = (i: number, patch: Partial<FunnelSection>) => {
+    const next = [...form.funnel_sections];
+    next[i] = { ...next[i], ...patch };
+    update("funnel_sections", next);
+  };
+  const removeFunnel = (i: number) => update("funnel_sections", form.funnel_sections.filter((_, idx) => idx !== i));
+  const moveFunnel = (i: number, dir: -1 | 1) => {
+    const j = i + dir;
+    if (j < 0 || j >= form.funnel_sections.length) return;
+    const next = [...form.funnel_sections];
+    [next[i], next[j]] = [next[j], next[i]];
+    update("funnel_sections", next);
+  };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    const payload = {
+      slug: form.slug || slugify(form.name),
+      name: form.name,
+      category_id: form.category_id,
+      price: form.price,
+      upsell_price: form.upsell_price,
+      short_description: form.short_description,
+      description: form.description,
+      benefits: benefitsText.split("\n").map((s) => s.trim()).filter(Boolean),
+      images: form.images as any,
+      funnel_sections: form.funnel_sections as any,
+      cta_label: form.cta_label,
+      is_active: form.is_active,
+      is_featured: form.is_featured,
+      is_new: form.is_new,
+      is_bestseller: form.is_bestseller,
+      is_recommended: form.is_recommended,
+      is_trending: form.is_trending,
+    };
+    const { error } = product
+      ? await supabase.from("products").update(payload).eq("id", product.id)
+      : await supabase.from("products").insert(payload);
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(product ? "Producto actualizado" : "Producto creado");
+    qc.invalidateQueries({ queryKey: ["admin-products"] });
+    onOpenChange(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-surface-elevated border-border/60 max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader><DialogTitle>{product ? "Editar producto" : "Nuevo producto"}</DialogTitle></DialogHeader>
+        <form onSubmit={submit} className="space-y-5">
+          {/* Básico */}
+          <section className="space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-hive">Información básica</h3>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <Label>Nombre</Label>
+                <Input required value={form.name} onChange={(e) => {
+                  update("name", e.target.value);
+                  if (!product && !form.slug) update("slug", slugify(e.target.value));
+                }} className="bg-white/5" />
+              </div>
+              <div><Label>Slug</Label><Input value={form.slug} onChange={(e) => update("slug", slugify(e.target.value))} className="bg-white/5" /></div>
+              <div>
+                <Label>Categoría</Label>
+                <Select value={form.category_id ?? "none"} onValueChange={(v) => update("category_id", v === "none" ? null : v)}>
+                  <SelectTrigger className="bg-white/5"><SelectValue placeholder="Seleccionar" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Sin categoría</SelectItem>
+                    {categories.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div><Label>Precio (S/)</Label><Input type="number" step="0.01" required value={form.price} onChange={(e) => update("price", Number(e.target.value))} className="bg-white/5" /></div>
+              <div><Label>Precio antes (S/)</Label><Input type="number" step="0.01" value={form.upsell_price ?? ""} onChange={(e) => update("upsell_price", e.target.value ? Number(e.target.value) : null)} className="bg-white/5" /></div>
+              <div className="sm:col-span-2"><Label>Descripción corta</Label><Input value={form.short_description ?? ""} onChange={(e) => update("short_description", e.target.value)} className="bg-white/5" /></div>
+              <div className="sm:col-span-2"><Label>Descripción completa</Label><Textarea rows={4} value={form.description ?? ""} onChange={(e) => update("description", e.target.value)} className="bg-white/5" /></div>
+              <div className="sm:col-span-2">
+                <Label>Beneficios (uno por línea)</Label>
+                <Textarea rows={4} value={benefitsText} onChange={(e) => setBenefitsText(e.target.value)} className="bg-white/5" placeholder="Ej: Resultados en 7 días" />
+              </div>
+              <div><Label>Texto CTA</Label><Input value={form.cta_label ?? ""} onChange={(e) => update("cta_label", e.target.value)} className="bg-white/5" /></div>
+            </div>
+          </section>
+
+          {/* Imágenes */}
+          <section className="space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-hive">Imágenes del producto</h3>
+            <ImageUploader
+              value={form.images}
+              onChange={(v) => update("images", v)}
+              folder={`products/${form.slug || "draft"}`}
+              label="Galería"
+            />
+          </section>
+
+          {/* Funnel */}
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-hive flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5" /> Secciones del funnel
+              </h3>
+              <Button type="button" size="sm" variant="ghost" onClick={addFunnel} className="h-7 border border-border/60">
+                <Plus className="mr-1 h-3 w-3" /> Sección
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Carga aquí las secciones e imágenes generadas por tu IA externa.</p>
+            <div className="space-y-3">
+              {form.funnel_sections.map((s, i) => (
+                <div key={i} className="rounded-lg border border-border/40 bg-white/5 p-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <GripVertical className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-xs font-bold text-muted-foreground">Sección {i + 1}</span>
+                    <div className="ml-auto flex gap-1">
+                      <Button type="button" size="icon" variant="ghost" className="h-6 w-6" onClick={() => moveFunnel(i, -1)}>↑</Button>
+                      <Button type="button" size="icon" variant="ghost" className="h-6 w-6" onClick={() => moveFunnel(i, 1)}>↓</Button>
+                      <Button type="button" size="icon" variant="ghost" className="h-6 w-6 text-destructive" onClick={() => removeFunnel(i)}>
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                  <Input placeholder="Título" value={s.title} onChange={(e) => updateFunnel(i, { title: e.target.value })} className="bg-background/60" />
+                  <Textarea placeholder="Contenido / copy" value={s.content} onChange={(e) => updateFunnel(i, { content: e.target.value })} className="bg-background/60" rows={3} />
+                  <ImageUploader
+                    value={s.image ? [s.image] : []}
+                    onChange={(v) => updateFunnel(i, { image: v[0] ?? "" })}
+                    folder={`products/${form.slug || "draft"}/funnel`}
+                    label="Imagen de sección"
+                    max={1}
+                  />
+                </div>
+              ))}
+              {form.funnel_sections.length === 0 && (
+                <p className="text-center text-xs text-muted-foreground py-6 border border-dashed border-border/40 rounded-lg">
+                  Sin secciones aún. Agrega la primera para construir tu funnel.
+                </p>
+              )}
+            </div>
+          </section>
+
+          {/* Flags */}
+          <section className="space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-hive">Visibilidad y etiquetas</h3>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <Flag label="Activo" v={form.is_active} on={(v) => update("is_active", v)} />
+              <Flag label="Destacado" v={form.is_featured} on={(v) => update("is_featured", v)} />
+              <Flag label="Nuevo" v={form.is_new} on={(v) => update("is_new", v)} />
+              <Flag label="Bestseller" v={form.is_bestseller} on={(v) => update("is_bestseller", v)} />
+              <Flag label="Recomendado" v={form.is_recommended} on={(v) => update("is_recommended", v)} />
+              <Flag label="Trending" v={form.is_trending} on={(v) => update("is_trending", v)} />
+            </div>
+          </section>
+
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
+            <Button type="submit" disabled={busy} className="hive-btn-primary border-0">
+              {busy && <Loader2 className="mr-1 h-4 w-4 animate-spin" />} Guardar producto
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function Flag({ label, v, on }: { label: string; v: boolean; on: (v: boolean) => void }) {
+  return (
+    <label className="flex items-center justify-between gap-2 rounded-md border border-border/40 bg-white/5 px-3 py-2 cursor-pointer">
+      <span className="text-xs font-medium">{label}</span>
+      <Switch checked={v} onCheckedChange={on} />
+    </label>
+  );
 }
