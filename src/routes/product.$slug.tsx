@@ -119,29 +119,38 @@ function ProductFunnel() {
 
       {/* Dynamic funnel sections from admin */}
       {funnel.length > 0 && (
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 space-y-16 py-8">
-          {funnel.map((s, i) => (
-            <section key={i} className={`grid gap-8 items-center ${s.image ? "lg:grid-cols-2" : ""}`}>
-              {s.image && (
-                <div className={`${i % 2 === 1 ? "lg:order-2" : ""} overflow-hidden rounded-2xl hive-gradient-border`}>
-                  <img src={s.image} alt={s.title} className="w-full h-auto object-cover" />
+        <div className="mx-auto max-w-5xl space-y-10 px-4 py-8 sm:px-6">
+          {funnel.map((s, i) => {
+            const imageOnly = Boolean(s.image && !s.content?.trim());
+            return imageOnly ? (
+              <section key={i} className="overflow-hidden rounded-2xl hive-gradient-border bg-surface-elevated/40">
+                {s.title && <h2 className="px-4 pt-4 text-xs font-bold uppercase tracking-wider text-hive sm:px-5">{s.title}</h2>}
+                <img src={s.image} alt={s.title || product.name} className="h-auto w-full object-contain" />
+              </section>
+            ) : (
+              <section key={i} className={`grid items-center gap-8 ${s.image ? "lg:grid-cols-2" : ""}`}>
+                {s.image && (
+                  <div className={`${i % 2 === 1 ? "lg:order-2" : ""} overflow-hidden rounded-2xl hive-gradient-border`}>
+                    <img src={s.image} alt={s.title || product.name} className="h-auto w-full object-contain" />
+                  </div>
+                )}
+                <div>
+                  {s.title && <h2 className="font-display text-3xl font-bold sm:text-4xl">{s.title}</h2>}
+                  {s.content && <p className="mt-4 whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{s.content}</p>}
                 </div>
-              )}
-              <div>
-                {s.title && <h2 className="font-display text-3xl sm:text-4xl font-bold">{s.title}</h2>}
-                {s.content && <p className="mt-4 text-lg leading-relaxed text-muted-foreground whitespace-pre-line">{s.content}</p>}
-              </div>
-            </section>
-          ))}
+              </section>
+            );
+          })}
         </div>
       )}
 
-      {/* Story */}
-      <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
-        <Sparkles className="mx-auto h-8 w-8 text-anma-orange" />
-        <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">La historia detrás de {product.name}</h2>
-        <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{product.description}</p>
-      </section>
+      {funnel.length === 0 && product.description && (
+        <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
+          <Sparkles className="mx-auto h-8 w-8 text-anma-orange" />
+          <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">La historia detrás de {product.name}</h2>
+          <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{product.description}</p>
+        </section>
+      )}
 
       {/* Scarcity / Offer */}
       <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
