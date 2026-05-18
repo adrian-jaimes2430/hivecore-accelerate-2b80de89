@@ -57,9 +57,13 @@ function ProductFunnel() {
           <div className="relative">
             <div className="hive-gradient-border relative mx-auto aspect-[3/4] max-w-md overflow-hidden rounded-3xl bg-gradient-to-br from-hive/30 via-ao-red/10 to-anma-orange/20">
               <div className="absolute inset-0 hive-grid-bg opacity-40" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-display text-[140px] font-black opacity-25">{product.name.charAt(0)}</span>
-              </div>
+              {heroImage ? (
+                <img src={heroImage} alt={product.name} className="absolute inset-0 h-full w-full object-cover" />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="font-display text-[140px] font-black opacity-25">{product.name.charAt(0)}</span>
+                </div>
+              )}
               <div className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-ao-red/90 px-3 py-1 text-xs font-bold text-white">
                 <Flame className="h-3 w-3" /> OFERTA LIMITADA
               </div>
