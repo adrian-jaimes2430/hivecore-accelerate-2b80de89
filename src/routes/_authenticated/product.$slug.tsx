@@ -15,10 +15,11 @@ export const Route = createFileRoute("/_authenticated/product/$slug")({
   component: ProductFunnel,
 });
 
+interface FunnelSection { title: string; content: string; image?: string }
 interface Product {
   id: string; slug: string; name: string; price: number; upsell_price: number | null;
   short_description: string | null; description: string | null;
-  benefits: unknown; images: unknown; cta_label: string | null;
+  benefits: unknown; images: unknown; funnel_sections: unknown; cta_label: string | null;
 }
 
 function ProductFunnel() {
