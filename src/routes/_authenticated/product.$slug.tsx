@@ -38,6 +38,9 @@ function ProductFunnel() {
     return <div className="flex min-h-[60vh] items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-hive" /></div>;
   }
   const benefits = Array.isArray(product.benefits) ? product.benefits as string[] : [];
+  const images = Array.isArray(product.images) ? product.images as string[] : [];
+  const funnel = Array.isArray(product.funnel_sections) ? product.funnel_sections as FunnelSection[] : [];
+  const heroImage = images[0];
 
   return (
     <div>
