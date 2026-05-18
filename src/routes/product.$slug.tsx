@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Check, Share2, Mail, MessageCircle, Link as LinkIcon, ShoppingBag, Flame, ArrowLeft, Lock, Loader2 } from "lucide-react";
+import { Check, Share2, Mail, MessageCircle, Link as LinkIcon, ShoppingBag, Flame, ArrowLeft, Lock, Sparkles, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/product/$slug")({
   component: ProductFunnel,
@@ -156,12 +156,20 @@ function ProductFunnel() {
             )}
           </div>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <OrderDialog product={product} />
+            {user ? <OrderDialog product={product} /> : <LoginCTA />}
             <ShareDialog product={product} />
           </div>
         </div>
       </section>
     </div>
+  );
+}
+
+function LoginCTA() {
+  return (
+    <Button disabled className="h-12 border border-border/60 bg-white/5 px-6 text-base text-muted-foreground opacity-100">
+      <Lock className="mr-2 h-4 w-4" /> Pedido gestionado por tu impulsador
+    </Button>
   );
 }
 
