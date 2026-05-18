@@ -456,6 +456,8 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
     if (error) return toast.error(error.message);
     toast.success(product ? "Producto actualizado" : "Producto creado");
     qc.invalidateQueries({ queryKey: ["admin-products"] });
+    qc.invalidateQueries({ queryKey: ["products"] });
+    qc.invalidateQueries({ queryKey: ["product", payload.slug] });
     onOpenChange(false);
   };
 
