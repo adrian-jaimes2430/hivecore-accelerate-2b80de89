@@ -107,6 +107,25 @@ function ProductFunnel() {
         </div>
       </section>
 
+      {/* Dynamic funnel sections from admin */}
+      {funnel.length > 0 && (
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 space-y-16 py-8">
+          {funnel.map((s, i) => (
+            <section key={i} className={`grid gap-8 items-center ${s.image ? "lg:grid-cols-2" : ""}`}>
+              {s.image && (
+                <div className={`${i % 2 === 1 ? "lg:order-2" : ""} overflow-hidden rounded-2xl hive-gradient-border`}>
+                  <img src={s.image} alt={s.title} className="w-full h-auto object-cover" />
+                </div>
+              )}
+              <div>
+                {s.title && <h2 className="font-display text-3xl sm:text-4xl font-bold">{s.title}</h2>}
+                {s.content && <p className="mt-4 text-lg leading-relaxed text-muted-foreground whitespace-pre-line">{s.content}</p>}
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
+
       {/* Story */}
       <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
         <Sparkles className="mx-auto h-8 w-8 text-anma-orange" />
