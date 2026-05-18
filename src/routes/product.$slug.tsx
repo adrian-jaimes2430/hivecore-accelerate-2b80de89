@@ -9,9 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Check, Share2, Mail, MessageCircle, Link as LinkIcon, ShoppingBag, Flame, ArrowLeft, Sparkles, Loader2 } from "lucide-react";
+import { Check, Share2, Mail, MessageCircle, Link as LinkIcon, ShoppingBag, Flame, ArrowLeft, Lock, Sparkles, Loader2 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/product/$slug")({
+export const Route = createFileRoute("/product/$slug")({
   component: ProductFunnel,
 });
 
@@ -24,10 +24,11 @@ interface Product {
 
 function ProductFunnel() {
   const { slug } = Route.useParams();
+  const { user } = useAuth();
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", slug],
     queryFn: async () => {
-      const { data, error } = await supabase.from("products").select("*").eq("slug", slug).maybeSingle();
+      const { data, error } = await supabase.from("products").select("*").eq("slug", slug).eq("is_active", true).maybeSingle();
       if (error) throw error;
       if (!data) throw notFound();
       return data as Product;
@@ -39,15 +40,23 @@ function ProductFunnel() {
   }
   const benefits = Array.isArray(product.benefits) ? product.benefits as string[] : [];
   const images = Array.isArray(product.images) ? product.images as string[] : [];
-  const funnel = Array.isArray(product.funnel_sections) ? product.funnel_sections as FunnelSection[] : [];
-  const heroImage = images[0];
+  const funnel = Array.isArray(product.funnel_sections)
+    ? (product.funnel_sections as FunnelSection[]).filter((s) => s.title || s.content || s.image)
+    : [];
+  const heroImage = funnel.find((s) => s.image)?.image ?? images[0];
 
   return (
     <div>
       <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
-        <Link to="/app" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> Volver al catálogo
-        </Link>
+        {user ? (
+          <Link to="/app" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="h-4 w-4" /> Volver al catálogo
+          </Link>
+        ) : (
+          <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+            <Lock className="h-4 w-4" /> Funnel público HIVECORE
+          </div>
+        )}
       </div>
 
       {/* HERO */}
@@ -84,54 +93,64 @@ function ProductFunnel() {
             <p className="mt-1 text-xs text-anma-orange">⚡ Solo quedan pocas unidades disponibles</p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <OrderDialog product={product} />
+              {user ? <OrderDialog product={product} /> : <LoginCTA />}
               <ShareDialog product={product} />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Benefits */}
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <p className="text-sm font-medium uppercase tracking-wider text-hive">Beneficios</p>
-        <h2 className="mt-2 font-display text-4xl font-bold">¿Por qué elegir {product.name}?</h2>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2">
-          {benefits.map((b, i) => (
-            <div key={i} className="hive-card flex items-start gap-3 p-5">
-              <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-hive/15 text-hive">
-                <Check className="h-4 w-4" />
+      {benefits.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <p className="text-sm font-medium uppercase tracking-wider text-hive">Beneficios</p>
+          <h2 className="mt-2 font-display text-4xl font-bold">¿Por qué elegir {product.name}?</h2>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+            {benefits.map((b, i) => (
+              <div key={i} className="hive-card flex items-start gap-3 p-5">
+                <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-hive/15 text-hive">
+                  <Check className="h-4 w-4" />
+                </div>
+                <p className="text-sm">{b}</p>
               </div>
-              <p className="text-sm">{b}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Dynamic funnel sections from admin */}
       {funnel.length > 0 && (
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 space-y-16 py-8">
-          {funnel.map((s, i) => (
-            <section key={i} className={`grid gap-8 items-center ${s.image ? "lg:grid-cols-2" : ""}`}>
-              {s.image && (
-                <div className={`${i % 2 === 1 ? "lg:order-2" : ""} overflow-hidden rounded-2xl hive-gradient-border`}>
-                  <img src={s.image} alt={s.title} className="w-full h-auto object-cover" />
+        <div className="mx-auto max-w-5xl space-y-10 px-4 py-8 sm:px-6">
+          {funnel.map((s, i) => {
+            const imageOnly = Boolean(s.image && !s.content?.trim());
+            return imageOnly ? (
+              <section key={i} className="overflow-hidden rounded-2xl hive-gradient-border bg-surface-elevated/40">
+                {s.title && <h2 className="px-4 pt-4 text-xs font-bold uppercase tracking-wider text-hive sm:px-5">{s.title}</h2>}
+                <img src={s.image} alt={s.title || product.name} className="h-auto w-full object-contain" />
+              </section>
+            ) : (
+              <section key={i} className={`grid items-center gap-8 ${s.image ? "lg:grid-cols-2" : ""}`}>
+                {s.image && (
+                  <div className={`${i % 2 === 1 ? "lg:order-2" : ""} overflow-hidden rounded-2xl hive-gradient-border`}>
+                    <img src={s.image} alt={s.title || product.name} className="h-auto w-full object-contain" />
+                  </div>
+                )}
+                <div>
+                  {s.title && <h2 className="font-display text-3xl font-bold sm:text-4xl">{s.title}</h2>}
+                  {s.content && <p className="mt-4 whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{s.content}</p>}
                 </div>
-              )}
-              <div>
-                {s.title && <h2 className="font-display text-3xl sm:text-4xl font-bold">{s.title}</h2>}
-                {s.content && <p className="mt-4 text-lg leading-relaxed text-muted-foreground whitespace-pre-line">{s.content}</p>}
-              </div>
-            </section>
-          ))}
+              </section>
+            );
+          })}
         </div>
       )}
 
-      {/* Story */}
-      <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
-        <Sparkles className="mx-auto h-8 w-8 text-anma-orange" />
-        <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">La historia detrás de {product.name}</h2>
-        <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{product.description}</p>
-      </section>
+      {funnel.length === 0 && product.description && (
+        <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
+          <Sparkles className="mx-auto h-8 w-8 text-anma-orange" />
+          <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">La historia detrás de {product.name}</h2>
+          <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{product.description}</p>
+        </section>
+      )}
 
       {/* Scarcity / Offer */}
       <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
@@ -146,12 +165,20 @@ function ProductFunnel() {
             )}
           </div>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <OrderDialog product={product} />
+            {user ? <OrderDialog product={product} /> : <LoginCTA />}
             <ShareDialog product={product} />
           </div>
         </div>
       </section>
     </div>
+  );
+}
+
+function LoginCTA() {
+  return (
+    <Button disabled className="h-12 border border-border/60 bg-white/5 px-6 text-base text-muted-foreground opacity-100">
+      <Lock className="mr-2 h-4 w-4" /> Pedido gestionado por tu impulsador
+    </Button>
   );
 }
 
