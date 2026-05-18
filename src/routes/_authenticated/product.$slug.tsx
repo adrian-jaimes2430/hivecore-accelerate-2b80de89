@@ -15,10 +15,11 @@ export const Route = createFileRoute("/_authenticated/product/$slug")({
   component: ProductFunnel,
 });
 
+interface FunnelSection { title: string; content: string; image?: string }
 interface Product {
   id: string; slug: string; name: string; price: number; upsell_price: number | null;
   short_description: string | null; description: string | null;
-  benefits: unknown; images: unknown; cta_label: string | null;
+  benefits: unknown; images: unknown; funnel_sections: unknown; cta_label: string | null;
 }
 
 function ProductFunnel() {
@@ -37,6 +38,9 @@ function ProductFunnel() {
     return <div className="flex min-h-[60vh] items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-hive" /></div>;
   }
   const benefits = Array.isArray(product.benefits) ? product.benefits as string[] : [];
+  const images = Array.isArray(product.images) ? product.images as string[] : [];
+  const funnel = Array.isArray(product.funnel_sections) ? product.funnel_sections as FunnelSection[] : [];
+  const heroImage = images[0];
 
   return (
     <div>
@@ -53,9 +57,13 @@ function ProductFunnel() {
           <div className="relative">
             <div className="hive-gradient-border relative mx-auto aspect-[3/4] max-w-md overflow-hidden rounded-3xl bg-gradient-to-br from-hive/30 via-ao-red/10 to-anma-orange/20">
               <div className="absolute inset-0 hive-grid-bg opacity-40" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-display text-[140px] font-black opacity-25">{product.name.charAt(0)}</span>
-              </div>
+              {heroImage ? (
+                <img src={heroImage} alt={product.name} className="absolute inset-0 h-full w-full object-cover" />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="font-display text-[140px] font-black opacity-25">{product.name.charAt(0)}</span>
+                </div>
+              )}
               <div className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-ao-red/90 px-3 py-1 text-xs font-bold text-white">
                 <Flame className="h-3 w-3" /> OFERTA LIMITADA
               </div>
@@ -98,6 +106,25 @@ function ProductFunnel() {
           ))}
         </div>
       </section>
+
+      {/* Dynamic funnel sections from admin */}
+      {funnel.length > 0 && (
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 space-y-16 py-8">
+          {funnel.map((s, i) => (
+            <section key={i} className={`grid gap-8 items-center ${s.image ? "lg:grid-cols-2" : ""}`}>
+              {s.image && (
+                <div className={`${i % 2 === 1 ? "lg:order-2" : ""} overflow-hidden rounded-2xl hive-gradient-border`}>
+                  <img src={s.image} alt={s.title} className="w-full h-auto object-cover" />
+                </div>
+              )}
+              <div>
+                {s.title && <h2 className="font-display text-3xl sm:text-4xl font-bold">{s.title}</h2>}
+                {s.content && <p className="mt-4 text-lg leading-relaxed text-muted-foreground whitespace-pre-line">{s.content}</p>}
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
 
       {/* Story */}
       <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
