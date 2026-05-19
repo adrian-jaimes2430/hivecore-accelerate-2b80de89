@@ -43,7 +43,8 @@ function ProductFunnel() {
   const funnel = Array.isArray(product.funnel_sections)
     ? (product.funnel_sections as FunnelSection[]).filter((s) => s.title || s.content || s.image)
     : [];
-  const heroImage = funnel.find((s) => s.image)?.image ?? images[0];
+  const heroImage = images[0];
+
 
   return (
     <div>
@@ -117,31 +118,31 @@ function ProductFunnel() {
         </section>
       )}
 
-      {/* Dynamic funnel sections from admin */}
+      {/* Dynamic funnel sections from admin - continuous flow */}
       {funnel.length > 0 && (
-        <div className="mx-auto max-w-5xl space-y-10 px-4 py-8 sm:px-6">
+        <div className="mx-auto max-w-3xl px-0 sm:px-6">
           {funnel.map((s, i) => {
             const imageOnly = Boolean(s.image && !s.content?.trim());
             return imageOnly ? (
-              <section key={i} className="overflow-hidden rounded-2xl hive-gradient-border bg-surface-elevated/40">
-                {s.title && <h2 className="px-4 pt-4 text-xs font-bold uppercase tracking-wider text-hive sm:px-5">{s.title}</h2>}
-                <img src={s.image} alt={s.title || product.name} className="h-auto w-full object-contain" />
-              </section>
+              <img
+                key={i}
+                src={s.image}
+                alt={product.name}
+                className="block h-auto w-full object-contain"
+              />
             ) : (
-              <section key={i} className={`grid items-center gap-8 ${s.image ? "lg:grid-cols-2" : ""}`}>
+              <section key={i} className="px-4 py-8 sm:px-0">
                 {s.image && (
-                  <div className={`${i % 2 === 1 ? "lg:order-2" : ""} overflow-hidden rounded-2xl hive-gradient-border`}>
-                    <img src={s.image} alt={s.title || product.name} className="h-auto w-full object-contain" />
-                  </div>
+                  <img src={s.image} alt={product.name} className="mb-6 block h-auto w-full object-contain" />
                 )}
-                <div>
-                  {s.title && <h2 className="font-display text-3xl font-bold sm:text-4xl">{s.title}</h2>}
-                  {s.content && <p className="mt-4 whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{s.content}</p>}
-                </div>
+                {s.content && (
+                  <p className="whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{s.content}</p>
+                )}
               </section>
             );
           })}
         </div>
+
       )}
 
       {funnel.length === 0 && product.description && (
