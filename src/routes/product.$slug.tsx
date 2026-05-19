@@ -43,7 +43,8 @@ function ProductFunnel() {
   const funnel = Array.isArray(product.funnel_sections)
     ? (product.funnel_sections as FunnelSection[]).filter((s) => s.title || s.content || s.image)
     : [];
-  const heroImage = funnel.find((s) => s.image)?.image ?? images[0];
+  const heroImage = images[0];
+
 
   return (
     <div>
