@@ -597,3 +597,172 @@ function Flag({ label, v, on }: { label: string; v: boolean; on: (v: boolean) =>
     </label>
   );
 }
+
+/* ─────────────── ORDERS ─────────────── */
+interface OrderRow {
+  id: string; order_code: string; client_name: string; client_phone: string;
+  client_address: string | null; notes: string | null; quantity: number;
+  total: number | null; status: string; created_at: string;
+  product_id: string | null;
+  products?: { name: string; sku: string } | null;
+}
+
+function OrdersTab() {
+  const qc = useQueryClient();
+  const [editOrder, setEditOrder] = useState<OrderRow | null>(null);
+
+  const { data: orders = [], isLoading } = useQuery({
+    queryKey: ["admin-orders"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("*, products(name, sku)")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as unknown as OrderRow[];
+    },
+  });
+
+  const remove = async (o: OrderRow) => {
+    if (!confirm(`¿Eliminar pedido ${o.order_code}? Esta acción no se puede deshacer.`)) return;
+    const { error } = await supabase.from("orders").delete().eq("id", o.id);
+    if (error) return toast.error(error.message);
+    toast.success("Pedido eliminado");
+    qc.invalidateQueries({ queryKey: ["admin-orders"] });
+    qc.invalidateQueries({ queryKey: ["orders"] });
+  };
+
+  const updateStatus = async (o: OrderRow, status: string) => {
+    const { error } = await supabase.from("orders").update({ status: status as any }).eq("id", o.id);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["admin-orders"] });
+    qc.invalidateQueries({ queryKey: ["orders"] });
+  };
+
+  if (isLoading) {
+    return <div className="flex h-40 items-center justify-center"><Loader2 className="h-5 w-5 animate-spin text-hive" /></div>;
+  }
+
+  return (
+    <div className="hive-card overflow-x-auto">
+      <table className="w-full text-sm min-w-[900px]">
+        <thead className="bg-white/5 text-left text-xs uppercase tracking-wider text-muted-foreground">
+          <tr>
+            <th className="px-4 py-3">Código</th>
+            <th className="px-4 py-3">Producto / SKU</th>
+            <th className="px-4 py-3">Cliente</th>
+            <th className="px-4 py-3">Teléfono</th>
+            <th className="px-4 py-3">Cant.</th>
+            <th className="px-4 py-3">Total</th>
+            <th className="px-4 py-3">Estado</th>
+            <th className="px-4 py-3">Fecha</th>
+            <th className="px-4 py-3 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders.map((o) => (
+            <tr key={o.id} className="border-t border-border/40">
+              <td className="px-4 py-3 font-mono text-xs font-bold text-hive">{o.order_code}</td>
+              <td className="px-4 py-3">
+                <div className="font-medium">{o.products?.name ?? "—"}</div>
+                <div className="text-[10px] font-mono text-muted-foreground">{o.products?.sku ?? "—"}</div>
+              </td>
+              <td className="px-4 py-3">{o.client_name}</td>
+              <td className="px-4 py-3 text-muted-foreground">{o.client_phone}</td>
+              <td className="px-4 py-3">{o.quantity}</td>
+              <td className="px-4 py-3">S/ {Number(o.total ?? 0).toFixed(2)}</td>
+              <td className="px-4 py-3">
+                <Select value={o.status} onValueChange={(v) => updateStatus(o, v)}>
+                  <SelectTrigger className="h-7 w-32 bg-white/5 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="confirmed">Confirmed</SelectItem>
+                    <SelectItem value="shipped">Shipped</SelectItem>
+                    <SelectItem value="delivered">Delivered</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </td>
+              <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(o.created_at).toLocaleDateString()}</td>
+              <td className="px-4 py-3 text-right">
+                <div className="flex justify-end gap-1">
+                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditOrder(o)}>
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => remove(o)}>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </td>
+            </tr>
+          ))}
+          {orders.length === 0 && (
+            <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">Aún no hay pedidos.</td></tr>
+          )}
+        </tbody>
+      </table>
+      <EditOrderDialog order={editOrder} onClose={() => setEditOrder(null)} />
+    </div>
+  );
+}
+
+function EditOrderDialog({ order, onClose }: { order: OrderRow | null; onClose: () => void }) {
+  const qc = useQueryClient();
+  const [form, setForm] = useState({ client_name: "", client_phone: "", client_address: "", quantity: 1, notes: "" });
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (order) {
+      setForm({
+        client_name: order.client_name,
+        client_phone: order.client_phone,
+        client_address: order.client_address ?? "",
+        quantity: order.quantity,
+        notes: order.notes ?? "",
+      });
+    }
+  }, [order]);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!order) return;
+    setBusy(true);
+    const { error } = await supabase.from("orders").update({
+      client_name: form.client_name,
+      client_phone: form.client_phone,
+      client_address: form.client_address || null,
+      quantity: form.quantity,
+      notes: form.notes || null,
+    }).eq("id", order.id);
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("Pedido actualizado");
+    qc.invalidateQueries({ queryKey: ["admin-orders"] });
+    qc.invalidateQueries({ queryKey: ["orders"] });
+    onClose();
+  };
+
+  return (
+    <Dialog open={!!order} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="bg-surface-elevated border-border/60">
+        <DialogHeader><DialogTitle>Editar pedido {order?.order_code}</DialogTitle></DialogHeader>
+        <form onSubmit={submit} className="space-y-3">
+          <div><Label>Nombre cliente</Label><Input required value={form.client_name} onChange={(e) => setForm({ ...form, client_name: e.target.value })} className="bg-white/5" /></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>Teléfono</Label><Input required value={form.client_phone} onChange={(e) => setForm({ ...form, client_phone: e.target.value })} className="bg-white/5" /></div>
+            <div><Label>Cantidad</Label><Input type="number" min={1} value={form.quantity} onChange={(e) => setForm({ ...form, quantity: Number(e.target.value) })} className="bg-white/5" /></div>
+          </div>
+          <div><Label>Dirección</Label><Input value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className="bg-white/5" /></div>
+          <div><Label>Observaciones</Label><Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="bg-white/5" /></div>
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
+            <Button type="submit" disabled={busy} className="hive-btn-primary border-0">
+              {busy && <Loader2 className="mr-1 h-4 w-4 animate-spin" />} Guardar cambios
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
