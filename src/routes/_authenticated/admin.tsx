@@ -65,15 +65,18 @@ function AdminPage() {
         <TabsList className="bg-white/5 border border-border/40">
           <TabsTrigger value="overview"><BarChart3 className="mr-1.5 h-4 w-4" />Resumen</TabsTrigger>
           <TabsTrigger value="products"><Package className="mr-1.5 h-4 w-4" />Productos</TabsTrigger>
+          <TabsTrigger value="orders"><ClipboardList className="mr-1.5 h-4 w-4" />Pedidos</TabsTrigger>
           <TabsTrigger value="categories"><Tag className="mr-1.5 h-4 w-4" />Categorías</TabsTrigger>
           <TabsTrigger value="users"><Users className="mr-1.5 h-4 w-4" />Impulsadores</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview"><Overview /></TabsContent>
         <TabsContent value="products"><ProductsTab /></TabsContent>
+        <TabsContent value="orders"><OrdersTab /></TabsContent>
         <TabsContent value="categories"><CategoriesTab /></TabsContent>
         <TabsContent value="users"><UsersTab /></TabsContent>
       </Tabs>
+
     </div>
   );
 }
