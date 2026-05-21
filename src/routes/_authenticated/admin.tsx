@@ -15,8 +15,9 @@ import { toast } from "sonner";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import {
   ShieldCheck, Users, ShoppingBag, BarChart3, Check, Ban, Loader2,
-  Plus, Pencil, Trash2, Package, Tag, Sparkles, GripVertical,
+  Plus, Pencil, Trash2, Package, Tag, Sparkles, GripVertical, ClipboardList,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
@@ -27,7 +28,7 @@ interface ProfileRow { id: string; full_name: string | null; phone: string | nul
 interface Category { id: string; name: string; slug: string; description: string | null; color: string | null; icon: string | null; sort_order: number | null }
 interface FunnelSection { title: string; content: string; image?: string }
 interface Product {
-  id: string; slug: string; name: string; category_id: string | null;
+  id: string; slug: string; sku: string; name: string; category_id: string | null;
   price: number; upsell_price: number | null;
   short_description: string | null; description: string | null;
   benefits: string[]; images: string[]; funnel_sections: FunnelSection[];
@@ -35,6 +36,7 @@ interface Product {
   is_active: boolean; is_featured: boolean; is_new: boolean;
   is_bestseller: boolean; is_recommended: boolean; is_trending: boolean;
 }
+
 
 const slugify = (s: string) =>
   s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -63,15 +65,18 @@ function AdminPage() {
         <TabsList className="bg-white/5 border border-border/40">
           <TabsTrigger value="overview"><BarChart3 className="mr-1.5 h-4 w-4" />Resumen</TabsTrigger>
           <TabsTrigger value="products"><Package className="mr-1.5 h-4 w-4" />Productos</TabsTrigger>
+          <TabsTrigger value="orders"><ClipboardList className="mr-1.5 h-4 w-4" />Pedidos</TabsTrigger>
           <TabsTrigger value="categories"><Tag className="mr-1.5 h-4 w-4" />Categorías</TabsTrigger>
           <TabsTrigger value="users"><Users className="mr-1.5 h-4 w-4" />Impulsadores</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview"><Overview /></TabsContent>
         <TabsContent value="products"><ProductsTab /></TabsContent>
+        <TabsContent value="orders"><OrdersTab /></TabsContent>
         <TabsContent value="categories"><CategoriesTab /></TabsContent>
         <TabsContent value="users"><UsersTab /></TabsContent>
       </Tabs>
+
     </div>
   );
 }
@@ -356,7 +361,9 @@ function ProductsTab() {
                 <div className="min-w-0">
                   <p className="font-display text-base font-bold truncate">{p.name}</p>
                   <p className="text-xs text-muted-foreground truncate">S/ {Number(p.price).toFixed(2)} · /{p.slug}</p>
+                  <p className="mt-1 text-[10px] font-mono font-bold text-hive">SKU: {p.sku}</p>
                 </div>
+
                 <Switch checked={p.is_active} onCheckedChange={() => toggleActive(p)} />
               </div>
               <div className="mt-3 flex flex-wrap gap-1">
@@ -393,11 +400,12 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
   const empty: Product = {
-    id: "", slug: "", name: "", category_id: null, price: 0, upsell_price: null,
+    id: "", slug: "", sku: "", name: "", category_id: null, price: 0, upsell_price: null,
     short_description: "", description: "", benefits: [], images: [], funnel_sections: [],
     cta_label: "Pedir ahora",
     is_active: true, is_featured: false, is_new: false, is_bestseller: false, is_recommended: false, is_trending: false,
   };
+
   const [form, setForm] = useState<Product>(empty);
   const [benefitsText, setBenefitsText] = useState("");
 
@@ -451,7 +459,8 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
     };
     const { error } = product
       ? await supabase.from("products").update(payload).eq("id", product.id)
-      : await supabase.from("products").insert(payload);
+      : await supabase.from("products").insert(payload as any);
+
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success(product ? "Producto actualizado" : "Producto creado");
@@ -588,3 +597,172 @@ function Flag({ label, v, on }: { label: string; v: boolean; on: (v: boolean) =>
     </label>
   );
 }
+
+/* ─────────────── ORDERS ─────────────── */
+interface OrderRow {
+  id: string; order_code: string; client_name: string; client_phone: string;
+  client_address: string | null; notes: string | null; quantity: number;
+  total: number | null; status: string; created_at: string;
+  product_id: string | null;
+  products?: { name: string; sku: string } | null;
+}
+
+function OrdersTab() {
+  const qc = useQueryClient();
+  const [editOrder, setEditOrder] = useState<OrderRow | null>(null);
+
+  const { data: orders = [], isLoading } = useQuery({
+    queryKey: ["admin-orders"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("*, products(name, sku)")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as unknown as OrderRow[];
+    },
+  });
+
+  const remove = async (o: OrderRow) => {
+    if (!confirm(`¿Eliminar pedido ${o.order_code}? Esta acción no se puede deshacer.`)) return;
+    const { error } = await supabase.from("orders").delete().eq("id", o.id);
+    if (error) return toast.error(error.message);
+    toast.success("Pedido eliminado");
+    qc.invalidateQueries({ queryKey: ["admin-orders"] });
+    qc.invalidateQueries({ queryKey: ["orders"] });
+  };
+
+  const updateStatus = async (o: OrderRow, status: string) => {
+    const { error } = await supabase.from("orders").update({ status: status as any }).eq("id", o.id);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["admin-orders"] });
+    qc.invalidateQueries({ queryKey: ["orders"] });
+  };
+
+  if (isLoading) {
+    return <div className="flex h-40 items-center justify-center"><Loader2 className="h-5 w-5 animate-spin text-hive" /></div>;
+  }
+
+  return (
+    <div className="hive-card overflow-x-auto">
+      <table className="w-full text-sm min-w-[900px]">
+        <thead className="bg-white/5 text-left text-xs uppercase tracking-wider text-muted-foreground">
+          <tr>
+            <th className="px-4 py-3">Código</th>
+            <th className="px-4 py-3">Producto / SKU</th>
+            <th className="px-4 py-3">Cliente</th>
+            <th className="px-4 py-3">Teléfono</th>
+            <th className="px-4 py-3">Cant.</th>
+            <th className="px-4 py-3">Total</th>
+            <th className="px-4 py-3">Estado</th>
+            <th className="px-4 py-3">Fecha</th>
+            <th className="px-4 py-3 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders.map((o) => (
+            <tr key={o.id} className="border-t border-border/40">
+              <td className="px-4 py-3 font-mono text-xs font-bold text-hive">{o.order_code}</td>
+              <td className="px-4 py-3">
+                <div className="font-medium">{o.products?.name ?? "—"}</div>
+                <div className="text-[10px] font-mono text-muted-foreground">{o.products?.sku ?? "—"}</div>
+              </td>
+              <td className="px-4 py-3">{o.client_name}</td>
+              <td className="px-4 py-3 text-muted-foreground">{o.client_phone}</td>
+              <td className="px-4 py-3">{o.quantity}</td>
+              <td className="px-4 py-3">S/ {Number(o.total ?? 0).toFixed(2)}</td>
+              <td className="px-4 py-3">
+                <Select value={o.status} onValueChange={(v) => updateStatus(o, v)}>
+                  <SelectTrigger className="h-7 w-32 bg-white/5 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="confirmed">Confirmed</SelectItem>
+                    <SelectItem value="shipped">Shipped</SelectItem>
+                    <SelectItem value="delivered">Delivered</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </td>
+              <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(o.created_at).toLocaleDateString()}</td>
+              <td className="px-4 py-3 text-right">
+                <div className="flex justify-end gap-1">
+                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditOrder(o)}>
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => remove(o)}>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </td>
+            </tr>
+          ))}
+          {orders.length === 0 && (
+            <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">Aún no hay pedidos.</td></tr>
+          )}
+        </tbody>
+      </table>
+      <EditOrderDialog order={editOrder} onClose={() => setEditOrder(null)} />
+    </div>
+  );
+}
+
+function EditOrderDialog({ order, onClose }: { order: OrderRow | null; onClose: () => void }) {
+  const qc = useQueryClient();
+  const [form, setForm] = useState({ client_name: "", client_phone: "", client_address: "", quantity: 1, notes: "" });
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (order) {
+      setForm({
+        client_name: order.client_name,
+        client_phone: order.client_phone,
+        client_address: order.client_address ?? "",
+        quantity: order.quantity,
+        notes: order.notes ?? "",
+      });
+    }
+  }, [order]);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!order) return;
+    setBusy(true);
+    const { error } = await supabase.from("orders").update({
+      client_name: form.client_name,
+      client_phone: form.client_phone,
+      client_address: form.client_address || null,
+      quantity: form.quantity,
+      notes: form.notes || null,
+    }).eq("id", order.id);
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("Pedido actualizado");
+    qc.invalidateQueries({ queryKey: ["admin-orders"] });
+    qc.invalidateQueries({ queryKey: ["orders"] });
+    onClose();
+  };
+
+  return (
+    <Dialog open={!!order} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="bg-surface-elevated border-border/60">
+        <DialogHeader><DialogTitle>Editar pedido {order?.order_code}</DialogTitle></DialogHeader>
+        <form onSubmit={submit} className="space-y-3">
+          <div><Label>Nombre cliente</Label><Input required value={form.client_name} onChange={(e) => setForm({ ...form, client_name: e.target.value })} className="bg-white/5" /></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>Teléfono</Label><Input required value={form.client_phone} onChange={(e) => setForm({ ...form, client_phone: e.target.value })} className="bg-white/5" /></div>
+            <div><Label>Cantidad</Label><Input type="number" min={1} value={form.quantity} onChange={(e) => setForm({ ...form, quantity: Number(e.target.value) })} className="bg-white/5" /></div>
+          </div>
+          <div><Label>Dirección</Label><Input value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className="bg-white/5" /></div>
+          <div><Label>Observaciones</Label><Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="bg-white/5" /></div>
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
+            <Button type="submit" disabled={busy} className="hive-btn-primary border-0">
+              {busy && <Loader2 className="mr-1 h-4 w-4 animate-spin" />} Guardar cambios
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
