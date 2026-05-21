@@ -361,7 +361,9 @@ function ProductsTab() {
                 <div className="min-w-0">
                   <p className="font-display text-base font-bold truncate">{p.name}</p>
                   <p className="text-xs text-muted-foreground truncate">S/ {Number(p.price).toFixed(2)} · /{p.slug}</p>
+                  <p className="mt-1 text-[10px] font-mono font-bold text-hive">SKU: {p.sku}</p>
                 </div>
+
                 <Switch checked={p.is_active} onCheckedChange={() => toggleActive(p)} />
               </div>
               <div className="mt-3 flex flex-wrap gap-1">
