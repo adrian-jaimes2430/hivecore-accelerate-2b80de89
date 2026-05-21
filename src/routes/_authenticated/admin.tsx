@@ -453,7 +453,8 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
     };
     const { error } = product
       ? await supabase.from("products").update(payload).eq("id", product.id)
-      : await supabase.from("products").insert(payload);
+      : await supabase.from("products").insert(payload as any);
+
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success(product ? "Producto actualizado" : "Producto creado");
