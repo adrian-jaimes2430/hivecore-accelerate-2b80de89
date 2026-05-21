@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -9,7 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Check, Share2, Mail, MessageCircle, Link as LinkIcon, ShoppingBag, Flame, ArrowLeft, Lock, Sparkles, Loader2 } from "lucide-react";
+import { Check, Share2, Mail, MessageCircle, Link as LinkIcon, ShoppingBag, ArrowLeft, Lock, Loader2 } from "lucide-react";
+import { sendOrderNotification } from "@/lib/order-email.functions";
 
 export const Route = createFileRoute("/product/$slug")({
   component: ProductFunnel,
@@ -17,14 +19,14 @@ export const Route = createFileRoute("/product/$slug")({
 
 interface FunnelSection { title: string; content: string; image?: string }
 interface Product {
-  id: string; slug: string; name: string; price: number; upsell_price: number | null;
+  id: string; slug: string; sku: string; name: string; price: number; upsell_price: number | null;
   short_description: string | null; description: string | null;
   benefits: unknown; images: unknown; funnel_sections: unknown; cta_label: string | null;
 }
 
 function ProductFunnel() {
   const { slug } = Route.useParams();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", slug],
     queryFn: async () => {
@@ -38,13 +40,10 @@ function ProductFunnel() {
   if (isLoading || !product) {
     return <div className="flex min-h-[60vh] items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-hive" /></div>;
   }
-  const benefits = Array.isArray(product.benefits) ? product.benefits as string[] : [];
-  const images = Array.isArray(product.images) ? product.images as string[] : [];
+
   const funnel = Array.isArray(product.funnel_sections)
     ? (product.funnel_sections as FunnelSection[]).filter((s) => s.title || s.content || s.image)
     : [];
-  const heroImage = images[0];
-
 
   return (
     <div>
@@ -60,76 +59,13 @@ function ProductFunnel() {
         )}
       </div>
 
-      {/* HERO */}
-      <section className="relative overflow-hidden pt-8">
-        <div className="absolute inset-0 bg-gradient-to-b from-hive/10 via-transparent to-transparent" />
-        <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2">
-          <div className="relative">
-            <div className="hive-gradient-border relative mx-auto aspect-[3/4] max-w-md overflow-hidden rounded-3xl bg-gradient-to-br from-hive/30 via-ao-red/10 to-anma-orange/20">
-              <div className="absolute inset-0 hive-grid-bg opacity-40" />
-              {heroImage ? (
-                <img src={heroImage} alt={product.name} className="absolute inset-0 h-full w-full object-cover" />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="font-display text-[140px] font-black opacity-25">{product.name.charAt(0)}</span>
-                </div>
-              )}
-              <div className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-ao-red/90 px-3 py-1 text-xs font-bold text-white">
-                <Flame className="h-3 w-3" /> OFERTA LIMITADA
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col justify-center">
-            <p className="text-sm font-medium uppercase tracking-wider text-hive">Premium · A&O Ecosystem</p>
-            <h1 className="mt-3 font-display text-5xl font-bold leading-tight sm:text-6xl">{product.name}</h1>
-            <p className="mt-4 text-lg text-muted-foreground">{product.short_description}</p>
-
-            <div className="mt-6 flex items-end gap-3">
-              <span className="font-display text-5xl font-bold hive-gradient-text">S/ {Number(product.price).toFixed(2)}</span>
-              {product.upsell_price && (
-                <span className="mb-1 text-lg text-muted-foreground line-through">S/ {Number(product.upsell_price).toFixed(2)}</span>
-              )}
-            </div>
-            <p className="mt-1 text-xs text-anma-orange">⚡ Solo quedan pocas unidades disponibles</p>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              {user ? <OrderDialog product={product} /> : <LoginCTA />}
-              <ShareDialog product={product} />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {benefits.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <p className="text-sm font-medium uppercase tracking-wider text-hive">Beneficios</p>
-          <h2 className="mt-2 font-display text-4xl font-bold">¿Por qué elegir {product.name}?</h2>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            {benefits.map((b, i) => (
-              <div key={i} className="hive-card flex items-start gap-3 p-5">
-                <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-hive/15 text-hive">
-                  <Check className="h-4 w-4" />
-                </div>
-                <p className="text-sm">{b}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Dynamic funnel sections from admin - continuous flow */}
+      {/* Dynamic funnel sections — continuous, no titles */}
       {funnel.length > 0 && (
-        <div className="mx-auto max-w-3xl px-0 sm:px-6">
+        <div className="mx-auto max-w-3xl px-0 sm:px-6 mt-6">
           {funnel.map((s, i) => {
             const imageOnly = Boolean(s.image && !s.content?.trim());
             return imageOnly ? (
-              <img
-                key={i}
-                src={s.image}
-                alt={product.name}
-                className="block h-auto w-full object-contain"
-              />
+              <img key={i} src={s.image} alt={product.name} className="block h-auto w-full object-contain" />
             ) : (
               <section key={i} className="px-4 py-8 sm:px-0">
                 {s.image && (
@@ -142,33 +78,36 @@ function ProductFunnel() {
             );
           })}
         </div>
-
       )}
 
-      {funnel.length === 0 && product.description && (
-        <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
-          <Sparkles className="mx-auto h-8 w-8 text-anma-orange" />
-          <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">La historia detrás de {product.name}</h2>
-          <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{product.description}</p>
-        </section>
-      )}
-
-      {/* Scarcity / Offer */}
-      <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-        <div className="hive-card hive-gradient-border overflow-hidden p-10 text-center">
-          <p className="text-sm font-medium uppercase tracking-wider text-ao-red">Oferta exclusiva</p>
-          <h2 className="mt-2 font-display text-4xl font-bold">Esta semana únicamente</h2>
-          <p className="mt-3 text-muted-foreground">Precio especial para impulsadores HIVECORE.</p>
-          <div className="mt-6 flex items-end justify-center gap-3">
-            <span className="font-display text-6xl font-bold hive-gradient-text">S/ {Number(product.price).toFixed(2)}</span>
-            {product.upsell_price && (
-              <span className="mb-2 text-xl text-muted-foreground line-through">S/ {Number(product.upsell_price).toFixed(2)}</span>
-            )}
-          </div>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            {user ? <OrderDialog product={product} /> : <LoginCTA />}
-            <ShareDialog product={product} />
-          </div>
+      {/* Final order section — minimal product data + CTA */}
+      <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+        <div className="hive-card overflow-hidden">
+          <table className="w-full text-sm">
+            <tbody>
+              <tr className="border-b border-border/40">
+                <td className="px-4 py-3 text-xs uppercase tracking-wider text-muted-foreground w-32">Producto</td>
+                <td className="px-4 py-3 font-medium">{product.name}</td>
+              </tr>
+              <tr className="border-b border-border/40">
+                <td className="px-4 py-3 text-xs uppercase tracking-wider text-muted-foreground">SKU</td>
+                <td className="px-4 py-3 font-mono text-xs font-bold text-hive">{product.sku}</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 text-xs uppercase tracking-wider text-muted-foreground">Precio</td>
+                <td className="px-4 py-3">
+                  <span className="font-display text-2xl font-bold hive-gradient-text">S/ {Number(product.price).toFixed(2)}</span>
+                  {product.upsell_price && (
+                    <span className="ml-2 text-sm text-muted-foreground line-through">S/ {Number(product.upsell_price).toFixed(2)}</span>
+                  )}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          {user ? <OrderDialog product={product} impulsadorName={profile?.full_name ?? null} /> : <LoginCTA />}
+          <ShareDialog product={product} />
         </div>
       </section>
     </div>
@@ -183,8 +122,9 @@ function LoginCTA() {
   );
 }
 
-function OrderDialog({ product }: { product: Product }) {
+function OrderDialog({ product, impulsadorName }: { product: Product; impulsadorName: string | null }) {
   const { user } = useAuth();
+  const sendEmail = useServerFn(sendOrderNotification);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [code, setCode] = useState<string | null>(null);
@@ -194,6 +134,7 @@ function OrderDialog({ product }: { product: Product }) {
     e.preventDefault();
     if (!user) return;
     setBusy(true);
+    const total = Number(product.price) * form.quantity;
     const { data, error } = await supabase.from("orders").insert({
       impulsador_id: user.id,
       product_id: product.id,
@@ -202,12 +143,28 @@ function OrderDialog({ product }: { product: Product }) {
       client_address: form.client_address,
       quantity: form.quantity,
       notes: form.notes,
-      total: Number(product.price) * form.quantity,
+      total,
     }).select("order_code").single();
     setBusy(false);
     if (error) return toast.error(error.message);
     setCode(data!.order_code);
     toast.success("Pedido creado");
+
+    // Fire-and-forget email notification
+    sendEmail({
+      data: {
+        orderCode: data!.order_code,
+        productName: product.name,
+        productSku: product.sku,
+        clientName: form.client_name,
+        clientPhone: form.client_phone,
+        clientAddress: form.client_address || null,
+        quantity: form.quantity,
+        total,
+        notes: form.notes || null,
+        impulsadorName: impulsadorName,
+      },
+    }).catch((err) => console.warn("[order-email]", err));
   };
 
   return (
