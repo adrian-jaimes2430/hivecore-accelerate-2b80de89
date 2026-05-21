@@ -394,11 +394,12 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
   const empty: Product = {
-    id: "", slug: "", name: "", category_id: null, price: 0, upsell_price: null,
+    id: "", slug: "", sku: "", name: "", category_id: null, price: 0, upsell_price: null,
     short_description: "", description: "", benefits: [], images: [], funnel_sections: [],
     cta_label: "Pedir ahora",
     is_active: true, is_featured: false, is_new: false, is_bestseller: false, is_recommended: false, is_trending: false,
   };
+
   const [form, setForm] = useState<Product>(empty);
   const [benefitsText, setBenefitsText] = useState("");
 
