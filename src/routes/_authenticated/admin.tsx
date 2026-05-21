@@ -15,8 +15,9 @@ import { toast } from "sonner";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import {
   ShieldCheck, Users, ShoppingBag, BarChart3, Check, Ban, Loader2,
-  Plus, Pencil, Trash2, Package, Tag, Sparkles, GripVertical,
+  Plus, Pencil, Trash2, Package, Tag, Sparkles, GripVertical, ClipboardList,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
