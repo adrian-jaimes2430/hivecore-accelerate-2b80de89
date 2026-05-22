@@ -42,11 +42,20 @@ function CategoryPage() {
         <div className="flex h-40 items-center justify-center"><Loader2 className="h-5 w-5 animate-spin text-hive" /></div>
       ) : (
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {products.map((p) => (
+          {products.map((p) => {
+            const imgs = Array.isArray(p.images) ? (p.images as string[]) : [];
+            const cover = imgs[0];
+            return (
             <Link key={p.id} to="/product/$slug" params={{ slug: p.slug }} className="hive-card group overflow-hidden">
-              <div className="relative aspect-[4/5] bg-gradient-to-br from-hive/20 via-ao-red/10 to-anma-orange/15">
-                <div className="absolute inset-0 hive-grid-bg opacity-40" />
-                <div className="absolute inset-0 flex items-center justify-center font-display text-5xl font-bold opacity-20">{p.name.charAt(0)}</div>
+              <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-hive/20 via-ao-red/10 to-anma-orange/15">
+                {cover ? (
+                  <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                ) : (
+                  <>
+                    <div className="absolute inset-0 hive-grid-bg opacity-40" />
+                    <div className="absolute inset-0 flex items-center justify-center font-display text-5xl font-bold opacity-20">{p.name.charAt(0)}</div>
+                  </>
+                )}
               </div>
               <div className="p-4">
                 <h3 className="font-semibold">{p.name}</h3>
@@ -57,7 +66,8 @@ function CategoryPage() {
                 </div>
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
