@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_authenticated/category/$slug")({
 });
 
 interface Cat { id: string; name: string; description: string | null; color: string | null }
-interface Product { id: string; slug: string; name: string; price: number; short_description: string | null }
+interface Product { id: string; slug: string; name: string; price: number; short_description: string | null; images: unknown }
 
 function CategoryPage() {
   const { slug } = Route.useParams();
