@@ -113,13 +113,22 @@ function ProductGrid({ items }: { items: Product[] }) {
   if (items.length === 0) return <p className="text-sm text-muted-foreground">Sin productos por ahora.</p>;
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {items.map((p) => (
+      {items.map((p) => {
+        const imgs = Array.isArray(p.images) ? (p.images as string[]) : [];
+        const cover = imgs[0];
+        return (
         <Link key={p.id} to="/product/$slug" params={{ slug: p.slug }} className="hive-card group overflow-hidden">
           <div className="relative aspect-[4/5] w-full overflow-hidden bg-gradient-to-br from-hive/20 via-ao-red/10 to-anma-orange/15">
-            <div className="absolute inset-0 hive-grid-bg opacity-40" />
-            <div className="absolute inset-0 flex items-center justify-center font-display text-5xl font-bold opacity-20">
-              {p.name.charAt(0)}
-            </div>
+            {cover ? (
+              <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            ) : (
+              <>
+                <div className="absolute inset-0 hive-grid-bg opacity-40" />
+                <div className="absolute inset-0 flex items-center justify-center font-display text-5xl font-bold opacity-20">
+                  {p.name.charAt(0)}
+                </div>
+              </>
+            )}
             <div className="absolute right-3 top-3 flex flex-col gap-1">
               {p.is_new && <Badge color="bg-hive/90 text-black">NUEVO</Badge>}
               {p.is_bestseller && <Badge color="bg-ao-red/90 text-white">TOP</Badge>}
@@ -137,7 +146,8 @@ function ProductGrid({ items }: { items: Product[] }) {
             </div>
           </div>
         </Link>
-      ))}
+        );
+      })}
     </div>
   );
 }
