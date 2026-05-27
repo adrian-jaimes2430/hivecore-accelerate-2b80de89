@@ -117,22 +117,52 @@ function Metric({ icon: Icon, label, value, accent }: { icon: any; label: string
 }
 
 /* ─────────────── USERS ─────────────── */
+type RoleType = "super_admin" | "collaborator" | "impulsador";
+interface ProfileWithRole extends ProfileRow { role: RoleType }
+
 function UsersTab() {
   const qc = useQueryClient();
   const { data: profiles = [] } = useQuery({
     queryKey: ["admin-profiles"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as ProfileRow[];
+      const [{ data: profs, error: e1 }, { data: roles, error: e2 }] = await Promise.all([
+        supabase.from("profiles").select("*").order("created_at", { ascending: false }),
+        supabase.from("user_roles").select("user_id, role"),
+      ]);
+      if (e1) throw e1;
+      if (e2) throw e2;
+      const roleMap = new Map<string, RoleType>();
+      (roles ?? []).forEach((r: any) => {
+        const prev = roleMap.get(r.user_id);
+        if (!prev || r.role === "super_admin") roleMap.set(r.user_id, r.role);
+      });
+      return (profs ?? []).map((p: any) => ({
+        ...p,
+        role: roleMap.get(p.id) ?? "impulsador",
+      })) as ProfileWithRole[];
     },
   });
 
   const setStatus = async (id: string, status: "approved" | "blocked" | "pending") => {
     const { error } = await supabase.from("profiles").update({ status }).eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success("Estado actualizado");
+    if (error) { toast.error(error.message); return false; }
     qc.invalidateQueries({ queryKey: ["admin-profiles"] });
+    return true;
+  };
+
+  const setRole = async (userId: string, role: RoleType) => {
+    const { error: delErr } = await supabase.from("user_roles").delete().eq("user_id", userId);
+    if (delErr) { toast.error(delErr.message); return false; }
+    const { error } = await supabase.from("user_roles").insert({ user_id: userId, role });
+    if (error) { toast.error(error.message); return false; }
+    qc.invalidateQueries({ queryKey: ["admin-profiles"] });
+    return true;
+  };
+
+  const approveAs = async (userId: string, role: RoleType) => {
+    const okRole = await setRole(userId, role);
+    const okStatus = await setStatus(userId, "approved");
+    if (okRole && okStatus) toast.success(`Aprobado como ${roleLabel(role)}`);
   };
 
   return (
@@ -143,6 +173,7 @@ function UsersTab() {
             <th className="px-4 py-3">Nombre</th>
             <th className="px-4 py-3">Teléfono</th>
             <th className="px-4 py-3">Estado</th>
+            <th className="px-4 py-3">Rol</th>
             <th className="px-4 py-3">Fecha</th>
             <th className="px-4 py-3 text-right">Acciones</th>
           </tr>
@@ -157,18 +188,42 @@ function UsersTab() {
                   {p.status}
                 </span>
               </td>
+              <td className="px-4 py-3">
+                <Select value={p.role} onValueChange={(v) => setRole(p.id, v as RoleType).then((ok) => ok && toast.success("Rol actualizado"))}>
+                  <SelectTrigger className="h-8 w-[160px] bg-white/5 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="impulsador">Impulsador</SelectItem>
+                    <SelectItem value="collaborator">Colaborador</SelectItem>
+                    <SelectItem value="super_admin">Administrador</SelectItem>
+                  </SelectContent>
+                </Select>
+              </td>
               <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</td>
               <td className="px-4 py-3 text-right">
-                {p.status !== "approved" && (
-                  <Button size="sm" onClick={() => setStatus(p.id, "approved")} className="hive-btn-primary mr-2 h-8 border-0">
-                    <Check className="mr-1 h-3 w-3" /> Aprobar
-                  </Button>
-                )}
-                {p.status !== "blocked" && (
-                  <Button size="sm" variant="ghost" onClick={() => setStatus(p.id, "blocked")} className="h-8 border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20">
-                    <Ban className="mr-1 h-3 w-3" /> Bloquear
-                  </Button>
-                )}
+                <div className="flex flex-wrap justify-end gap-2">
+                  {p.status === "pending" && (
+                    <>
+                      <Button size="sm" onClick={() => approveAs(p.id, "impulsador")} className="hive-btn-primary h-8 border-0">
+                        <Check className="mr-1 h-3 w-3" /> Aprobar como Impulsador
+                      </Button>
+                      <Button size="sm" onClick={() => approveAs(p.id, "super_admin")} className="h-8 border-0 bg-hive/20 text-hive hover:bg-hive/30">
+                        <ShieldCheck className="mr-1 h-3 w-3" /> Aprobar como Admin
+                      </Button>
+                    </>
+                  )}
+                  {p.status === "approved" && (
+                    <Button size="sm" variant="ghost" onClick={() => setStatus(p.id, "blocked").then((ok) => ok && toast.success("Usuario bloqueado"))} className="h-8 border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20">
+                      <Ban className="mr-1 h-3 w-3" /> Bloquear
+                    </Button>
+                  )}
+                  {p.status === "blocked" && (
+                    <Button size="sm" onClick={() => setStatus(p.id, "approved").then((ok) => ok && toast.success("Usuario reactivado"))} className="hive-btn-primary h-8 border-0">
+                      <Check className="mr-1 h-3 w-3" /> Reactivar
+                    </Button>
+                  )}
+                </div>
               </td>
             </tr>
           ))}
@@ -176,6 +231,12 @@ function UsersTab() {
       </table>
     </div>
   );
+}
+
+function roleLabel(r: RoleType) {
+  if (r === "super_admin") return "Administrador";
+  if (r === "collaborator") return "Colaborador";
+  return "Impulsador";
 }
 
 function statusChip(s: string) {
