@@ -339,8 +339,29 @@ function CategoryDialog({ open, onOpenChange, category }: { open: boolean; onOpe
           <div><Label>Slug</Label><Input value={form.slug} onChange={(e) => setForm({ ...form, slug: slugify(e.target.value) })} className="bg-white/5" /></div>
           <div><Label>Descripción</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="bg-white/5" /></div>
           <div className="grid grid-cols-3 gap-3">
-            <div><Label>Color</Label><Input value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="bg-white/5" /></div>
-            <div><Label>Icono</Label><Input value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} className="bg-white/5" /></div>
+            <div>
+              <Label>Color</Label>
+              <Select value={form.color} onValueChange={(v) => setForm({ ...form, color: v })}>
+                <SelectTrigger className="bg-white/5"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {["green","orange","red","yellow","blue","purple","pink","cyan","white","gray"].map((c) => (
+                    <SelectItem key={c} value={c}>{c.toUpperCase()}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Icono</Label>
+              <Select value={form.icon || "none"} onValueChange={(v) => setForm({ ...form, icon: v === "none" ? "" : v })}>
+                <SelectTrigger className="bg-white/5"><SelectValue placeholder="—" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— Sin ícono —</SelectItem>
+                  {["FIRE","STAR","BOLT","HEART","GIFT","CART","TAG","CROWN","SPARKLES","ROCKET","TROPHY","DIAMOND"].map((i) => (
+                    <SelectItem key={i} value={i}>{i}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div><Label>Orden</Label><Input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: Number(e.target.value) })} className="bg-white/5" /></div>
           </div>
           <DialogFooter>
@@ -606,8 +627,7 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
                       </Button>
                     </div>
                   </div>
-                  <Input placeholder="Título" value={s.title} onChange={(e) => updateFunnel(i, { title: e.target.value })} className="bg-background/60" />
-                  <Textarea placeholder="Contenido / copy" value={s.content} onChange={(e) => updateFunnel(i, { content: e.target.value })} className="bg-background/60" rows={3} />
+                  <Input placeholder="Título (interno, no se muestra)" value={s.title} onChange={(e) => updateFunnel(i, { title: e.target.value })} className="bg-background/60" />
                   <ImageUploader
                     value={s.image ? [s.image] : []}
                     onChange={(v) => updateFunnel(i, { image: v[0] ?? "" })}
