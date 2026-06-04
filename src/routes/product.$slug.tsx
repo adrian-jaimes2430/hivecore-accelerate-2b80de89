@@ -12,10 +12,44 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Check, Share2, Mail, MessageCircle, Link as LinkIcon, ShoppingBag, ArrowLeft, Lock, Loader2 } from "lucide-react";
 import { sendOrderNotification } from "@/lib/order-email.functions";
+import { getProductPublic } from "@/lib/product-public.functions";
+
+const SITE_URL = "https://hivecore-accelerate.lovable.app";
 
 export const Route = createFileRoute("/product/$slug")({
   component: ProductFunnel,
+  loader: async ({ params }) => {
+    const product = await getProductPublic({ data: { slug: params.slug } });
+    if (!product) throw notFound();
+    return { product };
+  },
+  head: ({ loaderData, params }) => {
+    const p: any = (loaderData as any)?.product;
+    if (!p) return { meta: [{ title: "Producto — HIVECORE" }] };
+    const imgs = Array.isArray(p.images) ? p.images : [];
+    const cover = imgs[0];
+    const title = `${p.name} — HIVECORE`;
+    const desc = p.short_description || (p.description ? String(p.description).slice(0, 160) : `Conoce ${p.name} en HIVECORE.`);
+    const url = `${SITE_URL}/product/${params.slug}`;
+    const meta: any[] = [
+      { title },
+      { name: "description", content: desc },
+      { property: "og:title", content: p.name },
+      { property: "og:description", content: desc },
+      { property: "og:type", content: "product" },
+      { property: "og:url", content: url },
+      { name: "twitter:title", content: p.name },
+      { name: "twitter:description", content: desc },
+      { name: "twitter:card", content: "summary_large_image" },
+    ];
+    if (cover) {
+      meta.push({ property: "og:image", content: cover });
+      meta.push({ name: "twitter:image", content: cover });
+    }
+    return { meta, links: [{ rel: "canonical", href: url }] };
+  },
 });
+
 
 interface FunnelSection { title: string; content: string; image?: string }
 interface Product {
