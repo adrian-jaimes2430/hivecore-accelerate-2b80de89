@@ -67,8 +67,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:title", content: "HIVECORE — Plataforma comercial premium A&O Ecosystem" },
       { name: "twitter:description", content: "Plataforma comercial inteligente para impulsadores del ecosistema Company A&O. Catálogo premium, funnels de venta y gestión de pedidos." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/233ce30b-8a3f-414c-9b01-00af449233db/id-preview-e751b12a--77c6b513-d8a7-4570-b2ba-3d1a42a2e650.lovable.app-1778963864882.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/233ce30b-8a3f-414c-9b01-00af449233db/id-preview-e751b12a--77c6b513-d8a7-4570-b2ba-3d1a42a2e650.lovable.app-1778963864882.png" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
