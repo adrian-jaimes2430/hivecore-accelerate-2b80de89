@@ -60,9 +60,11 @@ interface Product {
 
 function ProductFunnel() {
   const { slug } = Route.useParams();
+  const { product: initial } = Route.useLoaderData();
   const { user, profile } = useAuth();
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", slug],
+    initialData: initial as Product,
     queryFn: async () => {
       const { data, error } = await supabase.from("products").select("*").eq("slug", slug).eq("is_active", true).maybeSingle();
       if (error) throw error;
