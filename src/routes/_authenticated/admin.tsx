@@ -627,8 +627,7 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
                       </Button>
                     </div>
                   </div>
-                  <Input placeholder="Título" value={s.title} onChange={(e) => updateFunnel(i, { title: e.target.value })} className="bg-background/60" />
-                  <Textarea placeholder="Contenido / copy" value={s.content} onChange={(e) => updateFunnel(i, { content: e.target.value })} className="bg-background/60" rows={3} />
+                  <Input placeholder="Título (interno, no se muestra)" value={s.title} onChange={(e) => updateFunnel(i, { title: e.target.value })} className="bg-background/60" />
                   <ImageUploader
                     value={s.image ? [s.image] : []}
                     onChange={(v) => updateFunnel(i, { image: v[0] ?? "" })}
