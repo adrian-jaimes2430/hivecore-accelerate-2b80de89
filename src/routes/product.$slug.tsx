@@ -51,7 +51,7 @@ export const Route = createFileRoute("/product/$slug")({
 });
 
 
-interface FunnelSection { title: string; content: string; image?: string }
+interface FunnelSection { title: string; content: string; image?: string; video?: string }
 interface Product {
   id: string; slug: string; sku: string; name: string; price: number; upsell_price: number | null;
   short_description: string | null; description: string | null;
@@ -78,7 +78,7 @@ function ProductFunnel() {
   }
 
   const funnel = Array.isArray(product.funnel_sections)
-    ? (product.funnel_sections as FunnelSection[]).filter((s) => s.title || s.content || s.image)
+    ? (product.funnel_sections as FunnelSection[]).filter((s) => s.title || s.content || s.image || s.video)
     : [];
 
   return (
@@ -99,14 +99,17 @@ function ProductFunnel() {
       {funnel.length > 0 && (
         <div className="mx-auto max-w-3xl px-0 sm:px-6 mt-6">
           {funnel.map((s, i) => {
-            const imageOnly = Boolean(s.image && !s.content?.trim());
-            return imageOnly ? (
-              <img key={i} src={s.image} alt={product.name} className="block h-auto w-full object-contain" />
+            const mediaOnly = Boolean((s.image || s.video) && !s.content?.trim());
+            const media = s.video ? (
+              <video key={`v-${i}`} src={s.video} controls playsInline className="block h-auto w-full object-contain" />
+            ) : s.image ? (
+              <img key={`i-${i}`} src={s.image} alt={product.name} className="block h-auto w-full object-contain" />
+            ) : null;
+            return mediaOnly ? (
+              <div key={i}>{media}</div>
             ) : (
               <section key={i} className="px-4 py-8 sm:px-0">
-                {s.image && (
-                  <img src={s.image} alt={product.name} className="mb-6 block h-auto w-full object-contain" />
-                )}
+                {media && <div className="mb-6">{media}</div>}
                 {s.content && (
                   <p className="whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{s.content}</p>
                 )}

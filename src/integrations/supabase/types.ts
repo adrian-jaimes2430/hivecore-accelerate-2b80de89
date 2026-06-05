@@ -205,6 +205,7 @@ export type Database = {
           is_trending: boolean | null
           name: string
           price: number
+          secondary_category_ids: Json
           short_description: string | null
           sku: string
           slug: string
@@ -228,6 +229,7 @@ export type Database = {
           is_trending?: boolean | null
           name: string
           price?: number
+          secondary_category_ids?: Json
           short_description?: string | null
           sku: string
           slug: string
@@ -251,6 +253,7 @@ export type Database = {
           is_trending?: boolean | null
           name?: string
           price?: number
+          secondary_category_ids?: Json
           short_description?: string | null
           sku?: string
           slug?: string
