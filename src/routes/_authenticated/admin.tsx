@@ -528,6 +528,7 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
       slug: form.slug || slugify(form.name),
       name: form.name,
       category_id: form.category_id,
+      secondary_category_ids: form.secondary_category_ids.filter((id) => id && id !== form.category_id) as any,
       price: form.price,
       upsell_price: form.upsell_price,
       short_description: form.short_description,
