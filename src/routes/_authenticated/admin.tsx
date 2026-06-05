@@ -668,12 +668,12 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
                     </div>
                   </div>
                   <Input placeholder="Título (interno, no se muestra)" value={s.title} onChange={(e) => updateFunnel(i, { title: e.target.value })} className="bg-background/60" />
-                  <ImageUploader
-                    value={s.image ? [s.image] : []}
-                    onChange={(v) => updateFunnel(i, { image: v[0] ?? "" })}
+                  <MediaUploader
+                    image={s.image}
+                    video={s.video}
+                    onChange={(next) => updateFunnel(i, { image: next.image ?? "", video: next.video ?? "" })}
                     folder={`products/${form.slug || "draft"}/funnel`}
-                    label="Imagen de sección"
-                    max={1}
+                    label="Medio de sección (imagen o video)"
                   />
                 </div>
               ))}
