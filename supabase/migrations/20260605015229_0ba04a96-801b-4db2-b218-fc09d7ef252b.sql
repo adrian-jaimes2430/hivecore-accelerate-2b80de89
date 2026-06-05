@@ -1,0 +1,1 @@
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS secondary_category_ids jsonb NOT NULL DEFAULT '[]'::jsonb;
