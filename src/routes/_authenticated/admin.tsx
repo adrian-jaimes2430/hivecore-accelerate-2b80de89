@@ -575,7 +575,7 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
               </div>
               <div><Label>Slug</Label><Input value={form.slug} onChange={(e) => update("slug", slugify(e.target.value))} className="bg-white/5" /></div>
               <div>
-                <Label>Categoría</Label>
+                <Label>Categoría principal</Label>
                 <Select value={form.category_id ?? "none"} onValueChange={(v) => update("category_id", v === "none" ? null : v)}>
                   <SelectTrigger className="bg-white/5"><SelectValue placeholder="Seleccionar" /></SelectTrigger>
                   <SelectContent>
@@ -583,6 +583,41 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
                     {categories.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="sm:col-span-2">
+                <Label>Categorías secundarias</Label>
+                <div className="rounded-md border border-border/40 bg-white/5 p-2 space-y-2">
+                  {form.secondary_category_ids.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {form.secondary_category_ids.map((id) => {
+                        const c = categories.find((x) => x.id === id);
+                        if (!c) return null;
+                        return (
+                          <span key={id} className="inline-flex items-center gap-1 rounded-full bg-hive/15 px-2 py-0.5 text-xs text-hive">
+                            {c.name}
+                            <button type="button" onClick={() => update("secondary_category_ids", form.secondary_category_ids.filter((x) => x !== id))} className="hover:text-destructive">
+                              <X className="h-3 w-3" />
+                            </button>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+                  <Select
+                    value=""
+                    onValueChange={(v) => {
+                      if (!v || v === form.category_id || form.secondary_category_ids.includes(v)) return;
+                      update("secondary_category_ids", [...form.secondary_category_ids, v]);
+                    }}
+                  >
+                    <SelectTrigger className="h-8 bg-background/60 text-xs"><SelectValue placeholder="Añadir categoría secundaria" /></SelectTrigger>
+                    <SelectContent>
+                      {categories
+                        .filter((c) => c.id !== form.category_id && !form.secondary_category_ids.includes(c.id))
+                        .map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div><Label>Precio (S/)</Label><Input type="number" step="0.01" required value={form.price} onChange={(e) => update("price", Number(e.target.value))} className="bg-white/5" /></div>
               <div><Label>Precio antes (S/)</Label><Input type="number" step="0.01" value={form.upsell_price ?? ""} onChange={(e) => update("upsell_price", e.target.value ? Number(e.target.value) : null)} className="bg-white/5" /></div>
