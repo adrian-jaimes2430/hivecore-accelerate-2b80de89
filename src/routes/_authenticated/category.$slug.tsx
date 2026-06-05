@@ -23,7 +23,12 @@ function CategoryPage() {
     queryKey: ["category-products", category?.id],
     enabled: !!category?.id,
     queryFn: async () => {
-      const { data } = await supabase.from("products").select("*").eq("category_id", category!.id).eq("is_active", true);
+      const id = category!.id;
+      const { data } = await supabase
+        .from("products")
+        .select("*")
+        .eq("is_active", true)
+        .or(`category_id.eq.${id},secondary_category_ids.cs.["${id}"]`);
       return data as Product[];
     },
   });
