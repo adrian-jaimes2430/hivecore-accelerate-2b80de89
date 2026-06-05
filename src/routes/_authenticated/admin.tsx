@@ -393,6 +393,7 @@ function ProductsTab() {
         benefits: Array.isArray(p.benefits) ? p.benefits : [],
         images: Array.isArray(p.images) ? p.images : [],
         funnel_sections: Array.isArray(p.funnel_sections) ? p.funnel_sections : [],
+        secondary_category_ids: Array.isArray(p.secondary_category_ids) ? p.secondary_category_ids : [],
       })) as Product[];
     },
   });
