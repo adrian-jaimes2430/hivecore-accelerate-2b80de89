@@ -506,7 +506,7 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
 
   const update = <K extends keyof Product>(k: K, v: Product[K]) => setForm((f) => ({ ...f, [k]: v }));
 
-  const addFunnel = () => update("funnel_sections", [...form.funnel_sections, { title: "", content: "", image: "" }]);
+  const addFunnel = () => update("funnel_sections", [...form.funnel_sections, { title: "", content: "", image: "", video: "" }]);
   const updateFunnel = (i: number, patch: Partial<FunnelSection>) => {
     const next = [...form.funnel_sections];
     next[i] = { ...next[i], ...patch };
