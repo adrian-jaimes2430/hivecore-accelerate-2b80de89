@@ -27,9 +27,10 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 interface ProfileRow { id: string; full_name: string | null; phone: string | null; status: string; created_at: string }
 interface Category { id: string; name: string; slug: string; description: string | null; color: string | null; icon: string | null; sort_order: number | null }
-interface FunnelSection { title: string; content: string; image?: string }
+interface FunnelSection { title: string; content: string; image?: string; video?: string }
 interface Product {
   id: string; slug: string; sku: string; name: string; category_id: string | null;
+  secondary_category_ids: string[];
   price: number; upsell_price: number | null;
   short_description: string | null; description: string | null;
   benefits: string[]; images: string[]; funnel_sections: FunnelSection[];
