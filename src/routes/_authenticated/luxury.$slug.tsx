@@ -1,10 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { ArrowLeft, Crown, Loader2, ExternalLink } from "lucide-react";
+import { ArrowLeft, Crown, Loader2, ExternalLink, ShoppingBag, Check } from "lucide-react";
 import { ShareBar } from "@/components/luxury/ShareBar";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { sendOrderNotification } from "@/lib/order-email.functions";
 
 export const Route = createFileRoute("/_authenticated/luxury/$slug")({
   component: LuxuryProduct,
