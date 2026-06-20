@@ -28,7 +28,9 @@ interface Product {
 interface Category { id: string; slug: string; name: string; color: string | null; description: string | null }
 
 function Dashboard() {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
+  const SITE_URL = "https://hivecore-accelerate.lovable.app";
+  const myCatalogUrl = user ? `${SITE_URL}/catalogo?ref=${user.id}` : `${SITE_URL}/catalogo`;
 
   const { data: products = [] } = useQuery({
     queryKey: ["products"],
