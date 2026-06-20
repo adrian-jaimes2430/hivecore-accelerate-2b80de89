@@ -730,7 +730,9 @@ interface OrderRow {
   client_address: string | null; notes: string | null; quantity: number;
   total: number | null; status: string; created_at: string;
   product_id: string | null;
+  luxury_product_id: string | null;
   products?: { name: string; sku: string } | null;
+  luxury_products?: { name: string; sku: string | null } | null;
 }
 
 function OrdersTab() {
@@ -742,7 +744,7 @@ function OrdersTab() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("orders")
-        .select("*, products(name, sku)")
+        .select("*, products(name, sku), luxury_products(name, sku)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data as unknown as OrderRow[];
