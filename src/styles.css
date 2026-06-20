@@ -181,3 +181,15 @@
   50% { transform: translateY(-8px); }
 }
 .hive-float { animation: hive-float 6s ease-in-out infinite; }
+
+/* AnMa Luxury Collection — premium gold accent (additive, no overrides) */
+:root, .dark {
+  --luxury-gold: oklch(0.82 0.14 85);
+  --luxury-gold-soft: oklch(0.72 0.12 80);
+}
+.luxury-gradient-text {
+  background: linear-gradient(120deg, oklch(0.95 0.05 90), oklch(0.82 0.14 85), oklch(0.72 0.12 80));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
