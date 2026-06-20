@@ -107,8 +107,8 @@ function ProductsTab() {
       attributes: editing.attributes ?? {},
     };
     const { error } = editing.id
-      ? await supabase.from("luxury_products").update(payload).eq("id", editing.id)
-      : await supabase.from("luxury_products").insert(payload);
+      ? await supabase.from("luxury_products").update(payload as never).eq("id", editing.id)
+      : await supabase.from("luxury_products").insert(payload as never);
     if (error) return toast.error(error.message);
     toast.success("Guardado");
     setEditing(null);

@@ -95,7 +95,7 @@ function LuxuryCatalog() {
   const childrenOf = (id: string) => categories.filter((c) => c.parent_id === id);
 
   const setSearch = (patch: Record<string, unknown>) =>
-    navigate({ search: (prev) => ({ ...prev, ...patch }) });
+    navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, ...patch }) });
 
   const filtersPanel = (
     <div className="space-y-6">
