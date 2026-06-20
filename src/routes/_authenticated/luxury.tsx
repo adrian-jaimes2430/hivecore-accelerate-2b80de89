@@ -47,7 +47,10 @@ interface LuxProduct {
 function LuxuryCatalog() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/luxury" });
+  const { user } = useAuth();
   const [quickView, setQuickView] = useState<LuxProduct | null>(null);
+  const SITE_URL = "https://hivecore-accelerate.lovable.app";
+  const myCatalogUrl = user ? `${SITE_URL}/catalogo?ref=${user.id}` : `${SITE_URL}/catalogo`;
 
   const { data: categories = [] } = useQuery({
     queryKey: ["luxury-categories"],
