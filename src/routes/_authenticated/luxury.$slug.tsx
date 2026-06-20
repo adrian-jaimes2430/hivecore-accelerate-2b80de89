@@ -21,7 +21,9 @@ interface LuxProduct {
 
 function LuxuryProduct() {
   const { slug } = Route.useParams();
+  const { user } = useAuth();
   const [activeImg, setActiveImg] = useState(0);
+  const SITE_URL = "https://hivecore-accelerate.lovable.app";
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["luxury-product", slug],
