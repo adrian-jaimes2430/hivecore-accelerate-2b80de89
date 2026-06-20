@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminPage,
   head: () => ({ meta: [{ title: "Admin — HIVECORE" }] }),
 });
