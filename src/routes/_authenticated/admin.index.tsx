@@ -792,8 +792,8 @@ function OrdersTab() {
             <tr key={o.id} className="border-t border-border/40">
               <td className="px-4 py-3 font-mono text-xs font-bold text-hive">{o.order_code}</td>
               <td className="px-4 py-3">
-                <div className="font-medium">{o.products?.name ?? "—"}</div>
-                <div className="text-[10px] font-mono text-muted-foreground">{o.products?.sku ?? "—"}</div>
+                <div className="font-medium">{o.products?.name ?? o.luxury_products?.name ?? "—"} {o.luxury_product_id && <span className="ml-1 rounded bg-[color:var(--luxury-gold)]/15 px-1.5 py-0.5 text-[9px] uppercase text-[color:var(--luxury-gold)]">Luxury</span>}</div>
+                <div className="text-[10px] font-mono text-muted-foreground">{o.products?.sku ?? o.luxury_products?.sku ?? "—"}</div>
               </td>
               <td className="px-4 py-3">{o.client_name}</td>
               <td className="px-4 py-3 text-muted-foreground">{o.client_phone}</td>
