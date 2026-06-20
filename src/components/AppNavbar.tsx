@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { HiveLogo } from "./HiveLogo";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, ShieldCheck, LogOut, Package } from "lucide-react";
+import { LayoutDashboard, ShieldCheck, LogOut, Package, Crown } from "lucide-react";
 
 export function AppNavbar() {
   const { profile, isAdmin, signOut } = useAuth();
@@ -27,6 +27,13 @@ export function AppNavbar() {
               activeProps={{ className: "active" }}
             >
               <Package className="h-4 w-4" /> Pedidos
+            </Link>
+            <Link
+              to="/luxury"
+              className="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-[color:var(--luxury-gold)] transition-colors hover:bg-[color:var(--luxury-gold)]/10 [&.active]:bg-[color:var(--luxury-gold)]/15"
+              activeProps={{ className: "active" }}
+            >
+              <Crown className="h-4 w-4" /> Luxury
             </Link>
             {isAdmin && (
               <Link

@@ -134,6 +134,161 @@ export type Database = {
         }
         Relationships: []
       }
+      luxury_brands: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          name: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      luxury_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          parent_id: string | null
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          parent_id?: string | null
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          parent_id?: string | null
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "luxury_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "luxury_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      luxury_products: {
+        Row: {
+          attributes: Json
+          brand_id: string | null
+          category_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          images: Json
+          is_active: boolean
+          is_featured: boolean
+          name: string
+          price: number
+          short_description: string | null
+          sku: string | null
+          slug: string
+          stock_quantity: number
+          stock_status: string
+          suggested_retail_price: number
+          updated_at: string
+        }
+        Insert: {
+          attributes?: Json
+          brand_id?: string | null
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: Json
+          is_active?: boolean
+          is_featured?: boolean
+          name: string
+          price?: number
+          short_description?: string | null
+          sku?: string | null
+          slug: string
+          stock_quantity?: number
+          stock_status?: string
+          suggested_retail_price?: number
+          updated_at?: string
+        }
+        Update: {
+          attributes?: Json
+          brand_id?: string | null
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: Json
+          is_active?: boolean
+          is_featured?: boolean
+          name?: string
+          price?: number
+          short_description?: string | null
+          sku?: string | null
+          slug?: string
+          stock_quantity?: number
+          stock_status?: string
+          suggested_retail_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "luxury_products_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "luxury_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "luxury_products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "luxury_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           client_address: string | null
