@@ -197,6 +197,16 @@ function LuxuryCatalog() {
           <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">
             Productos premium de alto valor percibido — perfumería, relojería, joyería AAA y marroquinería. Mayores márgenes para impulsadores A&O.
           </p>
+          <div className="mt-6 space-y-3">
+            <a href={myCatalogUrl} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-md border border-[color:var(--luxury-gold)]/40 bg-[color:var(--luxury-gold)]/10 px-4 py-2 text-sm text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/20">
+              <ExternalLink className="h-4 w-4" /> Ver mi catálogo público
+            </a>
+            <div>
+              <p className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">Compartir mi catálogo</p>
+              <ShareBar url={myCatalogUrl} title="AnMa Luxury Collection" text="Descubre piezas premium seleccionadas" />
+            </div>
+          </div>
         </div>
       </div>
 
