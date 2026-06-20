@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminPage,
   head: () => ({ meta: [{ title: "Admin — HIVECORE" }] }),
 });
@@ -730,7 +730,9 @@ interface OrderRow {
   client_address: string | null; notes: string | null; quantity: number;
   total: number | null; status: string; created_at: string;
   product_id: string | null;
+  luxury_product_id: string | null;
   products?: { name: string; sku: string } | null;
+  luxury_products?: { name: string; sku: string | null } | null;
 }
 
 function OrdersTab() {
@@ -742,7 +744,7 @@ function OrdersTab() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("orders")
-        .select("*, products(name, sku)")
+        .select("*, products(name, sku), luxury_products(name, sku)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data as unknown as OrderRow[];
@@ -790,8 +792,8 @@ function OrdersTab() {
             <tr key={o.id} className="border-t border-border/40">
               <td className="px-4 py-3 font-mono text-xs font-bold text-hive">{o.order_code}</td>
               <td className="px-4 py-3">
-                <div className="font-medium">{o.products?.name ?? "—"}</div>
-                <div className="text-[10px] font-mono text-muted-foreground">{o.products?.sku ?? "—"}</div>
+                <div className="font-medium">{o.products?.name ?? o.luxury_products?.name ?? "—"} {o.luxury_product_id && <span className="ml-1 rounded bg-[color:var(--luxury-gold)]/15 px-1.5 py-0.5 text-[9px] uppercase text-[color:var(--luxury-gold)]">Luxury</span>}</div>
+                <div className="text-[10px] font-mono text-muted-foreground">{o.products?.sku ?? o.luxury_products?.sku ?? "—"}</div>
               </td>
               <td className="px-4 py-3">{o.client_name}</td>
               <td className="px-4 py-3 text-muted-foreground">{o.client_phone}</td>

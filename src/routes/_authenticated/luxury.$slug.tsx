@@ -1,10 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { ArrowLeft, Crown, Loader2, ExternalLink } from "lucide-react";
+import { ArrowLeft, Crown, Loader2, ExternalLink, ShoppingBag, Check } from "lucide-react";
 import { ShareBar } from "@/components/luxury/ShareBar";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { sendOrderNotification } from "@/lib/order-email.functions";
 
 export const Route = createFileRoute("/_authenticated/luxury/$slug")({
   component: LuxuryProduct,
@@ -107,6 +115,7 @@ function LuxuryProduct() {
 
           <div className="space-y-2">
             <StockBadge status={product.stock_status} qty={product.stock_quantity} />
+            {user && <LuxuryOrderDialog product={product} />}
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Compartir con clientes</p>
             <ShareBar url={publicUrl} title={product.name} text={product.short_description ?? undefined} />
             <a href={publicUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-[color:var(--luxury-gold)] hover:underline">
@@ -149,4 +158,100 @@ function StockBadge({ status, qty }: { status: string; qty: number }) {
   };
   const s = map[status] ?? map.in_stock;
   return <span className={`rounded-full border px-2 py-0.5 text-xs ${s.c}`}>{s.l}</span>;
+}
+
+function LuxuryOrderDialog({ product }: { product: LuxProduct }) {
+  const { user } = useAuth();
+  const sendEmail = useServerFn(sendOrderNotification);
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [code, setCode] = useState<string | null>(null);
+  const [form, setForm] = useState({ client_name: "", client_phone: "", client_address: "", quantity: 1, notes: "" });
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    setBusy(true);
+    const total = Number(product.price) * form.quantity;
+    const { data, error } = await supabase.from("orders").insert({
+      impulsador_id: user.id,
+      luxury_product_id: product.id,
+      product_id: null,
+      client_name: form.client_name,
+      client_phone: form.client_phone,
+      client_address: form.client_address,
+      quantity: form.quantity,
+      notes: form.notes,
+      total,
+    } as never).select("order_code").single();
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    setCode((data as { order_code: string }).order_code);
+    toast.success("Pedido creado");
+    sendEmail({
+      data: {
+        orderCode: (data as { order_code: string }).order_code,
+        productName: product.name,
+        productSku: product.sku ?? "",
+        clientName: form.client_name,
+        clientPhone: form.client_phone,
+        clientAddress: form.client_address || null,
+        quantity: form.quantity,
+        total,
+        notes: form.notes || null,
+        impulsadorName: null,
+      },
+    }).catch((err) => console.warn("[luxury-order-email]", err));
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setCode(null); }}>
+      <DialogTrigger asChild>
+        <Button className="w-full h-11 border-0 bg-gradient-to-r from-[color:var(--luxury-gold)] to-amber-500 text-black hover:opacity-90">
+          <ShoppingBag className="mr-2 h-4 w-4" /> Crear pedido
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-surface-elevated border-border/60">
+        <DialogHeader><DialogTitle>Nuevo pedido · {product.name}</DialogTitle></DialogHeader>
+        {code ? (
+          <div className="space-y-4 text-center py-4">
+            <div className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--luxury-gold)]/15 text-[color:var(--luxury-gold)]">
+              <Check className="h-6 w-6" />
+            </div>
+            <p>Pedido generado con código:</p>
+            <p className="font-display text-3xl font-bold luxury-gradient-text">{code}</p>
+            <Button onClick={() => setOpen(false)} className="border-0 bg-[color:var(--luxury-gold)] text-black hover:opacity-90">Cerrar</Button>
+          </div>
+        ) : (
+          <form onSubmit={submit} className="space-y-3">
+            <div>
+              <Label>Nombre cliente</Label>
+              <Input required value={form.client_name} onChange={(e) => setForm({ ...form, client_name: e.target.value })} className="bg-white/5" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Teléfono</Label>
+                <Input required value={form.client_phone} onChange={(e) => setForm({ ...form, client_phone: e.target.value })} className="bg-white/5" />
+              </div>
+              <div>
+                <Label>Cantidad</Label>
+                <Input type="number" min={1} value={form.quantity} onChange={(e) => setForm({ ...form, quantity: Number(e.target.value) })} className="bg-white/5" />
+              </div>
+            </div>
+            <div>
+              <Label>Dirección</Label>
+              <Input value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className="bg-white/5" />
+            </div>
+            <div>
+              <Label>Observaciones</Label>
+              <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="bg-white/5" />
+            </div>
+            <Button type="submit" disabled={busy} className="w-full h-11 border-0 bg-gradient-to-r from-[color:var(--luxury-gold)] to-amber-500 text-black hover:opacity-90">
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Generar pedido"}
+            </Button>
+          </form>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
 }

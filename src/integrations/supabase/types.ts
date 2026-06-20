@@ -297,6 +297,7 @@ export type Database = {
           created_at: string
           id: string
           impulsador_id: string
+          luxury_product_id: string | null
           notes: string | null
           order_code: string
           product_id: string | null
@@ -311,6 +312,7 @@ export type Database = {
           created_at?: string
           id?: string
           impulsador_id: string
+          luxury_product_id?: string | null
           notes?: string | null
           order_code?: string
           product_id?: string | null
@@ -325,6 +327,7 @@ export type Database = {
           created_at?: string
           id?: string
           impulsador_id?: string
+          luxury_product_id?: string | null
           notes?: string | null
           order_code?: string
           product_id?: string | null
@@ -333,6 +336,13 @@ export type Database = {
           total?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "orders_luxury_product_id_fkey"
+            columns: ["luxury_product_id"]
+            isOneToOne: false
+            referencedRelation: "luxury_products"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "orders_product_id_fkey"
             columns: ["product_id"]
