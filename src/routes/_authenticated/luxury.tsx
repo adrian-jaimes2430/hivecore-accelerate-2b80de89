@@ -4,12 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Crown, Filter, Sparkles, Loader2, ArrowRight, X, Search } from "lucide-react";
+import { ShareBar } from "@/components/luxury/ShareBar";
+import { Crown, Filter, Sparkles, Loader2, ArrowRight, Search, ExternalLink } from "lucide-react";
 
 const searchSchema = z.object({
   cat: fallback(z.string().optional(), undefined).optional(),
