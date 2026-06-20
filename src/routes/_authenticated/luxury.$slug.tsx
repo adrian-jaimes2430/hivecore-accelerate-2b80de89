@@ -105,11 +105,13 @@ function LuxuryProduct() {
             )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="space-y-2">
             <StockBadge status={product.stock_status} qty={product.stock_quantity} />
-            <Button variant="ghost" size="sm" onClick={share} className="border border-border/60">
-              <Share2 className="mr-1 h-3 w-3" /> Compartir
-            </Button>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Compartir con clientes</p>
+            <ShareBar url={publicUrl} title={product.name} text={product.short_description ?? undefined} />
+            <a href={publicUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-[color:var(--luxury-gold)] hover:underline">
+              <ExternalLink className="h-3 w-3" /> Ver ficha pública
+            </a>
           </div>
 
           {product.description && (
