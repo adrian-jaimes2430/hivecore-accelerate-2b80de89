@@ -19,7 +19,7 @@ const searchSchema = z.object({
 
 const SITE_URL = "https://hivecore-accelerate.lovable.app";
 
-export const Route = createFileRoute("/catalogo")({
+export const Route = createFileRoute("/catalogo/")({
   validateSearch: zodValidator(searchSchema),
   loader: () => listLuxuryCatalog(),
   component: PublicCatalog,
