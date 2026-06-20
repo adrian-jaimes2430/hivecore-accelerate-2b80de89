@@ -115,6 +115,7 @@ function LuxuryProduct() {
 
           <div className="space-y-2">
             <StockBadge status={product.stock_status} qty={product.stock_quantity} />
+            {user && <LuxuryOrderDialog product={product} />}
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Compartir con clientes</p>
             <ShareBar url={publicUrl} title={product.name} text={product.short_description ?? undefined} />
             <a href={publicUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-[color:var(--luxury-gold)] hover:underline">
