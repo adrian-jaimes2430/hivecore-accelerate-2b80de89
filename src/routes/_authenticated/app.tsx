@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { Sparkles, TrendingUp, Star, Flame, Layers, ArrowRight } from "lucide-react";
+import { Sparkles, TrendingUp, Star, Flame, Layers, ArrowRight, Crown } from "lucide-react";
+import { ShareBar } from "@/components/luxury/ShareBar";
 import type { LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/app")({
