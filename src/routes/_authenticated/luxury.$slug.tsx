@@ -50,16 +50,7 @@ function LuxuryProduct() {
   const utility = Number(product.suggested_retail_price) - Number(product.price);
   const attrs = (product.attributes ?? {}) as Record<string, unknown>;
 
-  const share = async () => {
-    const url = window.location.href;
-    try {
-      if (navigator.share) await navigator.share({ title: product.name, text: product.short_description ?? "", url });
-      else {
-        await navigator.clipboard.writeText(url);
-        toast.success("Enlace copiado");
-      }
-    } catch { /* user cancelled */ }
-  };
+  const publicUrl = user ? `${SITE_URL}/catalogo/${product.slug}?ref=${user.id}` : `${SITE_URL}/catalogo/${product.slug}`;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
