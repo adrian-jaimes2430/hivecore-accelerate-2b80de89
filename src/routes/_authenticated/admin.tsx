@@ -58,9 +58,14 @@ function AdminPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <div className="mb-8 flex items-center gap-3">
-        <ShieldCheck className="h-6 w-6 text-hive" />
-        <h1 className="font-display text-3xl font-bold">Panel administrativo</h1>
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <ShieldCheck className="h-6 w-6 text-hive" />
+          <h1 className="font-display text-3xl font-bold">Panel administrativo</h1>
+        </div>
+        <a href="/admin/luxury" className="inline-flex items-center gap-2 rounded-md border border-[color:var(--luxury-gold)]/40 bg-[color:var(--luxury-gold)]/10 px-4 py-2 text-sm text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/20">
+          <Sparkles className="h-4 w-4" /> Gestionar AnMa Luxury
+        </a>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">

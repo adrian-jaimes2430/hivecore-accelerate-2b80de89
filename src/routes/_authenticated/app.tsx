@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { Sparkles, TrendingUp, Star, Flame, Layers, ArrowRight } from "lucide-react";
+import { Sparkles, TrendingUp, Star, Flame, Layers, ArrowRight, Crown } from "lucide-react";
+import { ShareBar } from "@/components/luxury/ShareBar";
 import type { LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/app")({
@@ -27,7 +28,9 @@ interface Product {
 interface Category { id: string; slug: string; name: string; color: string | null; description: string | null }
 
 function Dashboard() {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
+  const SITE_URL = "https://hivecore-accelerate.lovable.app";
+  const myCatalogUrl = user ? `${SITE_URL}/catalogo?ref=${user.id}` : `${SITE_URL}/catalogo`;
 
   const { data: products = [] } = useQuery({
     queryKey: ["products"],
@@ -70,6 +73,37 @@ function Dashboard() {
           <p className="text-sm font-medium text-hive">Aprobado</p>
         </div>
       </div>
+
+      {/* Luxury hero */}
+      <div className="relative mb-10 overflow-hidden rounded-2xl border border-[color:var(--luxury-gold)]/30 bg-gradient-to-br from-black via-zinc-950 to-[#1a1208] p-6 sm:p-8 luxury-shine animate-fade-up">
+        <div className="absolute inset-0 hive-grid-bg opacity-15" />
+        <div className="relative grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--luxury-gold)]/40 bg-black/40 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[color:var(--luxury-gold)]">
+              <Crown className="h-3 w-3" /> Premium
+            </div>
+            <h2 className="mt-3 font-display text-2xl font-bold sm:text-3xl">
+              <span className="luxury-gradient-text">AnMa Luxury Collection</span>
+            </h2>
+            <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+              Comparte tu catálogo premium con clientes — sin que ellos tengan que registrarse. Tus pedidos llegan por WhatsApp.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link to="/luxury" className="inline-flex items-center gap-1 rounded-md border border-[color:var(--luxury-gold)]/40 bg-[color:var(--luxury-gold)]/15 px-4 py-2 text-sm text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/25">
+                Explorar catálogo <ArrowRight className="h-3 w-3" />
+              </Link>
+              <a href={myCatalogUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-md border border-border/60 px-4 py-2 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
+                Ver mi vista pública
+              </a>
+            </div>
+          </div>
+          <div className="md:max-w-sm">
+            <p className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">Compartir mi catálogo</p>
+            <ShareBar url={myCatalogUrl} title="AnMa Luxury Collection" text="Descubre piezas premium seleccionadas" />
+          </div>
+        </div>
+      </div>
+
 
       {/* Categories */}
       <Section title="Categorías" icon={Layers}>

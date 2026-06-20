@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CatalogoIndexRouteImport } from './routes/catalogo.index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as CatalogoSlugRouteImport } from './routes/catalogo.$slug'
 import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
 import { Route as AuthenticatedLuxuryRouteImport } from './routes/_authenticated/luxury'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
@@ -36,9 +38,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CatalogoIndexRoute = CatalogoIndexRouteImport.update({
+  id: '/catalogo/',
+  path: '/catalogo/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
   id: '/product/$slug',
   path: '/product/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatalogoSlugRoute = CatalogoSlugRouteImport.update({
+  id: '/catalogo/$slug',
+  path: '/catalogo/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
@@ -92,7 +104,9 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRoute
   '/luxury': typeof AuthenticatedLuxuryRouteWithChildren
   '/orders': typeof AuthenticatedOrdersRoute
+  '/catalogo/$slug': typeof CatalogoSlugRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/catalogo/': typeof CatalogoIndexRoute
   '/admin/luxury': typeof AuthenticatedAdminLuxuryRoute
   '/category/$slug': typeof AuthenticatedCategorySlugRoute
   '/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
@@ -105,7 +119,9 @@ export interface FileRoutesByTo {
   '/app': typeof AuthenticatedAppRoute
   '/luxury': typeof AuthenticatedLuxuryRouteWithChildren
   '/orders': typeof AuthenticatedOrdersRoute
+  '/catalogo/$slug': typeof CatalogoSlugRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/catalogo': typeof CatalogoIndexRoute
   '/admin/luxury': typeof AuthenticatedAdminLuxuryRoute
   '/category/$slug': typeof AuthenticatedCategorySlugRoute
   '/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
@@ -120,7 +136,9 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/luxury': typeof AuthenticatedLuxuryRouteWithChildren
   '/_authenticated/orders': typeof AuthenticatedOrdersRoute
+  '/catalogo/$slug': typeof CatalogoSlugRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/catalogo/': typeof CatalogoIndexRoute
   '/_authenticated/admin/luxury': typeof AuthenticatedAdminLuxuryRoute
   '/_authenticated/category/$slug': typeof AuthenticatedCategorySlugRoute
   '/_authenticated/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
@@ -135,7 +153,9 @@ export interface FileRouteTypes {
     | '/app'
     | '/luxury'
     | '/orders'
+    | '/catalogo/$slug'
     | '/product/$slug'
+    | '/catalogo/'
     | '/admin/luxury'
     | '/category/$slug'
     | '/luxury/$slug'
@@ -148,7 +168,9 @@ export interface FileRouteTypes {
     | '/app'
     | '/luxury'
     | '/orders'
+    | '/catalogo/$slug'
     | '/product/$slug'
+    | '/catalogo'
     | '/admin/luxury'
     | '/category/$slug'
     | '/luxury/$slug'
@@ -162,7 +184,9 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/_authenticated/luxury'
     | '/_authenticated/orders'
+    | '/catalogo/$slug'
     | '/product/$slug'
+    | '/catalogo/'
     | '/_authenticated/admin/luxury'
     | '/_authenticated/category/$slug'
     | '/_authenticated/luxury/$slug'
@@ -173,7 +197,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  CatalogoSlugRoute: typeof CatalogoSlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
+  CatalogoIndexRoute: typeof CatalogoIndexRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
@@ -200,11 +226,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/catalogo/': {
+      id: '/catalogo/'
+      path: '/catalogo'
+      fullPath: '/catalogo/'
+      preLoaderRoute: typeof CatalogoIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/product/$slug': {
       id: '/product/$slug'
       path: '/product/$slug'
       fullPath: '/product/$slug'
       preLoaderRoute: typeof ProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catalogo/$slug': {
+      id: '/catalogo/$slug'
+      path: '/catalogo/$slug'
+      fullPath: '/catalogo/$slug'
+      preLoaderRoute: typeof CatalogoSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/orders': {
@@ -312,7 +352,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
+  CatalogoSlugRoute: CatalogoSlugRoute,
   ProductSlugRoute: ProductSlugRoute,
+  CatalogoIndexRoute: CatalogoIndexRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport

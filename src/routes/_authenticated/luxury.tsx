@@ -4,12 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Crown, Filter, Sparkles, Loader2, ArrowRight, X, Search } from "lucide-react";
+import { ShareBar } from "@/components/luxury/ShareBar";
+import { Crown, Filter, Sparkles, Loader2, ArrowRight, Search, ExternalLink } from "lucide-react";
 
 const searchSchema = z.object({
   cat: fallback(z.string().optional(), undefined).optional(),
@@ -45,7 +47,10 @@ interface LuxProduct {
 function LuxuryCatalog() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/luxury" });
+  const { user } = useAuth();
   const [quickView, setQuickView] = useState<LuxProduct | null>(null);
+  const SITE_URL = "https://hivecore-accelerate.lovable.app";
+  const myCatalogUrl = user ? `${SITE_URL}/catalogo?ref=${user.id}` : `${SITE_URL}/catalogo`;
 
   const { data: categories = [] } = useQuery({
     queryKey: ["luxury-categories"],
@@ -192,6 +197,16 @@ function LuxuryCatalog() {
           <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">
             Productos premium de alto valor percibido — perfumería, relojería, joyería AAA y marroquinería. Mayores márgenes para impulsadores A&O.
           </p>
+          <div className="mt-6 space-y-3">
+            <a href={myCatalogUrl} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-md border border-[color:var(--luxury-gold)]/40 bg-[color:var(--luxury-gold)]/10 px-4 py-2 text-sm text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/20">
+              <ExternalLink className="h-4 w-4" /> Ver mi catálogo público
+            </a>
+            <div>
+              <p className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">Compartir mi catálogo</p>
+              <ShareBar url={myCatalogUrl} title="AnMa Luxury Collection" text="Descubre piezas premium seleccionadas" />
+            </div>
+          </div>
         </div>
       </div>
 

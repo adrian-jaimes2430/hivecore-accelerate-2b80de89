@@ -2,9 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Crown, Loader2, Share2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { useAuth } from "@/lib/auth";
+import { ArrowLeft, Crown, Loader2, ExternalLink } from "lucide-react";
+import { ShareBar } from "@/components/luxury/ShareBar";
 
 export const Route = createFileRoute("/_authenticated/luxury/$slug")({
   component: LuxuryProduct,
@@ -21,7 +21,9 @@ interface LuxProduct {
 
 function LuxuryProduct() {
   const { slug } = Route.useParams();
+  const { user } = useAuth();
   const [activeImg, setActiveImg] = useState(0);
+  const SITE_URL = "https://hivecore-accelerate.lovable.app";
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["luxury-product", slug],
@@ -48,16 +50,7 @@ function LuxuryProduct() {
   const utility = Number(product.suggested_retail_price) - Number(product.price);
   const attrs = (product.attributes ?? {}) as Record<string, unknown>;
 
-  const share = async () => {
-    const url = window.location.href;
-    try {
-      if (navigator.share) await navigator.share({ title: product.name, text: product.short_description ?? "", url });
-      else {
-        await navigator.clipboard.writeText(url);
-        toast.success("Enlace copiado");
-      }
-    } catch { /* user cancelled */ }
-  };
+  const publicUrl = user ? `${SITE_URL}/catalogo/${product.slug}?ref=${user.id}` : `${SITE_URL}/catalogo/${product.slug}`;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -112,11 +105,13 @@ function LuxuryProduct() {
             )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="space-y-2">
             <StockBadge status={product.stock_status} qty={product.stock_quantity} />
-            <Button variant="ghost" size="sm" onClick={share} className="border border-border/60">
-              <Share2 className="mr-1 h-3 w-3" /> Compartir
-            </Button>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Compartir con clientes</p>
+            <ShareBar url={publicUrl} title={product.name} text={product.short_description ?? undefined} />
+            <a href={publicUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-[color:var(--luxury-gold)] hover:underline">
+              <ExternalLink className="h-3 w-3" /> Ver ficha pública
+            </a>
           </div>
 
           {product.description && (
