@@ -2,9 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Crown, Loader2, Share2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { useAuth } from "@/lib/auth";
+import { ArrowLeft, Crown, Loader2, ExternalLink } from "lucide-react";
+import { ShareBar } from "@/components/luxury/ShareBar";
 
 export const Route = createFileRoute("/_authenticated/luxury/$slug")({
   component: LuxuryProduct,
