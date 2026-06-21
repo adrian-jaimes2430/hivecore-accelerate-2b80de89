@@ -234,6 +234,7 @@ function PublicCatalog() {
 
 function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand?: string; index: number; refQs: string; onQuickView: () => void }) {
   const imgs = Array.isArray(p.images) ? (p.images as string[]) : [];
+  const vids = Array.isArray(p.videos) ? (p.videos as string[]) : [];
   const cover = imgs[0];
   return (
     <div className="hive-card group overflow-hidden animate-fade-up" style={{ animationDelay: `${Math.min(index * 60, 600)}ms` }}>
@@ -248,6 +249,11 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
           {p.is_featured && (
             <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full border border-[color:var(--luxury-gold)]/40 bg-black/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--luxury-gold)]">
               <Crown className="h-3 w-3" /> Featured
+            </span>
+          )}
+          {vids.length > 0 && (
+            <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-[10px] text-white backdrop-blur">
+              <Film className="h-3 w-3" /> Video
             </span>
           )}
         </div>
