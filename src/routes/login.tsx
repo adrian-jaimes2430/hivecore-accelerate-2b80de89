@@ -135,8 +135,35 @@ function LoginPage() {
                   <Input id="name" required value={fullName} onChange={(e) => setFullName(e.target.value)} className="mt-1.5 bg-white/5" />
                 </div>
                 <div>
-                  <Label htmlFor="phone">Teléfono</Label>
-                  <Input id="phone" type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1.5 bg-white/5" />
+                  <Label htmlFor="phone">Teléfono (WhatsApp)</Label>
+                  <div className="mt-1.5 flex gap-2">
+                    <Select value={countryCode} onValueChange={setCountryCode}>
+                      <SelectTrigger className="w-[140px] bg-white/5">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[300px]">
+                        {COUNTRY_CODES.map((c) => (
+                          <SelectItem key={c.country} value={c.code}>
+                            <span className="mr-2">{c.flag}</span>
+                            {c.code} {c.country}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      required
+                      inputMode="numeric"
+                      placeholder="3001234567"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value.replace(/[^\d]/g, ""))}
+                      className="flex-1 bg-white/5"
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Selecciona tu país. Sin espacios ni guiones.
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="email2">Email</Label>
