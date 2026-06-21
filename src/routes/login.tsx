@@ -53,6 +53,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [countryCode, setCountryCode] = useState("+57");
   const [phone, setPhone] = useState("");
 
   useEffect(() => {
