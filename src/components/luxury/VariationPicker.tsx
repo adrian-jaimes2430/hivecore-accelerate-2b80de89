@@ -46,10 +46,6 @@ export function VariationPicker({
   );
 }
 
-export function useVariationState(variations: Variation[]) {
-  return useState<Record<string, string>>({});
-}
-
 export function summarizeVariations(value: Record<string, string>) {
   const entries = Object.entries(value).filter(([, v]) => v);
   if (entries.length === 0) return "";
