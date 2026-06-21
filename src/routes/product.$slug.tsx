@@ -163,7 +163,7 @@ function ProductFunnel() {
           {user
             ? <OrderDialog product={product} impulsadorName={profile?.full_name ?? null} />
             : <ImpulsadorCTA product={product} impulsador={impulsador ?? null} />}
-          <ShareDialog product={product} />
+          <ShareDialog product={product} impulsadorId={user?.id ?? ref ?? null} />
         </div>
       </section>
 
