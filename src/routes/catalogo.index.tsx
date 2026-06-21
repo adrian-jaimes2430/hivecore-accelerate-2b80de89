@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Crown, Filter, Sparkles, Loader2, ArrowRight, Search, MessageCircle } from "lucide-react";
+import { Crown, Filter, Sparkles, ArrowRight, Search, MessageCircle, Film } from "lucide-react";
 import { listLuxuryCatalog, getImpulsadorRef } from "@/lib/luxury-public.functions";
+import { PromoCarousel, type Promo } from "@/components/luxury/PromoCarousel";
 
 const searchSchema = z.object({
   cat: fallback(z.string().optional(), undefined).optional(),
@@ -45,14 +46,14 @@ interface Cat { id: string; name: string; slug: string; parent_id: string | null
 interface Brand { id: string; name: string; slug: string }
 interface Product {
   id: string; name: string; slug: string; short_description: string | null;
-  images: unknown; category_id: string | null; brand_id: string | null;
+  images: unknown; videos: unknown; category_id: string | null; brand_id: string | null;
   price: number; suggested_retail_price: number; is_featured: boolean;
   stock_status: string;
 }
 
 function PublicCatalog() {
-  const { products, categories, brands } = Route.useLoaderData() as {
-    products: Product[]; categories: Cat[]; brands: Brand[];
+  const { products, categories, brands, promos } = Route.useLoaderData() as {
+    products: Product[]; categories: Cat[]; brands: Brand[]; promos: Promo[];
   };
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/catalogo" });
@@ -168,6 +169,10 @@ function PublicCatalog() {
           </div>
         </section>
 
+        {promos.length > 0 && <PromoCarousel promos={promos} />}
+
+
+
         {/* Toolbar */}
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <div className="relative min-w-[200px] flex-1">
@@ -229,6 +234,7 @@ function PublicCatalog() {
 
 function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand?: string; index: number; refQs: string; onQuickView: () => void }) {
   const imgs = Array.isArray(p.images) ? (p.images as string[]) : [];
+  const vids = Array.isArray(p.videos) ? (p.videos as string[]) : [];
   const cover = imgs[0];
   return (
     <div className="hive-card group overflow-hidden animate-fade-up" style={{ animationDelay: `${Math.min(index * 60, 600)}ms` }}>
@@ -243,6 +249,11 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
           {p.is_featured && (
             <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full border border-[color:var(--luxury-gold)]/40 bg-black/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--luxury-gold)]">
               <Crown className="h-3 w-3" /> Featured
+            </span>
+          )}
+          {vids.length > 0 && (
+            <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-[10px] text-white backdrop-blur">
+              <Film className="h-3 w-3" /> Video
             </span>
           )}
         </div>

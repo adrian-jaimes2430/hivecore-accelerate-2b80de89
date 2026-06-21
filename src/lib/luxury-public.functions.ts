@@ -7,21 +7,23 @@ const serverClient = async () => {
 
 export const listLuxuryCatalog = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = await serverClient();
-  const [{ data: products }, { data: categories }, { data: brands }] = await Promise.all([
+  const [{ data: products }, { data: categories }, { data: brands }, { data: promos }] = await Promise.all([
     supabase
       .from("luxury_products")
-      .select("id,sku,name,slug,short_description,images,category_id,brand_id,price,suggested_retail_price,stock_status,stock_quantity,is_featured,attributes")
+      .select("id,sku,name,slug,short_description,images,videos,variations,category_id,brand_id,price,suggested_retail_price,show_impulsador_price,stock_status,stock_quantity,is_featured,attributes")
       .eq("is_active", true)
       .order("is_featured", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(500),
     supabase.from("luxury_categories").select("id,name,slug,parent_id,sort_order").eq("is_active", true).order("sort_order"),
     supabase.from("luxury_brands").select("id,name,slug").eq("is_active", true).order("sort_order"),
+    supabase.from("luxury_promos").select("id,title,subtitle,media_type,media_url,link_url,cta_label").eq("is_active", true).order("sort_order"),
   ]);
   return {
     products: products ?? [],
     categories: categories ?? [],
     brands: brands ?? [],
+    promos: promos ?? [],
   };
 });
 
@@ -46,6 +48,16 @@ export const getLuxuryProductPublic = createServerFn({ method: "GET" })
     ]);
     return { product, brand: brand ?? null, category: category ?? null };
   });
+
+export const listLuxuryPromos = createServerFn({ method: "GET" }).handler(async () => {
+  const supabase = await serverClient();
+  const { data } = await supabase
+    .from("luxury_promos")
+    .select("id,title,subtitle,media_type,media_url,link_url,cta_label")
+    .eq("is_active", true)
+    .order("sort_order");
+  return data ?? [];
+});
 
 export const getImpulsadorRef = createServerFn({ method: "GET" })
   .inputValidator((d: { ref: string }) => d)
