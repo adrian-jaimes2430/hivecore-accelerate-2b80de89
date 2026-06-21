@@ -4,9 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { ArrowLeft, Crown, MessageCircle, Mail, Sparkles, ShieldCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { getLuxuryProductPublic, getImpulsadorRef } from "@/lib/luxury-public.functions";
 import { ShareBar } from "@/components/luxury/ShareBar";
+import { MediaGallery, buildMedia } from "@/components/luxury/MediaGallery";
+import { VariationPicker, summarizeVariations } from "@/components/luxury/VariationPicker";
+import type { Variation } from "@/components/admin/VariationsEditor";
 
 const SITE_URL = "https://hivecore-accelerate.lovable.app";
 
@@ -52,7 +54,7 @@ export const Route = createFileRoute("/catalogo/$slug")({
 function PublicProduct() {
   const { product, brand } = Route.useLoaderData() as any;
   const { ref } = Route.useSearch();
-  const [activeImg, setActiveImg] = useState(0);
+  const [selectedVariations, setSelectedVariations] = useState<Record<string, string>>({});
 
   const { data: impulsador } = useQuery({
     queryKey: ["impulsador-ref", ref],
@@ -60,12 +62,16 @@ function PublicProduct() {
     queryFn: () => getImpulsadorRef({ data: { ref: ref! } }),
   });
 
-  const imgs: string[] = Array.isArray(product.images) ? product.images : [];
+  const media = buildMedia(product.images, product.videos);
+  const variations: Variation[] = Array.isArray(product.variations) ? product.variations : [];
   const attrs = (product.attributes ?? {}) as Record<string, unknown>;
   const url = typeof window !== "undefined" ? window.location.href : `${SITE_URL}/catalogo/${product.slug}`;
   const price = Number(product.suggested_retail_price || product.price);
+  const variantSummary = summarizeVariations(selectedVariations);
 
-  const waText = encodeURIComponent(`Hola, me interesa la pieza "${product.name}" del catálogo AnMa Luxury (S/ ${price.toFixed(2)}).\n${url}`);
+  const waText = encodeURIComponent(
+    `Hola, me interesa la pieza "${product.name}" del catálogo AnMa Luxury (S/ ${price.toFixed(2)}).${variantSummary ? `\nOpciones: ${variantSummary}` : ""}\n${url}`,
+  );
   const waHref = impulsador?.phone
     ? `https://wa.me/${impulsador.phone.replace(/[^\d]/g, "")}?text=${waText}`
     : `https://wa.me/?text=${waText}`;
@@ -89,23 +95,7 @@ function PublicProduct() {
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <div className="grid gap-8 md:grid-cols-2">
           <div className="animate-fade-up">
-            <div className="aspect-[4/5] overflow-hidden rounded-2xl border border-[color:var(--luxury-gold)]/20 bg-zinc-950 luxury-shine">
-              {imgs[activeImg] ? (
-                <img src={imgs[activeImg]} alt={product.name} className="h-full w-full object-cover" />
-              ) : (
-                <div className="flex h-full items-center justify-center font-display text-7xl opacity-20">{product.name.charAt(0)}</div>
-              )}
-            </div>
-            {imgs.length > 1 && (
-              <div className="mt-3 grid grid-cols-5 gap-2">
-                {imgs.map((u, i) => (
-                  <button key={u} onClick={() => setActiveImg(i)}
-                    className={`aspect-square overflow-hidden rounded-md border transition ${i === activeImg ? "border-[color:var(--luxury-gold)]" : "border-border/40 opacity-70 hover:opacity-100"}`}>
-                    <img src={u} alt="" className="h-full w-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
+            <MediaGallery media={media} fallbackInitial={product.name.charAt(0)} />
           </div>
 
           <div className="space-y-5 animate-fade-up" style={{ animationDelay: "120ms" }}>
@@ -125,12 +115,18 @@ function PublicProduct() {
               <StockBadge status={product.stock_status} />
             </div>
 
+            {variations.length > 0 && (
+              <div className="rounded-xl border border-border/40 bg-white/[0.02] p-4">
+                <VariationPicker variations={variations} value={selectedVariations} onChange={setSelectedVariations} />
+              </div>
+            )}
+
             <div className="flex flex-col gap-3">
               <a href={waHref} target="_blank" rel="noopener noreferrer"
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 font-semibold text-black shadow-lg shadow-emerald-500/30 transition-transform hover:scale-[1.02]">
                 <MessageCircle className="h-5 w-5" /> {impulsador?.name ? `Pedir a ${impulsador.name.split(" ")[0]} por WhatsApp` : "Hacer mi pedido por WhatsApp"}
               </a>
-              <a href={`mailto:?subject=${encodeURIComponent(product.name)}&body=${encodeURIComponent(`Me interesa: ${product.name}\n${url}`)}`}
+              <a href={`mailto:?subject=${encodeURIComponent(product.name)}&body=${encodeURIComponent(`Me interesa: ${product.name}${variantSummary ? `\nOpciones: ${variantSummary}` : ""}\n${url}`)}`}
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border/60 px-5 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
                 <Mail className="h-4 w-4" /> Consultar por email
               </a>
