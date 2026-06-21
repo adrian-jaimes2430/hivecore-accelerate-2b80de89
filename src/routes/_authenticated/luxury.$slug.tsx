@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { ArrowLeft, Crown, Loader2, ExternalLink, ShoppingBag, Check } from "lucide-react";
 import { ShareBar } from "@/components/luxury/ShareBar";
+import { MediaGallery, buildMedia } from "@/components/luxury/MediaGallery";
+import { VariationPicker, summarizeVariations } from "@/components/luxury/VariationPicker";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -13,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { sendOrderNotification } from "@/lib/order-email.functions";
+import type { Variation } from "@/components/admin/VariationsEditor";
 
 export const Route = createFileRoute("/_authenticated/luxury/$slug")({
   component: LuxuryProduct,
@@ -21,8 +24,10 @@ export const Route = createFileRoute("/_authenticated/luxury/$slug")({
 interface LuxProduct {
   id: string; sku: string | null; name: string; slug: string;
   short_description: string | null; description: string | null;
-  images: unknown; category_id: string | null; brand_id: string | null;
+  images: unknown; videos: unknown; variations: unknown;
+  category_id: string | null; brand_id: string | null;
   price: number; suggested_retail_price: number;
+  show_impulsador_price: boolean;
   stock_status: string; stock_quantity: number;
   attributes: Record<string, unknown>;
 }
@@ -30,7 +35,7 @@ interface LuxProduct {
 function LuxuryProduct() {
   const { slug } = Route.useParams();
   const { user } = useAuth();
-  const [activeImg, setActiveImg] = useState(0);
+  const [selectedVariations, setSelectedVariations] = useState<Record<string, string>>({});
   const SITE_URL = "https://hivecore-accelerate.lovable.app";
 
   const { data: product, isLoading } = useQuery({
@@ -54,9 +59,11 @@ function LuxuryProduct() {
   if (isLoading) return <div className="flex h-60 items-center justify-center"><Loader2 className="h-5 w-5 animate-spin text-[color:var(--luxury-gold)]" /></div>;
   if (!product) return <div className="mx-auto max-w-3xl px-4 py-16 text-center text-muted-foreground">Producto no encontrado.</div>;
 
-  const imgs = Array.isArray(product.images) ? (product.images as string[]) : [];
+  const media = buildMedia(product.images, product.videos);
+  const variations: Variation[] = Array.isArray(product.variations) ? (product.variations as Variation[]) : [];
   const utility = Number(product.suggested_retail_price) - Number(product.price);
   const attrs = (product.attributes ?? {}) as Record<string, unknown>;
+  const showImp = product.show_impulsador_price !== false;
 
   const publicUrl = user ? `${SITE_URL}/catalogo/${product.slug}?ref=${user.id}` : `${SITE_URL}/catalogo/${product.slug}`;
 
@@ -67,26 +74,11 @@ function LuxuryProduct() {
       </Link>
 
       <div className="mt-6 grid gap-8 md:grid-cols-2">
-        <div>
-          <div className="aspect-[4/5] overflow-hidden rounded-xl border border-border/40 bg-zinc-950">
-            {imgs[activeImg] ? (
-              <img src={imgs[activeImg]} alt={product.name} className="h-full w-full object-cover" />
-            ) : (
-              <div className="flex h-full items-center justify-center font-display text-6xl opacity-20">{product.name.charAt(0)}</div>
-            )}
-          </div>
-          {imgs.length > 1 && (
-            <div className="mt-3 grid grid-cols-5 gap-2">
-              {imgs.map((u, i) => (
-                <button key={u} onClick={() => setActiveImg(i)} className={`aspect-square overflow-hidden rounded-md border ${i === activeImg ? "border-[color:var(--luxury-gold)]" : "border-border/40"}`}>
-                  <img src={u} alt="" className="h-full w-full object-cover" />
-                </button>
-              ))}
-            </div>
-          )}
+        <div className="animate-fade-up">
+          <MediaGallery media={media} fallbackInitial={product.name.charAt(0)} />
         </div>
 
-        <div className="space-y-5">
+        <div className="space-y-5 animate-fade-up" style={{ animationDelay: "120ms" }}>
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--luxury-gold)]/30 bg-black/40 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-[color:var(--luxury-gold)]">
               <Crown className="h-3 w-3" /> Luxury
@@ -99,23 +91,38 @@ function LuxuryProduct() {
           {product.short_description && <p className="text-muted-foreground">{product.short_description}</p>}
 
           <div className="rounded-xl border border-[color:var(--luxury-gold)]/30 bg-black/40 p-5">
-            <div className="flex items-baseline gap-3">
-              <span className="font-display text-3xl font-bold">S/ {Number(product.price).toFixed(2)}</span>
-              <span className="text-xs text-muted-foreground">precio impulsador</span>
-            </div>
-            {product.suggested_retail_price > 0 && (
-              <p className="mt-2 text-sm text-muted-foreground">Precio sugerido al cliente: <span className="text-foreground">S/ {Number(product.suggested_retail_price).toFixed(2)}</span></p>
-            )}
-            {utility > 0 && (
-              <div className="mt-3 inline-flex items-center gap-1 rounded-md border border-[color:var(--luxury-gold)]/40 bg-[color:var(--luxury-gold)]/10 px-3 py-1 text-sm font-medium text-[color:var(--luxury-gold)]">
-                Utilidad estimada: +S/ {utility.toFixed(2)}
+            {showImp ? (
+              <>
+                <div className="flex items-baseline gap-3">
+                  <span className="font-display text-3xl font-bold">S/ {Number(product.price).toFixed(2)}</span>
+                  <span className="text-xs text-muted-foreground">precio impulsador</span>
+                </div>
+                {product.suggested_retail_price > 0 && (
+                  <p className="mt-2 text-sm text-muted-foreground">Precio sugerido al cliente: <span className="text-foreground">S/ {Number(product.suggested_retail_price).toFixed(2)}</span></p>
+                )}
+                {utility > 0 && (
+                  <div className="mt-3 inline-flex items-center gap-1 rounded-md border border-[color:var(--luxury-gold)]/40 bg-[color:var(--luxury-gold)]/10 px-3 py-1 text-sm font-medium text-[color:var(--luxury-gold)]">
+                    Utilidad estimada: +S/ {utility.toFixed(2)}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="flex items-baseline gap-3">
+                <span className="font-display text-3xl font-bold luxury-gradient-text">S/ {Number(product.suggested_retail_price || product.price).toFixed(2)}</span>
+                <span className="text-xs text-muted-foreground">precio final</span>
               </div>
             )}
           </div>
 
+          {variations.length > 0 && (
+            <div className="rounded-xl border border-border/40 bg-white/[0.02] p-4">
+              <VariationPicker variations={variations} value={selectedVariations} onChange={setSelectedVariations} />
+            </div>
+          )}
+
           <div className="space-y-2">
             <StockBadge status={product.stock_status} qty={product.stock_quantity} />
-            {user && <LuxuryOrderDialog product={product} />}
+            {user && <LuxuryOrderDialog product={product} selectedVariations={selectedVariations} />}
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Compartir con clientes</p>
             <ShareBar url={publicUrl} title={product.name} text={product.short_description ?? undefined} />
             <a href={publicUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-[color:var(--luxury-gold)] hover:underline">
@@ -160,19 +167,21 @@ function StockBadge({ status, qty }: { status: string; qty: number }) {
   return <span className={`rounded-full border px-2 py-0.5 text-xs ${s.c}`}>{s.l}</span>;
 }
 
-function LuxuryOrderDialog({ product }: { product: LuxProduct }) {
+function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduct; selectedVariations: Record<string, string> }) {
   const { user } = useAuth();
   const sendEmail = useServerFn(sendOrderNotification);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [code, setCode] = useState<string | null>(null);
   const [form, setForm] = useState({ client_name: "", client_phone: "", client_address: "", quantity: 1, notes: "" });
+  const variantSummary = summarizeVariations(selectedVariations);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
     setBusy(true);
     const total = Number(product.price) * form.quantity;
+    const fullNotes = [variantSummary && `Opciones: ${variantSummary}`, form.notes].filter(Boolean).join("\n");
     const { data, error } = await supabase.from("orders").insert({
       impulsador_id: user.id,
       luxury_product_id: product.id,
@@ -181,7 +190,7 @@ function LuxuryOrderDialog({ product }: { product: LuxProduct }) {
       client_phone: form.client_phone,
       client_address: form.client_address,
       quantity: form.quantity,
-      notes: form.notes,
+      notes: fullNotes,
       total,
     } as never).select("order_code").single();
     setBusy(false);
@@ -191,14 +200,14 @@ function LuxuryOrderDialog({ product }: { product: LuxProduct }) {
     sendEmail({
       data: {
         orderCode: (data as { order_code: string }).order_code,
-        productName: product.name,
+        productName: product.name + (variantSummary ? ` (${variantSummary})` : ""),
         productSku: product.sku ?? "",
         clientName: form.client_name,
         clientPhone: form.client_phone,
         clientAddress: form.client_address || null,
         quantity: form.quantity,
         total,
-        notes: form.notes || null,
+        notes: fullNotes || null,
         impulsadorName: null,
       },
     }).catch((err) => console.warn("[luxury-order-email]", err));
@@ -224,6 +233,11 @@ function LuxuryOrderDialog({ product }: { product: LuxProduct }) {
           </div>
         ) : (
           <form onSubmit={submit} className="space-y-3">
+            {variantSummary && (
+              <p className="rounded-md border border-[color:var(--luxury-gold)]/30 bg-[color:var(--luxury-gold)]/5 px-3 py-2 text-xs text-[color:var(--luxury-gold)]">
+                Variación: {variantSummary}
+              </p>
+            )}
             <div>
               <Label>Nombre cliente</Label>
               <Input required value={form.client_name} onChange={(e) => setForm({ ...form, client_name: e.target.value })} className="bg-white/5" />
