@@ -73,12 +73,17 @@ function LoginPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanPhone = phone.replace(/[^\d]/g, "");
+    if (cleanPhone.length < 6) {
+      return toast.error("Ingresa un número de teléfono válido");
+    }
+    const fullPhone = `${countryCode}${cleanPhone}`;
     setBusy(true);
     const { error } = await supabase.auth.signUp({
       email, password,
       options: {
         emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
-        data: { full_name: fullName, phone },
+        data: { full_name: fullName, phone: fullPhone },
       },
     });
     setBusy(false);
