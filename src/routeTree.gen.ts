@@ -16,8 +16,8 @@ import { Route as CatalogoIndexRouteImport } from './routes/catalogo.index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as CatalogoSlugRouteImport } from './routes/catalogo.$slug'
 import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
-import { Route as AuthenticatedLuxuryRouteImport } from './routes/_authenticated/luxury'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as AuthenticatedLuxuryIndexRouteImport } from './routes/_authenticated/luxury.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedLuxurySlugRouteImport } from './routes/_authenticated/luxury.$slug'
 import { Route as AuthenticatedCategorySlugRouteImport } from './routes/_authenticated/category.$slug'
@@ -58,25 +58,26 @@ const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedLuxuryRoute = AuthenticatedLuxuryRouteImport.update({
-  id: '/luxury',
-  path: '/luxury',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/app',
   path: '/app',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedLuxuryIndexRoute =
+  AuthenticatedLuxuryIndexRouteImport.update({
+    id: '/luxury/',
+    path: '/luxury/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedLuxurySlugRoute = AuthenticatedLuxurySlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => AuthenticatedLuxuryRoute,
+  id: '/luxury/$slug',
+  path: '/luxury/$slug',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedCategorySlugRoute =
   AuthenticatedCategorySlugRouteImport.update({
@@ -101,7 +102,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/app': typeof AuthenticatedAppRoute
-  '/luxury': typeof AuthenticatedLuxuryRouteWithChildren
   '/orders': typeof AuthenticatedOrdersRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -110,13 +110,13 @@ export interface FileRoutesByFullPath {
   '/category/$slug': typeof AuthenticatedCategorySlugRoute
   '/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/luxury/': typeof AuthenticatedLuxuryIndexRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/app': typeof AuthenticatedAppRoute
-  '/luxury': typeof AuthenticatedLuxuryRouteWithChildren
   '/orders': typeof AuthenticatedOrdersRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -125,6 +125,7 @@ export interface FileRoutesByTo {
   '/category/$slug': typeof AuthenticatedCategorySlugRoute
   '/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/luxury': typeof AuthenticatedLuxuryIndexRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
@@ -133,7 +134,6 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
-  '/_authenticated/luxury': typeof AuthenticatedLuxuryRouteWithChildren
   '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -142,6 +142,7 @@ export interface FileRoutesById {
   '/_authenticated/category/$slug': typeof AuthenticatedCategorySlugRoute
   '/_authenticated/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/luxury/': typeof AuthenticatedLuxuryIndexRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
@@ -150,7 +151,6 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/app'
-    | '/luxury'
     | '/orders'
     | '/catalogo/$slug'
     | '/product/$slug'
@@ -159,13 +159,13 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/luxury/$slug'
     | '/admin/'
+    | '/luxury/'
     | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/app'
-    | '/luxury'
     | '/orders'
     | '/catalogo/$slug'
     | '/product/$slug'
@@ -174,6 +174,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/luxury/$slug'
     | '/admin'
+    | '/luxury'
     | '/lovable/email/queue/process'
   id:
     | '__root__'
@@ -181,7 +182,6 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/login'
     | '/_authenticated/app'
-    | '/_authenticated/luxury'
     | '/_authenticated/orders'
     | '/catalogo/$slug'
     | '/product/$slug'
@@ -190,6 +190,7 @@ export interface FileRouteTypes {
     | '/_authenticated/category/$slug'
     | '/_authenticated/luxury/$slug'
     | '/_authenticated/admin/'
+    | '/_authenticated/luxury/'
     | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
@@ -254,18 +255,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrdersRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/luxury': {
-      id: '/_authenticated/luxury'
-      path: '/luxury'
-      fullPath: '/luxury'
-      preLoaderRoute: typeof AuthenticatedLuxuryRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/app': {
       id: '/_authenticated/app'
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AuthenticatedAppRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/luxury/': {
+      id: '/_authenticated/luxury/'
+      path: '/luxury'
+      fullPath: '/luxury/'
+      preLoaderRoute: typeof AuthenticatedLuxuryIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin/': {
@@ -277,10 +278,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/luxury/$slug': {
       id: '/_authenticated/luxury/$slug'
-      path: '/$slug'
+      path: '/luxury/$slug'
       fullPath: '/luxury/$slug'
       preLoaderRoute: typeof AuthenticatedLuxurySlugRouteImport
-      parentRoute: typeof AuthenticatedLuxuryRoute
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/category/$slug': {
       id: '/_authenticated/category/$slug'
@@ -306,33 +307,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedLuxuryRouteChildren {
-  AuthenticatedLuxurySlugRoute: typeof AuthenticatedLuxurySlugRoute
-}
-
-const AuthenticatedLuxuryRouteChildren: AuthenticatedLuxuryRouteChildren = {
-  AuthenticatedLuxurySlugRoute: AuthenticatedLuxurySlugRoute,
-}
-
-const AuthenticatedLuxuryRouteWithChildren =
-  AuthenticatedLuxuryRoute._addFileChildren(AuthenticatedLuxuryRouteChildren)
-
 interface AuthenticatedRouteChildren {
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
-  AuthenticatedLuxuryRoute: typeof AuthenticatedLuxuryRouteWithChildren
   AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
   AuthenticatedAdminLuxuryRoute: typeof AuthenticatedAdminLuxuryRoute
   AuthenticatedCategorySlugRoute: typeof AuthenticatedCategorySlugRoute
+  AuthenticatedLuxurySlugRoute: typeof AuthenticatedLuxurySlugRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedLuxuryIndexRoute: typeof AuthenticatedLuxuryIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAppRoute: AuthenticatedAppRoute,
-  AuthenticatedLuxuryRoute: AuthenticatedLuxuryRouteWithChildren,
   AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
   AuthenticatedAdminLuxuryRoute: AuthenticatedAdminLuxuryRoute,
   AuthenticatedCategorySlugRoute: AuthenticatedCategorySlugRoute,
+  AuthenticatedLuxurySlugRoute: AuthenticatedLuxurySlugRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedLuxuryIndexRoute: AuthenticatedLuxuryIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
