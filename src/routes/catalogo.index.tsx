@@ -169,6 +169,10 @@ function PublicCatalog() {
           </div>
         </section>
 
+        {promos.length > 0 && <PromoCarousel promos={promos} />}
+
+
+
         {/* Toolbar */}
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <div className="relative min-w-[200px] flex-1">
