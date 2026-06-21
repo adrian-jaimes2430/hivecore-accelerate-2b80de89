@@ -291,21 +291,30 @@ function LuxuryCatalog() {
 
 function ProductCard({ p, brand, onQuickView }: { p: LuxProduct; brand?: string; onQuickView: () => void }) {
   const imgs = Array.isArray(p.images) ? (p.images as string[]) : [];
+  const vids = Array.isArray(p.videos) ? (p.videos as string[]) : [];
   const cover = imgs[0];
   const utility = Number(p.suggested_retail_price) - Number(p.price);
+  const showImp = p.show_impulsador_price !== false;
+  const finalPrice = Number(p.suggested_retail_price || p.price);
 
   return (
-    <div className="hive-card group overflow-hidden">
+    <div className="hive-card group overflow-hidden transition-transform duration-300 hover:-translate-y-0.5">
       <Link to="/luxury/$slug" params={{ slug: p.slug }} className="block">
         <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-zinc-900 to-black">
           {cover ? (
-            <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center font-display text-5xl font-bold opacity-15">{p.name.charAt(0)}</div>
           )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           {p.is_featured && (
             <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full border border-[color:var(--luxury-gold)]/40 bg-black/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--luxury-gold)]">
               <Crown className="h-3 w-3" /> Featured
+            </span>
+          )}
+          {vids.length > 0 && (
+            <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-[10px] text-white">
+              <Film className="h-3 w-3" /> {vids.length}
             </span>
           )}
         </div>
@@ -314,15 +323,23 @@ function ProductCard({ p, brand, onQuickView }: { p: LuxProduct; brand?: string;
         {brand && <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{brand}</p>}
         <h3 className="font-semibold leading-tight">{p.name}</h3>
         {p.short_description && <p className="line-clamp-2 text-xs text-muted-foreground">{p.short_description}</p>}
-        <div className="flex items-baseline gap-2">
-          <span className="font-display text-lg font-bold">S/ {Number(p.price).toFixed(2)}</span>
-          {p.suggested_retail_price > p.price && (
-            <span className="text-xs text-muted-foreground line-through">S/ {Number(p.suggested_retail_price).toFixed(2)}</span>
-          )}
-        </div>
-        {utility > 0 && (
-          <div className="inline-flex items-center gap-1 rounded-md border border-[color:var(--luxury-gold)]/30 bg-[color:var(--luxury-gold)]/10 px-2 py-0.5 text-[11px] font-medium text-[color:var(--luxury-gold)]">
-            +S/ {utility.toFixed(2)} utilidad
+        {showImp ? (
+          <>
+            <div className="flex items-baseline gap-2">
+              <span className="font-display text-lg font-bold">S/ {Number(p.price).toFixed(2)}</span>
+              {p.suggested_retail_price > p.price && (
+                <span className="text-xs text-muted-foreground line-through">S/ {Number(p.suggested_retail_price).toFixed(2)}</span>
+              )}
+            </div>
+            {utility > 0 && (
+              <div className="inline-flex items-center gap-1 rounded-md border border-[color:var(--luxury-gold)]/30 bg-[color:var(--luxury-gold)]/10 px-2 py-0.5 text-[11px] font-medium text-[color:var(--luxury-gold)]">
+                +S/ {utility.toFixed(2)} utilidad
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="flex items-baseline gap-2">
+            <span className="font-display text-lg font-bold luxury-gradient-text">S/ {finalPrice.toFixed(2)}</span>
           </div>
         )}
         <div className="flex items-center gap-2 pt-2">
