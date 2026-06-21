@@ -189,7 +189,7 @@ function UsersTab() {
           {profiles.map((p) => (
             <tr key={p.id} className="border-t border-border/40">
               <td className="px-4 py-3 font-medium">{p.full_name ?? "—"}</td>
-              <td className="px-4 py-3 text-muted-foreground">{p.phone ?? "—"}</td>
+              <td className="px-4 py-3"><PhoneEditor id={p.id} phone={p.phone} /></td>
               <td className="px-4 py-3">
                 <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${statusChip(p.status)}`}>
                   {p.status}
