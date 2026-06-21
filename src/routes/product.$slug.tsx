@@ -68,6 +68,7 @@ interface Product {
 
 function ProductFunnel() {
   const { slug } = Route.useParams();
+  const { ref } = Route.useSearch();
   const { product: initial } = Route.useLoaderData();
   const { user, profile } = useAuth();
   const { data: product, isLoading } = useQuery({
@@ -79,6 +80,12 @@ function ProductFunnel() {
       if (!data) throw notFound();
       return data as Product;
     },
+  });
+
+  const { data: impulsador } = useQuery({
+    queryKey: ["impulsador-ref", ref],
+    enabled: !!ref,
+    queryFn: () => getImpulsadorRef({ data: { ref: ref! } }),
   });
 
   if (isLoading || !product) {
