@@ -163,7 +163,7 @@ function ProductFunnel() {
           {user
             ? <OrderDialog product={product} impulsadorName={profile?.full_name ?? null} />
             : <ImpulsadorCTA product={product} impulsador={impulsador ?? null} />}
-          <ShareDialog product={product} />
+          <ShareDialog product={product} impulsadorId={user?.id ?? ref ?? null} />
         </div>
       </section>
 
@@ -316,8 +316,9 @@ function OrderDialog({ product, impulsadorName }: { product: Product; impulsador
   );
 }
 
-function ShareDialog({ product }: { product: Product }) {
-  const url = typeof window !== "undefined" ? `${window.location.origin}/product/${product.slug}` : "";
+function ShareDialog({ product, impulsadorId }: { product: Product; impulsadorId: string | null }) {
+  const base = typeof window !== "undefined" ? `${window.location.origin}/product/${product.slug}` : "";
+  const url = impulsadorId ? `${base}?ref=${impulsadorId}` : base;
   const msg = `🔥 ${product.name} — ${product.short_description ?? ""}\n${url}`;
   const copy = async () => { await navigator.clipboard.writeText(url); toast.success("Enlace copiado"); };
 
