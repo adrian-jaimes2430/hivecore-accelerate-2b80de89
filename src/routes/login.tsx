@@ -5,6 +5,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const COUNTRY_CODES = [
+  { code: "+57", country: "Colombia", flag: "🇨🇴" },
+  { code: "+52", country: "México", flag: "🇲🇽" },
+  { code: "+1", country: "USA/Canadá", flag: "🇺🇸" },
+  { code: "+34", country: "España", flag: "🇪🇸" },
+  { code: "+54", country: "Argentina", flag: "🇦🇷" },
+  { code: "+56", country: "Chile", flag: "🇨🇱" },
+  { code: "+51", country: "Perú", flag: "🇵🇪" },
+  { code: "+58", country: "Venezuela", flag: "🇻🇪" },
+  { code: "+593", country: "Ecuador", flag: "🇪🇨" },
+  { code: "+591", country: "Bolivia", flag: "🇧🇴" },
+  { code: "+595", country: "Paraguay", flag: "🇵🇾" },
+  { code: "+598", country: "Uruguay", flag: "🇺🇾" },
+  { code: "+507", country: "Panamá", flag: "🇵🇦" },
+  { code: "+506", country: "Costa Rica", flag: "🇨🇷" },
+  { code: "+503", country: "El Salvador", flag: "🇸🇻" },
+  { code: "+502", country: "Guatemala", flag: "🇬🇹" },
+  { code: "+504", country: "Honduras", flag: "🇭🇳" },
+  { code: "+505", country: "Nicaragua", flag: "🇳🇮" },
+  { code: "+1809", country: "Rep. Dominicana", flag: "🇩🇴" },
+  { code: "+53", country: "Cuba", flag: "🇨🇺" },
+  { code: "+55", country: "Brasil", flag: "🇧🇷" },
+  { code: "+44", country: "Reino Unido", flag: "🇬🇧" },
+  { code: "+33", country: "Francia", flag: "🇫🇷" },
+  { code: "+49", country: "Alemania", flag: "🇩🇪" },
+  { code: "+39", country: "Italia", flag: "🇮🇹" },
+  { code: "+351", country: "Portugal", flag: "🇵🇹" },
+];
 import { HiveLogo } from "@/components/HiveLogo";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
@@ -23,6 +53,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [countryCode, setCountryCode] = useState("+57");
   const [phone, setPhone] = useState("");
 
   useEffect(() => {
@@ -42,12 +73,17 @@ function LoginPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanPhone = phone.replace(/[^\d]/g, "");
+    if (cleanPhone.length < 6) {
+      return toast.error("Ingresa un número de teléfono válido");
+    }
+    const fullPhone = `${countryCode}${cleanPhone}`;
     setBusy(true);
     const { error } = await supabase.auth.signUp({
       email, password,
       options: {
         emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
-        data: { full_name: fullName, phone },
+        data: { full_name: fullName, phone: fullPhone },
       },
     });
     setBusy(false);
@@ -99,8 +135,35 @@ function LoginPage() {
                   <Input id="name" required value={fullName} onChange={(e) => setFullName(e.target.value)} className="mt-1.5 bg-white/5" />
                 </div>
                 <div>
-                  <Label htmlFor="phone">Teléfono</Label>
-                  <Input id="phone" type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1.5 bg-white/5" />
+                  <Label htmlFor="phone">Teléfono (WhatsApp)</Label>
+                  <div className="mt-1.5 flex gap-2">
+                    <Select value={countryCode} onValueChange={setCountryCode}>
+                      <SelectTrigger className="w-[140px] bg-white/5">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[300px]">
+                        {COUNTRY_CODES.map((c) => (
+                          <SelectItem key={c.country} value={c.code}>
+                            <span className="mr-2">{c.flag}</span>
+                            {c.code} {c.country}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      required
+                      inputMode="numeric"
+                      placeholder="3001234567"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value.replace(/[^\d]/g, ""))}
+                      className="flex-1 bg-white/5"
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Selecciona tu país. Sin espacios ni guiones.
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="email2">Email</Label>
