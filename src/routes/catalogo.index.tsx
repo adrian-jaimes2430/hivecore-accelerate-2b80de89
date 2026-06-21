@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Crown, Filter, Sparkles, Loader2, ArrowRight, Search, MessageCircle } from "lucide-react";
+import { Crown, Filter, Sparkles, ArrowRight, Search, MessageCircle, Film } from "lucide-react";
 import { listLuxuryCatalog, getImpulsadorRef } from "@/lib/luxury-public.functions";
+import { PromoCarousel, type Promo } from "@/components/luxury/PromoCarousel";
 
 const searchSchema = z.object({
   cat: fallback(z.string().optional(), undefined).optional(),
