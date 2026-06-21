@@ -189,7 +189,7 @@ function UsersTab() {
           {profiles.map((p) => (
             <tr key={p.id} className="border-t border-border/40">
               <td className="px-4 py-3 font-medium">{p.full_name ?? "—"}</td>
-              <td className="px-4 py-3 text-muted-foreground">{p.phone ?? "—"}</td>
+              <td className="px-4 py-3"><PhoneEditor id={p.id} phone={p.phone} /></td>
               <td className="px-4 py-3">
                 <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${statusChip(p.status)}`}>
                   {p.status}
@@ -250,6 +250,57 @@ function statusChip(s: string) {
   if (s === "approved") return "bg-hive/15 text-hive";
   if (s === "blocked") return "bg-destructive/15 text-destructive";
   return "bg-anma-orange/15 text-anma-orange";
+}
+
+function PhoneEditor({ id, phone }: { id: string; phone: string | null }) {
+  const qc = useQueryClient();
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(phone ?? "");
+  const [busy, setBusy] = useState(false);
+
+  const save = async () => {
+    const clean = value.trim();
+    setBusy(true);
+    const { error } = await supabase.from("profiles").update({ phone: clean || null }).eq("id", id);
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Teléfono actualizado");
+    qc.invalidateQueries({ queryKey: ["admin-profiles"] });
+    setEditing(false);
+  };
+
+  if (!editing) {
+    return (
+      <button
+        type="button"
+        onClick={() => { setValue(phone ?? ""); setEditing(true); }}
+        className="group inline-flex items-center gap-2 rounded-md px-2 py-1 text-left text-muted-foreground hover:bg-white/5 hover:text-foreground"
+        title="Editar teléfono"
+      >
+        <span className={phone ? "" : "italic opacity-60"}>{phone ?? "Agregar teléfono"}</span>
+        <Pencil className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-1">
+      <Input
+        autoFocus
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => { if (e.key === "Enter") save(); if (e.key === "Escape") setEditing(false); }}
+        placeholder="+57 300..."
+        className="h-8 w-40 bg-white/5 text-xs"
+      />
+      <Button size="sm" onClick={save} disabled={busy} className="hive-btn-primary h-8 border-0 px-2">
+        {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
+      </Button>
+      <Button size="sm" variant="ghost" onClick={() => setEditing(false)} className="h-8 px-2">
+        <X className="h-3 w-3" />
+      </Button>
+    </div>
+  );
 }
 
 /* ─────────────── CATEGORIES ─────────────── */
