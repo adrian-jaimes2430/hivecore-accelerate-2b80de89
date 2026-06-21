@@ -160,19 +160,62 @@ function ProductFunnel() {
           </table>
         </div>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          {user ? <OrderDialog product={product} impulsadorName={profile?.full_name ?? null} /> : <LoginCTA />}
+          {user
+            ? <OrderDialog product={product} impulsadorName={profile?.full_name ?? null} />
+            : <ImpulsadorCTA product={product} impulsador={impulsador ?? null} />}
           <ShareDialog product={product} />
         </div>
       </section>
+
+      {!user && impulsador && <FloatingImpulsadorCTA product={product} impulsador={impulsador} />}
     </div>
   );
 }
 
-function LoginCTA() {
+function ImpulsadorCTA({ product, impulsador }: { product: Product; impulsador: { id: string; name: string | null; phone: string | null } | null }) {
+  if (!impulsador) {
+    return (
+      <Button disabled className="h-12 border border-border/60 bg-white/5 px-6 text-base text-muted-foreground opacity-100">
+        <Lock className="mr-2 h-4 w-4" /> Pedido gestionado por tu impulsador
+      </Button>
+    );
+  }
+  const url = typeof window !== "undefined" ? window.location.href : `${SITE_URL}/product/${product.slug}`;
+  const text = encodeURIComponent(
+    `Hola ${impulsador.name?.split(" ")[0] ?? ""}, me interesa "${product.name}" (SKU ${product.sku}) — S/ ${Number(product.price).toFixed(2)}.\n${url}`,
+  );
+  const phone = impulsador.phone?.replace(/[^\d]/g, "") ?? "";
+  const href = phone ? `https://wa.me/${phone}?text=${text}` : `https://wa.me/?text=${text}`;
   return (
-    <Button disabled className="h-12 border border-border/60 bg-white/5 px-6 text-base text-muted-foreground opacity-100">
-      <Lock className="mr-2 h-4 w-4" /> Pedido gestionado por tu impulsador
-    </Button>
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-emerald-500 px-6 text-base font-semibold text-black shadow-lg shadow-emerald-500/30 transition-transform hover:scale-[1.02]"
+    >
+      <MessageCircle className="h-5 w-5" />
+      Pedir a {impulsador.name?.split(" ")[0] ?? "tu impulsador"} por WhatsApp
+    </a>
+  );
+}
+
+function FloatingImpulsadorCTA({ product, impulsador }: { product: Product; impulsador: { id: string; name: string | null; phone: string | null } }) {
+  const url = typeof window !== "undefined" ? window.location.href : `${SITE_URL}/product/${product.slug}`;
+  const text = encodeURIComponent(
+    `Hola ${impulsador.name?.split(" ")[0] ?? ""}, me interesa "${product.name}" (SKU ${product.sku}).\n${url}`,
+  );
+  const phone = impulsador.phone?.replace(/[^\d]/g, "") ?? "";
+  const href = phone ? `https://wa.me/${phone}?text=${text}` : `https://wa.me/?text=${text}`;
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500 px-4 py-3 text-sm font-medium text-black shadow-2xl shadow-emerald-500/30 transition-transform hover:scale-105"
+    >
+      <MessageCircle className="h-4 w-4" />
+      Pedir por WhatsApp
+    </a>
   );
 }
 
