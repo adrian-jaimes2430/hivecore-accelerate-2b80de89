@@ -46,7 +46,7 @@ interface Cat { id: string; name: string; slug: string; parent_id: string | null
 interface Brand { id: string; name: string; slug: string }
 interface Product {
   id: string; name: string; slug: string; short_description: string | null;
-  images: unknown; category_id: string | null; brand_id: string | null;
+  images: unknown; videos: unknown; category_id: string | null; brand_id: string | null;
   price: number; suggested_retail_price: number; is_featured: boolean;
   stock_status: string;
 }
