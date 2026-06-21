@@ -52,8 +52,8 @@ interface Product {
 }
 
 function PublicCatalog() {
-  const { products, categories, brands } = Route.useLoaderData() as {
-    products: Product[]; categories: Cat[]; brands: Brand[];
+  const { products, categories, brands, promos } = Route.useLoaderData() as {
+    products: Product[]; categories: Cat[]; brands: Brand[]; promos: Promo[];
   };
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/catalogo" });
