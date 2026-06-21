@@ -39,8 +39,8 @@ interface LuxBrand { id: string; name: string; slug: string }
 interface LuxProduct {
   id: string; sku: string | null; name: string; slug: string;
   short_description: string | null; description: string | null;
-  images: unknown; category_id: string | null; brand_id: string | null;
-  price: number; suggested_retail_price: number;
+  images: unknown; videos: unknown; category_id: string | null; brand_id: string | null;
+  price: number; suggested_retail_price: number; show_impulsador_price: boolean;
   stock_status: string; stock_quantity: number;
   attributes: Record<string, unknown>; is_featured: boolean;
 }
