@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Check } from "lucide-react";
 import type { Variation } from "@/components/admin/VariationsEditor";
 
