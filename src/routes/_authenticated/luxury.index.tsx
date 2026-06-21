@@ -23,7 +23,7 @@ const searchSchema = z.object({
   stock: fallback(z.string().optional(), undefined).optional(),
 });
 
-export const Route = createFileRoute("/_authenticated/luxury")({
+export const Route = createFileRoute("/_authenticated/luxury/")({
   validateSearch: zodValidator(searchSchema),
   component: LuxuryCatalog,
   head: () => ({
