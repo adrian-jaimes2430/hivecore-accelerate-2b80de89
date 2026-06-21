@@ -225,12 +225,15 @@ export type Database = {
           name: string
           price: number
           short_description: string | null
+          show_impulsador_price: boolean
           sku: string | null
           slug: string
           stock_quantity: number
           stock_status: string
           suggested_retail_price: number
           updated_at: string
+          variations: Json
+          videos: Json
         }
         Insert: {
           attributes?: Json
@@ -245,12 +248,15 @@ export type Database = {
           name: string
           price?: number
           short_description?: string | null
+          show_impulsador_price?: boolean
           sku?: string | null
           slug: string
           stock_quantity?: number
           stock_status?: string
           suggested_retail_price?: number
           updated_at?: string
+          variations?: Json
+          videos?: Json
         }
         Update: {
           attributes?: Json
@@ -265,12 +271,15 @@ export type Database = {
           name?: string
           price?: number
           short_description?: string | null
+          show_impulsador_price?: boolean
           sku?: string | null
           slug?: string
           stock_quantity?: number
           stock_status?: string
           suggested_retail_price?: number
           updated_at?: string
+          variations?: Json
+          videos?: Json
         }
         Relationships: [
           {
@@ -288,6 +297,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      luxury_promos: {
+        Row: {
+          created_at: string
+          cta_label: string | null
+          id: string
+          is_active: boolean
+          link_url: string | null
+          media_type: string
+          media_url: string
+          sort_order: number
+          subtitle: string | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cta_label?: string | null
+          id?: string
+          is_active?: boolean
+          link_url?: string | null
+          media_type?: string
+          media_url: string
+          sort_order?: number
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cta_label?: string | null
+          id?: string
+          is_active?: boolean
+          link_url?: string | null
+          media_type?: string
+          media_url?: string
+          sort_order?: number
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       orders: {
         Row: {
