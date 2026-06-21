@@ -24,6 +24,7 @@ const searchSchema = z.object({
 });
 
 export const Route = createFileRoute("/product/$slug")({
+  validateSearch: zodValidator(searchSchema),
   component: ProductFunnel,
   loader: async ({ params }) => {
     const product = await getProductPublic({ data: { slug: params.slug } });
