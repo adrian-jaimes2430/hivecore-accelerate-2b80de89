@@ -11,7 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ShareBar } from "@/components/luxury/ShareBar";
-import { Crown, Filter, Sparkles, Loader2, ArrowRight, Search, ExternalLink } from "lucide-react";
+import { PromoCarousel, type Promo } from "@/components/luxury/PromoCarousel";
+import { Crown, Filter, Sparkles, Loader2, ArrowRight, Search, ExternalLink, Film } from "lucide-react";
 
 const searchSchema = z.object({
   cat: fallback(z.string().optional(), undefined).optional(),
