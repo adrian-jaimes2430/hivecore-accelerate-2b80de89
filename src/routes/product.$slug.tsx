@@ -13,8 +13,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Check, Share2, Mail, MessageCircle, Link as LinkIcon, ShoppingBag, ArrowLeft, Lock, Loader2 } from "lucide-react";
 import { sendOrderNotification } from "@/lib/order-email.functions";
 import { getProductPublic } from "@/lib/product-public.functions";
+import { getImpulsadorRef } from "@/lib/luxury-public.functions";
+import { z } from "zod";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
 
 const SITE_URL = "https://hivecore-accelerate.lovable.app";
+
+const searchSchema = z.object({
+  ref: fallback(z.string().optional(), undefined).optional(),
+});
 
 export const Route = createFileRoute("/product/$slug")({
   component: ProductFunnel,
