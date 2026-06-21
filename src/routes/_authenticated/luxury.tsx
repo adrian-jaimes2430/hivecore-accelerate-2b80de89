@@ -375,14 +375,23 @@ function QuickView({ p, brand }: { p: LuxProduct; brand?: string }) {
         {p.short_description && <p className="text-sm text-muted-foreground">{p.short_description}</p>}
         {p.description && <p className="text-sm">{p.description}</p>}
         <div className="rounded-lg border border-[color:var(--luxury-gold)]/30 bg-black/40 p-4">
-          <div className="flex items-baseline gap-3">
-            <span className="font-display text-2xl font-bold">S/ {Number(p.price).toFixed(2)}</span>
-            <span className="text-xs text-muted-foreground">precio impulsador</span>
-          </div>
-          {p.suggested_retail_price > 0 && (
-            <p className="mt-1 text-sm text-muted-foreground">Sugerido al cliente: <span className="text-foreground">S/ {Number(p.suggested_retail_price).toFixed(2)}</span></p>
+          {p.show_impulsador_price !== false ? (
+            <>
+              <div className="flex items-baseline gap-3">
+                <span className="font-display text-2xl font-bold">S/ {Number(p.price).toFixed(2)}</span>
+                <span className="text-xs text-muted-foreground">precio impulsador</span>
+              </div>
+              {p.suggested_retail_price > 0 && (
+                <p className="mt-1 text-sm text-muted-foreground">Sugerido al cliente: <span className="text-foreground">S/ {Number(p.suggested_retail_price).toFixed(2)}</span></p>
+              )}
+              {utility > 0 && <p className="mt-1 text-sm text-[color:var(--luxury-gold)]">Utilidad estimada: +S/ {utility.toFixed(2)}</p>}
+            </>
+          ) : (
+            <div className="flex items-baseline gap-3">
+              <span className="font-display text-2xl font-bold luxury-gradient-text">S/ {Number(p.suggested_retail_price || p.price).toFixed(2)}</span>
+              <span className="text-xs text-muted-foreground">precio final</span>
+            </div>
           )}
-          {utility > 0 && <p className="mt-1 text-sm text-[color:var(--luxury-gold)]">Utilidad estimada: +S/ {utility.toFixed(2)}</p>}
         </div>
         <Link to="/luxury/$slug" params={{ slug: p.slug }} className="inline-flex items-center gap-1 text-sm text-[color:var(--luxury-gold)]">
           Ver ficha completa <ArrowRight className="h-3 w-3" />
