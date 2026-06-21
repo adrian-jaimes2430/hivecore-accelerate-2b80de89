@@ -223,6 +223,10 @@ function LuxuryCatalog() {
         </div>
       </div>
 
+      {promos.length > 0 && <PromoCarousel promos={promos} />}
+
+
+
       {/* Toolbar */}
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px]">
