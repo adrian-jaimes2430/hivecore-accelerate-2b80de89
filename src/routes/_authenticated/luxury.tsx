@@ -71,6 +71,18 @@ function LuxuryCatalog() {
     },
   });
 
+  const { data: promos = [] } = useQuery({
+    queryKey: ["luxury-promos"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("luxury_promos")
+        .select("id,title,subtitle,media_type,media_url,link_url,cta_label")
+        .eq("is_active", true)
+        .order("sort_order");
+      return (data ?? []) as Promo[];
+    },
+  });
+
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["luxury-products", search],
     queryFn: async () => {
