@@ -194,11 +194,13 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
       quantity: form.quantity,
       notes: fullNotes,
       total,
-    } as never).select("order_code").single();
+    } as never).select("id, order_code").single();
     setBusy(false);
     if (error) return toast.error(error.message);
-    setCode((data as { order_code: string }).order_code);
+    const created = data as { id: string; order_code: string };
+    setCode(created.order_code);
     toast.success("Pedido creado");
+    forwardOrder({ data: { orderId: created.id } }).catch((err) => console.warn("[order-forward]", err));
     sendEmail({
       data: {
         orderCode: (data as { order_code: string }).order_code,
