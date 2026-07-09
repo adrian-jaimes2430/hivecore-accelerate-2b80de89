@@ -243,11 +243,13 @@ function OrderDialog({ product, impulsadorName }: { product: Product; impulsador
       quantity: form.quantity,
       notes: form.notes,
       total,
-    }).select("order_code").single();
+    }).select("id, order_code").single();
     setBusy(false);
     if (error) return toast.error(error.message);
     setCode(data!.order_code);
     toast.success("Pedido creado");
+
+    forwardOrder({ data: { orderId: data!.id } }).catch((err) => console.warn("[order-forward]", err));
 
     // Fire-and-forget email notification
     sendEmail({
