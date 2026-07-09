@@ -171,6 +171,7 @@ function StockBadge({ status, qty }: { status: string; qty: number }) {
 function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduct; selectedVariations: Record<string, string> }) {
   const { user } = useAuth();
   const sendEmail = useServerFn(sendOrderNotification);
+  const forwardOrder = useServerFn(forwardOrderToIntegrations);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [code, setCode] = useState<string | null>(null);
