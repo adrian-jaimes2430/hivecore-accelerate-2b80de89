@@ -223,6 +223,7 @@ function FloatingImpulsadorCTA({ product, impulsador }: { product: Product; impu
 function OrderDialog({ product, impulsadorName }: { product: Product; impulsadorName: string | null }) {
   const { user } = useAuth();
   const sendEmail = useServerFn(sendOrderNotification);
+  const forwardOrder = useServerFn(forwardOrderToIntegrations);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [code, setCode] = useState<string | null>(null);
