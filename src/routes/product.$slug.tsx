@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Check, Share2, Mail, MessageCircle, Link as LinkIcon, ShoppingBag, ArrowLeft, Lock, Loader2 } from "lucide-react";
 import { sendOrderNotification } from "@/lib/order-email.functions";
+import { forwardOrderToIntegrations } from "@/lib/integrations.functions";
 import { getProductPublic } from "@/lib/product-public.functions";
 import { getImpulsadorRef } from "@/lib/luxury-public.functions";
 import { z } from "zod";
@@ -222,6 +223,7 @@ function FloatingImpulsadorCTA({ product, impulsador }: { product: Product; impu
 function OrderDialog({ product, impulsadorName }: { product: Product; impulsadorName: string | null }) {
   const { user } = useAuth();
   const sendEmail = useServerFn(sendOrderNotification);
+  const forwardOrder = useServerFn(forwardOrderToIntegrations);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [code, setCode] = useState<string | null>(null);
@@ -241,11 +243,13 @@ function OrderDialog({ product, impulsadorName }: { product: Product; impulsador
       quantity: form.quantity,
       notes: form.notes,
       total,
-    }).select("order_code").single();
+    }).select("id, order_code").single();
     setBusy(false);
     if (error) return toast.error(error.message);
     setCode(data!.order_code);
     toast.success("Pedido creado");
+
+    forwardOrder({ data: { orderId: data!.id } }).catch((err) => console.warn("[order-forward]", err));
 
     // Fire-and-forget email notification
     sendEmail({
