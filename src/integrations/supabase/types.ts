@@ -134,6 +134,51 @@ export type Database = {
         }
         Relationships: []
       }
+      integrations: {
+        Row: {
+          api_key: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          last_error: string | null
+          last_sent_at: string | null
+          last_status: string | null
+          name: string
+          orders_sent: number
+          updated_at: string
+          webhook_url: string
+        }
+        Insert: {
+          api_key?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          last_error?: string | null
+          last_sent_at?: string | null
+          last_status?: string | null
+          name: string
+          orders_sent?: number
+          updated_at?: string
+          webhook_url: string
+        }
+        Update: {
+          api_key?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          last_error?: string | null
+          last_sent_at?: string | null
+          last_status?: string | null
+          name?: string
+          orders_sent?: number
+          updated_at?: string
+          webhook_url?: string
+        }
+        Relationships: []
+      }
       luxury_brands: {
         Row: {
           created_at: string
@@ -346,6 +391,9 @@ export type Database = {
           client_name: string
           client_phone: string
           created_at: string
+          external_error: string | null
+          external_ref: string | null
+          external_synced_at: string | null
           id: string
           impulsador_id: string
           luxury_product_id: string | null
@@ -361,6 +409,9 @@ export type Database = {
           client_name: string
           client_phone: string
           created_at?: string
+          external_error?: string | null
+          external_ref?: string | null
+          external_synced_at?: string | null
           id?: string
           impulsador_id: string
           luxury_product_id?: string | null
@@ -376,6 +427,9 @@ export type Database = {
           client_name?: string
           client_phone?: string
           created_at?: string
+          external_error?: string | null
+          external_ref?: string | null
+          external_synced_at?: string | null
           id?: string
           impulsador_id?: string
           luxury_product_id?: string | null
