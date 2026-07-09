@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { sendOrderNotification } from "@/lib/order-email.functions";
+import { forwardOrderToIntegrations } from "@/lib/integrations.functions";
 import type { Variation } from "@/components/admin/VariationsEditor";
 
 export const Route = createFileRoute("/_authenticated/luxury/$slug")({
