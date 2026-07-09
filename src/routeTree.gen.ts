@@ -22,6 +22,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedLuxurySlugRouteImport } from './routes/_authenticated/luxury.$slug'
 import { Route as AuthenticatedCategorySlugRouteImport } from './routes/_authenticated/category.$slug'
 import { Route as AuthenticatedAdminLuxuryRouteImport } from './routes/_authenticated/admin.luxury'
+import { Route as AuthenticatedAdminIntegrationsRouteImport } from './routes/_authenticated/admin.integrations'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
 const LoginRoute = LoginRouteImport.update({
@@ -91,6 +92,12 @@ const AuthenticatedAdminLuxuryRoute =
     path: '/admin/luxury',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminIntegrationsRoute =
+  AuthenticatedAdminIntegrationsRouteImport.update({
+    id: '/admin/integrations',
+    path: '/admin/integrations',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -106,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/catalogo/$slug': typeof CatalogoSlugRoute
   '/product/$slug': typeof ProductSlugRoute
   '/catalogo/': typeof CatalogoIndexRoute
+  '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/admin/luxury': typeof AuthenticatedAdminLuxuryRoute
   '/category/$slug': typeof AuthenticatedCategorySlugRoute
   '/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
@@ -121,6 +129,7 @@ export interface FileRoutesByTo {
   '/catalogo/$slug': typeof CatalogoSlugRoute
   '/product/$slug': typeof ProductSlugRoute
   '/catalogo': typeof CatalogoIndexRoute
+  '/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/admin/luxury': typeof AuthenticatedAdminLuxuryRoute
   '/category/$slug': typeof AuthenticatedCategorySlugRoute
   '/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
@@ -138,6 +147,7 @@ export interface FileRoutesById {
   '/catalogo/$slug': typeof CatalogoSlugRoute
   '/product/$slug': typeof ProductSlugRoute
   '/catalogo/': typeof CatalogoIndexRoute
+  '/_authenticated/admin/integrations': typeof AuthenticatedAdminIntegrationsRoute
   '/_authenticated/admin/luxury': typeof AuthenticatedAdminLuxuryRoute
   '/_authenticated/category/$slug': typeof AuthenticatedCategorySlugRoute
   '/_authenticated/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/catalogo/$slug'
     | '/product/$slug'
     | '/catalogo/'
+    | '/admin/integrations'
     | '/admin/luxury'
     | '/category/$slug'
     | '/luxury/$slug'
@@ -170,6 +181,7 @@ export interface FileRouteTypes {
     | '/catalogo/$slug'
     | '/product/$slug'
     | '/catalogo'
+    | '/admin/integrations'
     | '/admin/luxury'
     | '/category/$slug'
     | '/luxury/$slug'
@@ -186,6 +198,7 @@ export interface FileRouteTypes {
     | '/catalogo/$slug'
     | '/product/$slug'
     | '/catalogo/'
+    | '/_authenticated/admin/integrations'
     | '/_authenticated/admin/luxury'
     | '/_authenticated/category/$slug'
     | '/_authenticated/luxury/$slug'
@@ -297,6 +310,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminLuxuryRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/integrations': {
+      id: '/_authenticated/admin/integrations'
+      path: '/admin/integrations'
+      fullPath: '/admin/integrations'
+      preLoaderRoute: typeof AuthenticatedAdminIntegrationsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -310,6 +330,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
   AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
+  AuthenticatedAdminIntegrationsRoute: typeof AuthenticatedAdminIntegrationsRoute
   AuthenticatedAdminLuxuryRoute: typeof AuthenticatedAdminLuxuryRoute
   AuthenticatedCategorySlugRoute: typeof AuthenticatedCategorySlugRoute
   AuthenticatedLuxurySlugRoute: typeof AuthenticatedLuxurySlugRoute
@@ -320,6 +341,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAppRoute: AuthenticatedAppRoute,
   AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
+  AuthenticatedAdminIntegrationsRoute: AuthenticatedAdminIntegrationsRoute,
   AuthenticatedAdminLuxuryRoute: AuthenticatedAdminLuxuryRoute,
   AuthenticatedCategorySlugRoute: AuthenticatedCategorySlugRoute,
   AuthenticatedLuxurySlugRoute: AuthenticatedLuxurySlugRoute,

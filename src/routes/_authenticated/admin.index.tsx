@@ -63,9 +63,14 @@ function AdminPage() {
           <ShieldCheck className="h-6 w-6 text-hive" />
           <h1 className="font-display text-3xl font-bold">Panel administrativo</h1>
         </div>
-        <a href="/admin/luxury" className="inline-flex items-center gap-2 rounded-md border border-[color:var(--luxury-gold)]/40 bg-[color:var(--luxury-gold)]/10 px-4 py-2 text-sm text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/20">
-          <Sparkles className="h-4 w-4" /> Gestionar AnMa Luxury
-        </a>
+        <div className="flex items-center gap-2">
+          <a href="/admin/integrations" className="inline-flex items-center gap-2 rounded-md border border-hive/40 bg-hive/10 px-4 py-2 text-sm text-hive hover:bg-hive/20">
+            <Package className="h-4 w-4" /> Integraciones
+          </a>
+          <a href="/admin/luxury" className="inline-flex items-center gap-2 rounded-md border border-[color:var(--luxury-gold)]/40 bg-[color:var(--luxury-gold)]/10 px-4 py-2 text-sm text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/20">
+            <Sparkles className="h-4 w-4" /> AnMa Luxury
+          </a>
+        </div>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
