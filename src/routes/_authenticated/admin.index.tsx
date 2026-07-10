@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { forwardOrderEvent } from "@/lib/integrations.functions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -794,6 +796,7 @@ interface OrderRow {
 function OrdersTab() {
   const qc = useQueryClient();
   const [editOrder, setEditOrder] = useState<OrderRow | null>(null);
+  const forwardEvent = useServerFn(forwardOrderEvent);
 
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ["admin-orders"],
@@ -808,12 +811,21 @@ function OrdersTab() {
   });
 
   const remove = async (o: OrderRow) => {
-    if (!confirm(`¿Eliminar pedido ${o.order_code}? Esta acción no se puede deshacer.`)) return;
-    const { error } = await supabase.from("orders").delete().eq("id", o.id);
-    if (error) return toast.error(error.message);
-    toast.success("Pedido eliminado");
-    qc.invalidateQueries({ queryKey: ["admin-orders"] });
-    qc.invalidateQueries({ queryKey: ["orders"] });
+    if (!confirm(`¿Eliminar pedido ${o.order_code}? Esta acción no se puede deshacer y se sincronizará con A&O CORE OS.`)) return;
+    try {
+      // The server fn dispatches order.deleted to all active integrations
+      // AND deletes the row (service role bypasses RLS).
+      const r = await forwardEvent({ data: { orderId: o.id, event: "order.deleted" } });
+      if (r.error && r.forwarded === 0 && r.total > 0) {
+        toast.error(`No se pudo sincronizar la eliminación: ${r.error}`);
+        return;
+      }
+      toast.success("Pedido eliminado" + (r.forwarded ? ` y sincronizado (${r.forwarded})` : ""));
+      qc.invalidateQueries({ queryKey: ["admin-orders"] });
+      qc.invalidateQueries({ queryKey: ["orders"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Error al eliminar");
+    }
   };
 
   const updateStatus = async (o: OrderRow, status: string) => {
@@ -821,6 +833,10 @@ function OrdersTab() {
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["admin-orders"] });
     qc.invalidateQueries({ queryKey: ["orders"] });
+    // Fire-and-forget sync to A&O CORE OS
+    forwardEvent({ data: { orderId: o.id, event: "order.updated" } }).catch((e) =>
+      console.warn("[integrations] updateStatus forward", e),
+    );
   };
 
   if (isLoading) {
@@ -892,6 +908,7 @@ function OrdersTab() {
 
 function EditOrderDialog({ order, onClose }: { order: OrderRow | null; onClose: () => void }) {
   const qc = useQueryClient();
+  const forwardEvent = useServerFn(forwardOrderEvent);
   const [form, setForm] = useState({ client_name: "", client_phone: "", client_address: "", quantity: 1, notes: "" });
   const [busy, setBusy] = useState(false);
 
@@ -923,6 +940,10 @@ function EditOrderDialog({ order, onClose }: { order: OrderRow | null; onClose: 
     toast.success("Pedido actualizado");
     qc.invalidateQueries({ queryKey: ["admin-orders"] });
     qc.invalidateQueries({ queryKey: ["orders"] });
+    // Sync change to A&O CORE OS (fire-and-forget)
+    forwardEvent({ data: { orderId: order.id, event: "order.updated" } }).catch((e) =>
+      console.warn("[integrations] editOrder forward", e),
+    );
     onClose();
   };
 

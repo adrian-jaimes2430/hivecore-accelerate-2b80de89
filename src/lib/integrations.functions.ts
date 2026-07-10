@@ -5,90 +5,76 @@ const inputSchema = z.object({
   orderId: z.string().uuid(),
 });
 
+type OrderEvent = "order.created" | "order.updated" | "order.deleted";
+
+const eventSchema = z.object({
+  orderId: z.string().uuid(),
+  event: z.enum(["order.created", "order.updated", "order.deleted"]),
+});
+
 /**
- * Fire-and-forget forwarding of a HIVECORE order to every active
- * external integration (A&O CORE OS, etc.). Called from the client
- * right after `orders.insert(...)` succeeds.
- *
- * Uses the service-role admin client because ordinary impulsadores
- * cannot read `integrations` or update sync columns on `orders`.
+ * Build a normalized payload for a HiveCore order to send to external
+ * integrations (A&O CORE OS, etc.). Returns null if the order does not
+ * exist (already deleted for example).
  */
-export const forwardOrderToIntegrations = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => inputSchema.parse(input))
-  .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+async function buildOrderPayload(
+  supabaseAdmin: any,
+  orderId: string,
+  event: OrderEvent,
+) {
+  const { data: order } = await supabaseAdmin
+    .from("orders")
+    .select("*")
+    .eq("id", orderId)
+    .maybeSingle();
+  if (!order) return null;
 
-    // Load active integrations
-    const { data: integrations, error: integErr } = await supabaseAdmin
-      .from("integrations")
-      .select("id, name, api_key, webhook_url, orders_sent")
-      .eq("is_active", true);
-    if (integErr) {
-      console.error("[integrations.forward] load", integErr);
-      return { forwarded: 0, reason: "load_failed" };
-    }
-    if (!integrations || integrations.length === 0) {
-      return { forwarded: 0, reason: "no_active_integrations" };
-    }
+  let productName = "";
+  let productSku = "";
+  let productSource: "hivecore" | "luxury" = "hivecore";
+  if ((order as any).product_id) {
+    const { data: p } = await supabaseAdmin
+      .from("products")
+      .select("name, sku")
+      .eq("id", (order as any).product_id)
+      .maybeSingle();
+    productName = p?.name ?? "";
+    productSku = p?.sku ?? "";
+  } else if ((order as any).luxury_product_id) {
+    productSource = "luxury";
+    const { data: p } = await supabaseAdmin
+      .from("luxury_products")
+      .select("name, sku")
+      .eq("id", (order as any).luxury_product_id)
+      .maybeSingle();
+    productName = p?.name ?? "";
+    productSku = p?.sku ?? "";
+  }
 
-    // Load order + related product + impulsador profile
-    const { data: order, error: orderErr } = await supabaseAdmin
-      .from("orders")
-      .select("*")
-      .eq("id", data.orderId)
-      .single();
-    if (orderErr || !order) {
-      console.error("[integrations.forward] order", orderErr);
-      return { forwarded: 0, reason: "order_not_found" };
+  let impulsadorName: string | null = null;
+  let impulsadorPhone: string | null = null;
+  let impulsadorEmail: string | null = null;
+  const impulsadorId = (order as any).impulsador_id as string | null;
+  if (impulsadorId) {
+    const { data: prof } = await supabaseAdmin
+      .from("profiles")
+      .select("full_name, phone")
+      .eq("id", impulsadorId)
+      .maybeSingle();
+    impulsadorName = prof?.full_name ?? null;
+    impulsadorPhone = prof?.phone ?? null;
+    try {
+      const { data: u } = await supabaseAdmin.auth.admin.getUserById(impulsadorId);
+      impulsadorEmail = u?.user?.email ?? null;
+    } catch (e) {
+      console.warn("[integrations.forward] getUserById", e);
     }
+  }
 
-    // Product may be from `products` or `luxury_products`
-    let productName = "";
-    let productSku = "";
-    let productSource: "hivecore" | "luxury" = "hivecore";
-    if ((order as any).product_id) {
-      const { data: p } = await supabaseAdmin
-        .from("products")
-        .select("name, sku")
-        .eq("id", (order as any).product_id)
-        .maybeSingle();
-      productName = p?.name ?? "";
-      productSku = p?.sku ?? "";
-    } else if ((order as any).luxury_product_id) {
-      productSource = "luxury";
-      const { data: p } = await supabaseAdmin
-        .from("luxury_products")
-        .select("name, sku")
-        .eq("id", (order as any).luxury_product_id)
-        .maybeSingle();
-      productName = p?.name ?? "";
-      productSku = p?.sku ?? "";
-    }
-
-    // Impulsador profile + email
-    let impulsadorName: string | null = null;
-    let impulsadorPhone: string | null = null;
-    let impulsadorEmail: string | null = null;
-    const impulsadorId = (order as any).impulsador_id as string | null;
-    if (impulsadorId) {
-      const { data: prof } = await supabaseAdmin
-        .from("profiles")
-        .select("full_name, phone")
-        .eq("id", impulsadorId)
-        .maybeSingle();
-      impulsadorName = prof?.full_name ?? null;
-      impulsadorPhone = prof?.phone ?? null;
-      try {
-        const { data: u } = await supabaseAdmin.auth.admin.getUserById(impulsadorId);
-        impulsadorEmail = u?.user?.email ?? null;
-      } catch (e) {
-        console.warn("[integrations.forward] getUserById", e);
-      }
-    }
-
-    const payload = {
+  return {
+    payload: {
       source: "hivecore",
-      event: "order.created",
+      event,
       order: {
         id: (order as any).id,
         code: (order as any).order_code,
@@ -100,6 +86,7 @@ export const forwardOrderToIntegrations = createServerFn({ method: "POST" })
         notes: (order as any).notes,
         status: (order as any).status,
         created_at: (order as any).created_at,
+        external_ref: (order as any).external_ref ?? null,
       },
       product: {
         source: productSource,
@@ -112,65 +99,90 @@ export const forwardOrderToIntegrations = createServerFn({ method: "POST" })
         email: impulsadorEmail,
         phone: impulsadorPhone,
       },
-    };
+    },
+    order,
+  };
+}
 
-    let forwarded = 0;
-    let lastRef: string | null = null;
-    let lastErr: string | null = null;
+/**
+ * Send a payload to every active integration. Updates sync columns on the
+ * order (unless the event is `order.deleted`, in which case the row is gone).
+ */
+async function dispatchToIntegrations(
+  supabaseAdmin: any,
+  orderId: string,
+  event: OrderEvent,
+  payload: Record<string, unknown>,
+) {
+  const { data: integrations, error: integErr } = await supabaseAdmin
+    .from("integrations")
+    .select("id, name, api_key, webhook_url, orders_sent")
+    .eq("is_active", true);
+  if (integErr) {
+    console.error("[integrations.forward] load", integErr);
+    return { forwarded: 0, total: 0, error: "load_failed" as string | null };
+  }
+  if (!integrations || integrations.length === 0) {
+    return { forwarded: 0, total: 0, error: null };
+  }
 
-    for (const integ of integrations) {
-      try {
-        const res = await fetch(integ.webhook_url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${integ.api_key}`,
-            "X-HiveCore-Integration": integ.id,
-            "X-HiveCore-Event": "order.created",
-          },
-          body: JSON.stringify(payload),
-        });
-        const text = await res.text().catch(() => "");
-        if (res.ok) {
-          forwarded += 1;
-          // Try to extract an external reference from the response
-          try {
-            const j = text ? JSON.parse(text) : null;
-            lastRef = j?.id ?? j?.ref ?? j?.order_id ?? null;
-          } catch { /* ignore */ }
-          await supabaseAdmin
-            .from("integrations")
-            .update({
-              orders_sent: (integ.orders_sent ?? 0) + 1,
-              last_sent_at: new Date().toISOString(),
-              last_status: `ok ${res.status}`,
-              last_error: null,
-            })
-            .eq("id", integ.id);
-        } else {
-          lastErr = `HTTP ${res.status}: ${text.slice(0, 300)}`;
-          await supabaseAdmin
-            .from("integrations")
-            .update({
-              last_sent_at: new Date().toISOString(),
-              last_status: `error ${res.status}`,
-              last_error: lastErr,
-            })
-            .eq("id", integ.id);
-        }
-      } catch (e: any) {
-        lastErr = e?.message ?? String(e);
+  let forwarded = 0;
+  let lastRef: string | null = null;
+  let lastErr: string | null = null;
+
+  for (const integ of integrations) {
+    try {
+      const res = await fetch(integ.webhook_url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${integ.api_key}`,
+          "X-HiveCore-Integration": integ.id,
+          "X-HiveCore-Event": event,
+        },
+        body: JSON.stringify(payload),
+      });
+      const text = await res.text().catch(() => "");
+      if (res.ok) {
+        forwarded += 1;
+        try {
+          const j = text ? JSON.parse(text) : null;
+          lastRef = j?.id ?? j?.ref ?? j?.order_id ?? lastRef;
+        } catch { /* ignore */ }
+        await supabaseAdmin
+          .from("integrations")
+          .update({
+            orders_sent: (integ.orders_sent ?? 0) + 1,
+            last_sent_at: new Date().toISOString(),
+            last_status: `${event} ok ${res.status}`,
+            last_error: null,
+          })
+          .eq("id", integ.id);
+      } else {
+        lastErr = `HTTP ${res.status}: ${text.slice(0, 300)}`;
         await supabaseAdmin
           .from("integrations")
           .update({
             last_sent_at: new Date().toISOString(),
-            last_status: "error network",
+            last_status: `${event} error ${res.status}`,
             last_error: lastErr,
           })
           .eq("id", integ.id);
       }
+    } catch (e: any) {
+      lastErr = e?.message ?? String(e);
+      await supabaseAdmin
+        .from("integrations")
+        .update({
+          last_sent_at: new Date().toISOString(),
+          last_status: `${event} error network`,
+          last_error: lastErr,
+        })
+        .eq("id", integ.id);
     }
+  }
 
+  if (event !== "order.deleted") {
     await supabaseAdmin
       .from("orders")
       .update({
@@ -178,9 +190,61 @@ export const forwardOrderToIntegrations = createServerFn({ method: "POST" })
         external_ref: lastRef,
         external_error: forwarded > 0 ? null : lastErr,
       } as never)
-      .eq("id", data.orderId);
+      .eq("id", orderId);
+  }
 
-    return { forwarded, total: integrations.length, error: lastErr };
+  return { forwarded, total: integrations.length, error: lastErr };
+}
+
+/**
+ * Fire-and-forget forwarding of a newly created HiveCore order. Kept for
+ * backward compat with existing call sites (product/luxury pages).
+ */
+export const forwardOrderToIntegrations = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => inputSchema.parse(input))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const built = await buildOrderPayload(supabaseAdmin, data.orderId, "order.created");
+    if (!built) return { forwarded: 0, total: 0, error: "order_not_found" };
+    return dispatchToIntegrations(supabaseAdmin, data.orderId, "order.created", built.payload);
+  });
+
+/**
+ * Generic event forwarder. Use for `order.updated` (status / client edits)
+ * and `order.deleted`. For deletion, call this BEFORE deleting the row —
+ * we need to build the payload from the current DB state, then the caller
+ * (or this fn) removes the row.
+ *
+ * When called with `order.deleted`, this function also deletes the row
+ * itself after successfully building and dispatching the payload, so the
+ * client only needs to call this one function.
+ */
+export const forwardOrderEvent = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => eventSchema.parse(input))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const built = await buildOrderPayload(supabaseAdmin, data.orderId, data.event);
+    if (!built) return { forwarded: 0, total: 0, error: "order_not_found" };
+
+    const result = await dispatchToIntegrations(
+      supabaseAdmin,
+      data.orderId,
+      data.event,
+      built.payload,
+    );
+
+    if (data.event === "order.deleted") {
+      const { error } = await supabaseAdmin
+        .from("orders")
+        .delete()
+        .eq("id", data.orderId);
+      if (error) {
+        console.error("[integrations.forward] delete order", error);
+        return { ...result, error: error.message };
+      }
+    }
+
+    return result;
   });
 
 /**
