@@ -908,6 +908,7 @@ function OrdersTab() {
 
 function EditOrderDialog({ order, onClose }: { order: OrderRow | null; onClose: () => void }) {
   const qc = useQueryClient();
+  const forwardEvent = useServerFn(forwardOrderEvent);
   const [form, setForm] = useState({ client_name: "", client_phone: "", client_address: "", quantity: 1, notes: "" });
   const [busy, setBusy] = useState(false);
 
@@ -939,6 +940,10 @@ function EditOrderDialog({ order, onClose }: { order: OrderRow | null; onClose: 
     toast.success("Pedido actualizado");
     qc.invalidateQueries({ queryKey: ["admin-orders"] });
     qc.invalidateQueries({ queryKey: ["orders"] });
+    // Sync change to A&O CORE OS (fire-and-forget)
+    forwardEvent({ data: { orderId: order.id, event: "order.updated" } }).catch((e) =>
+      console.warn("[integrations] editOrder forward", e),
+    );
     onClose();
   };
 
