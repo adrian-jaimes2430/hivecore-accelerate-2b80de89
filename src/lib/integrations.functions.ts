@@ -5,6 +5,11 @@ const inputSchema = z.object({
   orderId: z.string().uuid(),
 });
 
+const eventSchema = z.object({
+  orderId: z.string().uuid(),
+  event: z.enum(["order.created", "order.updated", "order.deleted"]),
+});
+
 /**
  * Fire-and-forget forwarding of a HIVECORE order to every active
  * external integration (A&O CORE OS, etc.). Called from the client
