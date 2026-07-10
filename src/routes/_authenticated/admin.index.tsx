@@ -796,6 +796,7 @@ interface OrderRow {
 function OrdersTab() {
   const qc = useQueryClient();
   const [editOrder, setEditOrder] = useState<OrderRow | null>(null);
+  const forwardEvent = useServerFn(forwardOrderEvent);
 
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ["admin-orders"],
@@ -810,12 +811,21 @@ function OrdersTab() {
   });
 
   const remove = async (o: OrderRow) => {
-    if (!confirm(`¿Eliminar pedido ${o.order_code}? Esta acción no se puede deshacer.`)) return;
-    const { error } = await supabase.from("orders").delete().eq("id", o.id);
-    if (error) return toast.error(error.message);
-    toast.success("Pedido eliminado");
-    qc.invalidateQueries({ queryKey: ["admin-orders"] });
-    qc.invalidateQueries({ queryKey: ["orders"] });
+    if (!confirm(`¿Eliminar pedido ${o.order_code}? Esta acción no se puede deshacer y se sincronizará con A&O CORE OS.`)) return;
+    try {
+      // The server fn dispatches order.deleted to all active integrations
+      // AND deletes the row (service role bypasses RLS).
+      const r = await forwardEvent({ data: { orderId: o.id, event: "order.deleted" } });
+      if (r.error && r.forwarded === 0 && r.total > 0) {
+        toast.error(`No se pudo sincronizar la eliminación: ${r.error}`);
+        return;
+      }
+      toast.success("Pedido eliminado" + (r.forwarded ? ` y sincronizado (${r.forwarded})` : ""));
+      qc.invalidateQueries({ queryKey: ["admin-orders"] });
+      qc.invalidateQueries({ queryKey: ["orders"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Error al eliminar");
+    }
   };
 
   const updateStatus = async (o: OrderRow, status: string) => {
@@ -823,6 +833,10 @@ function OrdersTab() {
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["admin-orders"] });
     qc.invalidateQueries({ queryKey: ["orders"] });
+    // Fire-and-forget sync to A&O CORE OS
+    forwardEvent({ data: { orderId: o.id, event: "order.updated" } }).catch((e) =>
+      console.warn("[integrations] updateStatus forward", e),
+    );
   };
 
   if (isLoading) {
