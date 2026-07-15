@@ -24,6 +24,7 @@ import { Route as AuthenticatedCategorySlugRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminLuxuryRouteImport } from './routes/_authenticated/admin.luxury'
 import { Route as AuthenticatedAdminIntegrationsRouteImport } from './routes/_authenticated/admin.integrations'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as ApiPublicIntegrationsAocoreOrderRouteImport } from './routes/api/public/integrations/aocore/order'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -104,6 +105,12 @@ const LovableEmailQueueProcessRoute =
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicIntegrationsAocoreOrderRoute =
+  ApiPublicIntegrationsAocoreOrderRouteImport.update({
+    id: '/api/public/integrations/aocore/order',
+    path: '/api/public/integrations/aocore/order',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/luxury/': typeof AuthenticatedLuxuryIndexRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/api/public/integrations/aocore/order': typeof ApiPublicIntegrationsAocoreOrderRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -136,6 +144,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/luxury': typeof AuthenticatedLuxuryIndexRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/api/public/integrations/aocore/order': typeof ApiPublicIntegrationsAocoreOrderRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -154,6 +163,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/luxury/': typeof AuthenticatedLuxuryIndexRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/api/public/integrations/aocore/order': typeof ApiPublicIntegrationsAocoreOrderRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/luxury/'
     | '/lovable/email/queue/process'
+    | '/api/public/integrations/aocore/order'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/luxury'
     | '/lovable/email/queue/process'
+    | '/api/public/integrations/aocore/order'
   id:
     | '__root__'
     | '/'
@@ -205,6 +217,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/luxury/'
     | '/lovable/email/queue/process'
+    | '/api/public/integrations/aocore/order'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -215,6 +228,7 @@ export interface RootRouteChildren {
   ProductSlugRoute: typeof ProductSlugRoute
   CatalogoIndexRoute: typeof CatalogoIndexRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+  ApiPublicIntegrationsAocoreOrderRoute: typeof ApiPublicIntegrationsAocoreOrderRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -324,6 +338,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/integrations/aocore/order': {
+      id: '/api/public/integrations/aocore/order'
+      path: '/api/public/integrations/aocore/order'
+      fullPath: '/api/public/integrations/aocore/order'
+      preLoaderRoute: typeof ApiPublicIntegrationsAocoreOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -361,6 +382,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductSlugRoute: ProductSlugRoute,
   CatalogoIndexRoute: CatalogoIndexRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+  ApiPublicIntegrationsAocoreOrderRoute: ApiPublicIntegrationsAocoreOrderRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
