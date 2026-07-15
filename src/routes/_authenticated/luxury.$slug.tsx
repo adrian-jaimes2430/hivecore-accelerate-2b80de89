@@ -182,7 +182,8 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
     e.preventDefault();
     if (!user) return;
     setBusy(true);
-    const total = Number(product.price) * form.quantity;
+    const unitPrice = Number(product.suggested_retail_price) > 0 ? Number(product.suggested_retail_price) : Number(product.price);
+    const total = unitPrice * form.quantity;
     const fullNotes = [variantSummary && `Opciones: ${variantSummary}`, form.notes].filter(Boolean).join("\n");
     const { data, error } = await supabase.from("orders").insert({
       impulsador_id: user.id,
