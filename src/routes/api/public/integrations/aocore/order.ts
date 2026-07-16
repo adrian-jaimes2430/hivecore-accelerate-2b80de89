@@ -66,7 +66,7 @@ export const Route = createFileRoute("/api/public/integrations/aocore/order")({
           return jsonResponse(401, { ok: false, error: "invalid_signature" });
         }
 
-        let parsed;
+        let parsed: z.infer<typeof bodySchema>;
         try {
           parsed = bodySchema.parse(JSON.parse(rawBody));
         } catch (e: any) {
