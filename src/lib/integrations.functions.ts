@@ -32,23 +32,45 @@ async function buildOrderPayload(
   let productName = "";
   let productSku = "";
   let productSource: "hivecore" | "luxury" = "hivecore";
+  let unitPrice: number | null = null;
+  let suggestedRetailPrice: number | null = null;
+  let impulsadorPrice: number | null = null;
+  let authoritativeTotal: number | null = null;
+  const orderQty = Number((order as any).quantity ?? 1) || 1;
+
   if ((order as any).product_id) {
     const { data: p } = await supabaseAdmin
       .from("products")
-      .select("name, sku")
+      .select("name, sku, price")
       .eq("id", (order as any).product_id)
       .maybeSingle();
     productName = p?.name ?? "";
     productSku = p?.sku ?? "";
+    if (p?.price != null) {
+      unitPrice = Number(p.price);
+      authoritativeTotal = unitPrice * orderQty;
+    }
   } else if ((order as any).luxury_product_id) {
     productSource = "luxury";
     const { data: p } = await supabaseAdmin
       .from("luxury_products")
-      .select("name, sku")
+      .select("name, sku, price, suggested_retail_price")
       .eq("id", (order as any).luxury_product_id)
       .maybeSingle();
     productName = p?.name ?? "";
     productSku = p?.sku ?? "";
+    if (p) {
+      impulsadorPrice = p.price != null ? Number(p.price) : null;
+      suggestedRetailPrice = p.suggested_retail_price != null ? Number(p.suggested_retail_price) : null;
+      // Authoritative selling price: retail if defined & > 0, else impulsador price.
+      unitPrice =
+        suggestedRetailPrice && suggestedRetailPrice > 0
+          ? suggestedRetailPrice
+          : impulsadorPrice ?? null;
+      if (unitPrice != null) {
+        authoritativeTotal = unitPrice * orderQty;
+      }
+    }
   }
 
   let impulsadorName: string | null = null;
@@ -71,6 +93,29 @@ async function buildOrderPayload(
     }
   }
 
+  // If the DB total differs from the recomputed authoritative total (client
+  // could have inserted with the wrong unit price, or the row predates a
+  // pricing fix), self-heal the orders row so both HiveCore and A&O CORE OS
+  // stay in sync with the source of truth (the product table).
+  const dbTotal = Number((order as any).total ?? 0);
+  if (
+    authoritativeTotal != null &&
+    Math.abs(authoritativeTotal - dbTotal) > 0.009 &&
+    event !== "order.deleted"
+  ) {
+    await supabaseAdmin
+      .from("orders")
+      .update({ total: authoritativeTotal } as never)
+      .eq("id", orderId);
+    (order as any).total = authoritativeTotal;
+  }
+
+  const finalTotal = authoritativeTotal ?? dbTotal;
+  const utility =
+    productSource === "luxury" && unitPrice != null && impulsadorPrice != null
+      ? Math.max(0, (unitPrice - impulsadorPrice) * orderQty)
+      : null;
+
   return {
     payload: {
       source: "hivecore",
@@ -81,8 +126,12 @@ async function buildOrderPayload(
         client_name: (order as any).client_name,
         client_phone: (order as any).client_phone,
         client_address: (order as any).client_address,
-        quantity: (order as any).quantity,
-        total: (order as any).total,
+        quantity: orderQty,
+        total: finalTotal,
+        unit_price: unitPrice,
+        suggested_retail_price: suggestedRetailPrice,
+        impulsador_price: impulsadorPrice,
+        utility,
         notes: (order as any).notes,
         status: (order as any).status,
         created_at: (order as any).created_at,
@@ -92,6 +141,9 @@ async function buildOrderPayload(
         source: productSource,
         name: productName,
         sku: productSku,
+        unit_price: unitPrice,
+        suggested_retail_price: suggestedRetailPrice,
+        impulsador_price: impulsadorPrice,
       },
       impulsador: {
         id: impulsadorId,
@@ -103,6 +155,7 @@ async function buildOrderPayload(
     order,
   };
 }
+
 
 /**
  * Send a payload to every active integration. Updates sync columns on the
