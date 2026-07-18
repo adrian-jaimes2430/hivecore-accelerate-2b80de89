@@ -789,6 +789,8 @@ interface OrderRow {
   total: number | null; status: string; created_at: string;
   product_id: string | null;
   luxury_product_id: string | null;
+  impulsador_id: string | null;
+  impulsador_name?: string | null;
   products?: { name: string; sku: string } | null;
   luxury_products?: { name: string; sku: string | null } | null;
 }
@@ -806,7 +808,14 @@ function OrdersTab() {
         .select("*, products(name, sku), luxury_products(name, sku)")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as unknown as OrderRow[];
+      const rows = (data ?? []) as unknown as OrderRow[];
+      const impIds = Array.from(new Set(rows.map((r) => r.impulsador_id).filter(Boolean))) as string[];
+      if (impIds.length) {
+        const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", impIds);
+        const map = new Map((profs ?? []).map((p: any) => [p.id, p.full_name as string | null]));
+        rows.forEach((r) => { r.impulsador_name = r.impulsador_id ? map.get(r.impulsador_id) ?? null : null; });
+      }
+      return rows;
     },
   });
 
@@ -850,6 +859,7 @@ function OrdersTab() {
           <tr>
             <th className="px-4 py-3">Código</th>
             <th className="px-4 py-3">Producto / SKU</th>
+            <th className="px-4 py-3">Impulsador</th>
             <th className="px-4 py-3">Cliente</th>
             <th className="px-4 py-3">Teléfono</th>
             <th className="px-4 py-3">Cant.</th>
@@ -867,6 +877,7 @@ function OrdersTab() {
                 <div className="font-medium">{o.products?.name ?? o.luxury_products?.name ?? "—"} {o.luxury_product_id && <span className="ml-1 rounded bg-[color:var(--luxury-gold)]/15 px-1.5 py-0.5 text-[9px] uppercase text-[color:var(--luxury-gold)]">Luxury</span>}</div>
                 <div className="text-[10px] font-mono text-muted-foreground">{o.products?.sku ?? o.luxury_products?.sku ?? "—"}</div>
               </td>
+              <td className="px-4 py-3 text-xs">{o.impulsador_name ?? <span className="text-muted-foreground">—</span>}</td>
               <td className="px-4 py-3">{o.client_name}</td>
               <td className="px-4 py-3 text-muted-foreground">{o.client_phone}</td>
               <td className="px-4 py-3">{o.quantity}</td>
@@ -897,7 +908,7 @@ function OrdersTab() {
             </tr>
           ))}
           {orders.length === 0 && (
-            <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">Aún no hay pedidos.</td></tr>
+            <tr><td colSpan={10} className="px-4 py-10 text-center text-muted-foreground">Aún no hay pedidos.</td></tr>
           )}
         </tbody>
       </table>
