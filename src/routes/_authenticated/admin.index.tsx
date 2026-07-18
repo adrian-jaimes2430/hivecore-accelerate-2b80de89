@@ -789,6 +789,8 @@ interface OrderRow {
   total: number | null; status: string; created_at: string;
   product_id: string | null;
   luxury_product_id: string | null;
+  impulsador_id: string | null;
+  impulsador_name?: string | null;
   products?: { name: string; sku: string } | null;
   luxury_products?: { name: string; sku: string | null } | null;
 }
