@@ -859,6 +859,7 @@ function OrdersTab() {
           <tr>
             <th className="px-4 py-3">Código</th>
             <th className="px-4 py-3">Producto / SKU</th>
+            <th className="px-4 py-3">Impulsador</th>
             <th className="px-4 py-3">Cliente</th>
             <th className="px-4 py-3">Teléfono</th>
             <th className="px-4 py-3">Cant.</th>
@@ -876,6 +877,7 @@ function OrdersTab() {
                 <div className="font-medium">{o.products?.name ?? o.luxury_products?.name ?? "—"} {o.luxury_product_id && <span className="ml-1 rounded bg-[color:var(--luxury-gold)]/15 px-1.5 py-0.5 text-[9px] uppercase text-[color:var(--luxury-gold)]">Luxury</span>}</div>
                 <div className="text-[10px] font-mono text-muted-foreground">{o.products?.sku ?? o.luxury_products?.sku ?? "—"}</div>
               </td>
+              <td className="px-4 py-3 text-xs">{o.impulsador_name ?? <span className="text-muted-foreground">—</span>}</td>
               <td className="px-4 py-3">{o.client_name}</td>
               <td className="px-4 py-3 text-muted-foreground">{o.client_phone}</td>
               <td className="px-4 py-3">{o.quantity}</td>
