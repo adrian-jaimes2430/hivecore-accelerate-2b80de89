@@ -808,7 +808,14 @@ function OrdersTab() {
         .select("*, products(name, sku), luxury_products(name, sku)")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as unknown as OrderRow[];
+      const rows = (data ?? []) as unknown as OrderRow[];
+      const impIds = Array.from(new Set(rows.map((r) => r.impulsador_id).filter(Boolean))) as string[];
+      if (impIds.length) {
+        const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", impIds);
+        const map = new Map((profs ?? []).map((p: any) => [p.id, p.full_name as string | null]));
+        rows.forEach((r) => { r.impulsador_name = r.impulsador_id ? map.get(r.impulsador_id) ?? null : null; });
+      }
+      return rows;
     },
   });
 
