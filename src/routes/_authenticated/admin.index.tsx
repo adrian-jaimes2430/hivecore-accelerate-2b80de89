@@ -877,7 +877,38 @@ function OrdersTab() {
                 <div className="font-medium">{o.products?.name ?? o.luxury_products?.name ?? "—"} {o.luxury_product_id && <span className="ml-1 rounded bg-[color:var(--luxury-gold)]/15 px-1.5 py-0.5 text-[9px] uppercase text-[color:var(--luxury-gold)]">Luxury</span>}</div>
                 <div className="text-[10px] font-mono text-muted-foreground">{o.products?.sku ?? o.luxury_products?.sku ?? "—"}</div>
               </td>
-              <td className="px-4 py-3 text-xs">{o.impulsador_name ?? <span className="text-muted-foreground">—</span>}</td>
+              <td className="px-4 py-3 text-xs">
+                {o.impulsador_name ? (
+                  o.impulsador_name
+                ) : (
+                  <span className="rounded bg-blue-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-blue-300">
+                    Tráfico pago · Meta Ads
+                  </span>
+                )}
+              </td>
+              <td className="px-4 py-3 text-xs">
+                <div className="font-medium">
+                  {o.payment_method === "online" ? "Pago en línea" : "Contra entrega"}
+                </div>
+                <div
+                  className={
+                    o.payment_status === "paid"
+                      ? "text-emerald-400"
+                      : o.payment_status === "failed" || o.payment_status === "voided"
+                        ? "text-red-400"
+                        : "text-muted-foreground"
+                  }
+                >
+                  {o.payment_status === "paid"
+                    ? "Pagado"
+                    : o.payment_status === "failed"
+                      ? "Rechazado"
+                      : o.payment_status === "voided"
+                        ? "Anulado"
+                        : "Pendiente"}
+                </div>
+              </td>
+
               <td className="px-4 py-3">{o.client_name}</td>
               <td className="px-4 py-3 text-muted-foreground">{o.client_phone}</td>
               <td className="px-4 py-3">{o.quantity}</td>
