@@ -395,12 +395,20 @@ export type Database = {
           external_ref: string | null
           external_synced_at: string | null
           id: string
-          impulsador_id: string
+          impulsador_id: string | null
           luxury_product_id: string | null
           notes: string | null
           order_code: string
+          paid_at: string | null
+          payment_amount: number | null
+          payment_method: string
+          payment_provider: string | null
+          payment_reference: string | null
+          payment_status: string
+          payment_transaction_id: string | null
           product_id: string | null
           quantity: number
+          source: string
           status: Database["public"]["Enums"]["order_status"]
           total: number | null
         }
@@ -413,12 +421,20 @@ export type Database = {
           external_ref?: string | null
           external_synced_at?: string | null
           id?: string
-          impulsador_id: string
+          impulsador_id?: string | null
           luxury_product_id?: string | null
           notes?: string | null
           order_code?: string
+          paid_at?: string | null
+          payment_amount?: number | null
+          payment_method?: string
+          payment_provider?: string | null
+          payment_reference?: string | null
+          payment_status?: string
+          payment_transaction_id?: string | null
           product_id?: string | null
           quantity?: number
+          source?: string
           status?: Database["public"]["Enums"]["order_status"]
           total?: number | null
         }
@@ -431,12 +447,20 @@ export type Database = {
           external_ref?: string | null
           external_synced_at?: string | null
           id?: string
-          impulsador_id?: string
+          impulsador_id?: string | null
           luxury_product_id?: string | null
           notes?: string | null
           order_code?: string
+          paid_at?: string | null
+          payment_amount?: number | null
+          payment_method?: string
+          payment_provider?: string | null
+          payment_reference?: string | null
+          payment_status?: string
+          payment_transaction_id?: string | null
           product_id?: string | null
           quantity?: number
+          source?: string
           status?: Database["public"]["Enums"]["order_status"]
           total?: number | null
         }
