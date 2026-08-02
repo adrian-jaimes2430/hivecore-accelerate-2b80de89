@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as GraciasRouteImport } from './routes/gracias'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CatalogoIndexRouteImport } from './routes/catalogo.index'
@@ -24,11 +25,17 @@ import { Route as AuthenticatedCategorySlugRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminLuxuryRouteImport } from './routes/_authenticated/admin.luxury'
 import { Route as AuthenticatedAdminIntegrationsRouteImport } from './routes/_authenticated/admin.integrations'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as ApiPublicWebhooksWompiRouteImport } from './routes/api/public/webhooks/wompi'
 import { Route as ApiPublicIntegrationsAocoreOrderRouteImport } from './routes/api/public/integrations/aocore/order'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GraciasRoute = GraciasRouteImport.update({
+  id: '/gracias',
+  path: '/gracias',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -105,6 +112,11 @@ const LovableEmailQueueProcessRoute =
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicWebhooksWompiRoute = ApiPublicWebhooksWompiRouteImport.update({
+  id: '/api/public/webhooks/wompi',
+  path: '/api/public/webhooks/wompi',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicIntegrationsAocoreOrderRoute =
   ApiPublicIntegrationsAocoreOrderRouteImport.update({
     id: '/api/public/integrations/aocore/order',
@@ -114,6 +126,7 @@ const ApiPublicIntegrationsAocoreOrderRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
   '/app': typeof AuthenticatedAppRoute
   '/orders': typeof AuthenticatedOrdersRoute
@@ -126,11 +139,13 @@ export interface FileRoutesByFullPath {
   '/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/luxury/': typeof AuthenticatedLuxuryIndexRoute
+  '/api/public/webhooks/wompi': typeof ApiPublicWebhooksWompiRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/api/public/integrations/aocore/order': typeof ApiPublicIntegrationsAocoreOrderRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
   '/app': typeof AuthenticatedAppRoute
   '/orders': typeof AuthenticatedOrdersRoute
@@ -143,6 +158,7 @@ export interface FileRoutesByTo {
   '/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/luxury': typeof AuthenticatedLuxuryIndexRoute
+  '/api/public/webhooks/wompi': typeof ApiPublicWebhooksWompiRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/api/public/integrations/aocore/order': typeof ApiPublicIntegrationsAocoreOrderRoute
 }
@@ -150,6 +166,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/orders': typeof AuthenticatedOrdersRoute
@@ -162,6 +179,7 @@ export interface FileRoutesById {
   '/_authenticated/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/luxury/': typeof AuthenticatedLuxuryIndexRoute
+  '/api/public/webhooks/wompi': typeof ApiPublicWebhooksWompiRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/api/public/integrations/aocore/order': typeof ApiPublicIntegrationsAocoreOrderRoute
 }
@@ -169,6 +187,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/gracias'
     | '/login'
     | '/app'
     | '/orders'
@@ -181,11 +200,13 @@ export interface FileRouteTypes {
     | '/luxury/$slug'
     | '/admin/'
     | '/luxury/'
+    | '/api/public/webhooks/wompi'
     | '/lovable/email/queue/process'
     | '/api/public/integrations/aocore/order'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/gracias'
     | '/login'
     | '/app'
     | '/orders'
@@ -198,12 +219,14 @@ export interface FileRouteTypes {
     | '/luxury/$slug'
     | '/admin'
     | '/luxury'
+    | '/api/public/webhooks/wompi'
     | '/lovable/email/queue/process'
     | '/api/public/integrations/aocore/order'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/gracias'
     | '/login'
     | '/_authenticated/app'
     | '/_authenticated/orders'
@@ -216,6 +239,7 @@ export interface FileRouteTypes {
     | '/_authenticated/luxury/$slug'
     | '/_authenticated/admin/'
     | '/_authenticated/luxury/'
+    | '/api/public/webhooks/wompi'
     | '/lovable/email/queue/process'
     | '/api/public/integrations/aocore/order'
   fileRoutesById: FileRoutesById
@@ -223,10 +247,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  GraciasRoute: typeof GraciasRoute
   LoginRoute: typeof LoginRoute
   CatalogoSlugRoute: typeof CatalogoSlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
   CatalogoIndexRoute: typeof CatalogoIndexRoute
+  ApiPublicWebhooksWompiRoute: typeof ApiPublicWebhooksWompiRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   ApiPublicIntegrationsAocoreOrderRoute: typeof ApiPublicIntegrationsAocoreOrderRoute
 }
@@ -238,6 +264,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gracias': {
+      id: '/gracias'
+      path: '/gracias'
+      fullPath: '/gracias'
+      preLoaderRoute: typeof GraciasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -338,6 +371,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/webhooks/wompi': {
+      id: '/api/public/webhooks/wompi'
+      path: '/api/public/webhooks/wompi'
+      fullPath: '/api/public/webhooks/wompi'
+      preLoaderRoute: typeof ApiPublicWebhooksWompiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/integrations/aocore/order': {
       id: '/api/public/integrations/aocore/order'
       path: '/api/public/integrations/aocore/order'
@@ -377,10 +417,12 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  GraciasRoute: GraciasRoute,
   LoginRoute: LoginRoute,
   CatalogoSlugRoute: CatalogoSlugRoute,
   ProductSlugRoute: ProductSlugRoute,
   CatalogoIndexRoute: CatalogoIndexRoute,
+  ApiPublicWebhooksWompiRoute: ApiPublicWebhooksWompiRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   ApiPublicIntegrationsAocoreOrderRoute: ApiPublicIntegrationsAocoreOrderRoute,
 }
