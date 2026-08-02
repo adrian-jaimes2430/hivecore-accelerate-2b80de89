@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as GraciasRouteImport } from './routes/gracias'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CatalogoIndexRouteImport } from './routes/catalogo.index'
@@ -30,6 +31,11 @@ import { Route as ApiPublicIntegrationsAocoreOrderRouteImport } from './routes/a
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GraciasRoute = GraciasRouteImport.update({
+  id: '/gracias',
+  path: '/gracias',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -120,6 +126,7 @@ const ApiPublicIntegrationsAocoreOrderRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
   '/app': typeof AuthenticatedAppRoute
   '/orders': typeof AuthenticatedOrdersRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
   '/app': typeof AuthenticatedAppRoute
   '/orders': typeof AuthenticatedOrdersRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/orders': typeof AuthenticatedOrdersRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/gracias'
     | '/login'
     | '/app'
     | '/orders'
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/gracias'
     | '/login'
     | '/app'
     | '/orders'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/gracias'
     | '/login'
     | '/_authenticated/app'
     | '/_authenticated/orders'
@@ -235,6 +247,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  GraciasRoute: typeof GraciasRoute
   LoginRoute: typeof LoginRoute
   CatalogoSlugRoute: typeof CatalogoSlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
@@ -251,6 +264,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gracias': {
+      id: '/gracias'
+      path: '/gracias'
+      fullPath: '/gracias'
+      preLoaderRoute: typeof GraciasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -397,6 +417,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  GraciasRoute: GraciasRoute,
   LoginRoute: LoginRoute,
   CatalogoSlugRoute: CatalogoSlugRoute,
   ProductSlugRoute: ProductSlugRoute,
