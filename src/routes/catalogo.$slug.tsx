@@ -122,6 +122,17 @@ function PublicProduct() {
             )}
 
             <div className="flex flex-col gap-3">
+              <PublicCheckoutDialog
+                productKind="luxury"
+                slug={product.slug}
+                productName={product.name}
+                unitPrice={price}
+                currencyPrefix="S/"
+                ctaLabel="Comprar ahora"
+                ref={ref ?? null}
+                variations={variantSummary || null}
+                triggerClassName="h-12 w-full rounded-xl border border-[color:var(--luxury-gold)]/40 bg-[color:var(--luxury-gold)]/15 px-5 text-base font-semibold text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/25"
+              />
               <a href={waHref} target="_blank" rel="noopener noreferrer"
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 font-semibold text-black shadow-lg shadow-emerald-500/30 transition-transform hover:scale-[1.02]">
                 <MessageCircle className="h-5 w-5" /> {impulsador?.name ? `Pedir a ${impulsador.name.split(" ")[0]} por WhatsApp` : "Hacer mi pedido por WhatsApp"}
