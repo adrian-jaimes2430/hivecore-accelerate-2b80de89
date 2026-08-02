@@ -161,11 +161,25 @@ function ProductFunnel() {
           </table>
         </div>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          {user
-            ? <OrderDialog product={product} impulsadorName={profile?.full_name ?? null} />
-            : <ImpulsadorCTA product={product} impulsador={impulsador ?? null} />}
+          {user ? (
+            <OrderDialog product={product} impulsadorName={profile?.full_name ?? null} />
+          ) : (
+            <>
+              <PublicCheckoutDialog
+                productKind="funnel"
+                slug={product.slug}
+                productName={product.name}
+                unitPrice={Number(product.price)}
+                currencyPrefix="S/"
+                ctaLabel={product.cta_label ?? "Comprar ahora"}
+                ref={ref ?? null}
+              />
+              {impulsador && <ImpulsadorCTA product={product} impulsador={impulsador} />}
+            </>
+          )}
           <ShareDialog product={product} impulsadorId={user?.id ?? ref ?? null} />
         </div>
+
       </section>
 
       {!user && impulsador && <FloatingImpulsadorCTA product={product} impulsador={impulsador} />}
