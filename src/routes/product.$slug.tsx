@@ -15,6 +15,7 @@ import { sendOrderNotification } from "@/lib/order-email.functions";
 import { forwardOrderToIntegrations } from "@/lib/integrations.functions";
 import { getProductPublic } from "@/lib/product-public.functions";
 import { getImpulsadorRef } from "@/lib/luxury-public.functions";
+import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 
