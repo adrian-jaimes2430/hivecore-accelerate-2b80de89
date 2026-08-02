@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import {
   createPublicOrder,
   getPublicOrderStatus,
@@ -10,8 +11,7 @@ export const submitPublicOrder = createServerFn({ method: "POST" })
   .handler(async ({ data }) => createPublicOrder(data));
 
 export const readPublicOrderStatus = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) => {
-    const { z } = require("zod") as typeof import("zod");
-    return z.object({ reference: z.string().min(3).max(60) }).parse(input);
-  })
+  .inputValidator((input: unknown) =>
+    z.object({ reference: z.string().min(3).max(60) }).parse(input),
+  )
   .handler(async ({ data }) => getPublicOrderStatus(data.reference));
