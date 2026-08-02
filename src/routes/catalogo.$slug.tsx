@@ -9,6 +9,7 @@ import { ShareBar } from "@/components/luxury/ShareBar";
 import { MediaGallery, buildMedia } from "@/components/luxury/MediaGallery";
 import { VariationPicker, summarizeVariations } from "@/components/luxury/VariationPicker";
 import type { Variation } from "@/components/admin/VariationsEditor";
+import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
 
 const SITE_URL = "https://hivecore-accelerate.lovable.app";
 
