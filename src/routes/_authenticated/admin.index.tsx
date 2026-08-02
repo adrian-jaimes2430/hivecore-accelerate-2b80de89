@@ -791,6 +791,9 @@ interface OrderRow {
   luxury_product_id: string | null;
   impulsador_id: string | null;
   impulsador_name?: string | null;
+  source?: string | null;
+  payment_method?: string | null;
+  payment_status?: string | null;
   products?: { name: string; sku: string } | null;
   luxury_products?: { name: string; sku: string | null } | null;
 }
