@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { forwardOrderEvent } from "@/lib/integrations.functions";
+import { listUserEmails } from "@/lib/admin-users.functions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -136,6 +137,12 @@ interface ProfileWithRole extends ProfileRow { role: RoleType }
 
 function UsersTab() {
   const qc = useQueryClient();
+  const fetchEmails = useServerFn(listUserEmails);
+  const { data: emailMap = {} } = useQuery({
+    queryKey: ["admin-user-emails"],
+    queryFn: async () => (await fetchEmails({})).emails as Record<string, string>,
+    staleTime: 60_000,
+  });
   const { data: profiles = [] } = useQuery({
     queryKey: ["admin-profiles"],
     queryFn: async () => {
@@ -156,6 +163,7 @@ function UsersTab() {
       })) as ProfileWithRole[];
     },
   });
+
 
   const setStatus = async (id: string, status: "approved" | "blocked" | "pending") => {
     const { error } = await supabase.from("profiles").update({ status }).eq("id", id);
@@ -185,6 +193,7 @@ function UsersTab() {
         <thead className="bg-white/5 text-left text-xs uppercase tracking-wider text-muted-foreground">
           <tr>
             <th className="px-4 py-3">Nombre</th>
+            <th className="px-4 py-3">Correo registrado</th>
             <th className="px-4 py-3">Teléfono</th>
             <th className="px-4 py-3">Estado</th>
             <th className="px-4 py-3">Rol</th>
@@ -196,6 +205,7 @@ function UsersTab() {
           {profiles.map((p) => (
             <tr key={p.id} className="border-t border-border/40">
               <td className="px-4 py-3 font-medium">{p.full_name ?? "—"}</td>
+              <td className="px-4 py-3"><EmailCell email={emailMap[p.id]} /></td>
               <td className="px-4 py-3"><PhoneEditor id={p.id} phone={p.phone} /></td>
               <td className="px-4 py-3">
                 <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${statusChip(p.status)}`}>
@@ -259,7 +269,25 @@ function statusChip(s: string) {
   return "bg-anma-orange/15 text-anma-orange";
 }
 
+function EmailCell({ email }: { email?: string }) {
+  if (!email) return <span className="text-xs italic text-muted-foreground">—</span>;
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        void navigator.clipboard?.writeText(email);
+        toast.success("Correo copiado");
+      }}
+      title="Correo con el que se registró (copiar para cotejar en CORE OS)"
+      className="max-w-[240px] truncate rounded-md px-2 py-1 text-left text-xs text-muted-foreground hover:bg-white/5 hover:text-foreground"
+    >
+      {email}
+    </button>
+  );
+}
+
 function PhoneEditor({ id, phone }: { id: string; phone: string | null }) {
+
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(phone ?? "");
