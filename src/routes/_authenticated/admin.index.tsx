@@ -269,7 +269,25 @@ function statusChip(s: string) {
   return "bg-anma-orange/15 text-anma-orange";
 }
 
+function EmailCell({ email }: { email?: string }) {
+  if (!email) return <span className="text-xs italic text-muted-foreground">—</span>;
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        void navigator.clipboard?.writeText(email);
+        toast.success("Correo copiado");
+      }}
+      title="Correo con el que se registró (copiar para cotejar en CORE OS)"
+      className="max-w-[240px] truncate rounded-md px-2 py-1 text-left text-xs text-muted-foreground hover:bg-white/5 hover:text-foreground"
+    >
+      {email}
+    </button>
+  );
+}
+
 function PhoneEditor({ id, phone }: { id: string; phone: string | null }) {
+
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(phone ?? "");
