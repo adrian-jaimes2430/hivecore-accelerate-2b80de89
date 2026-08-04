@@ -193,6 +193,7 @@ function UsersTab() {
         <thead className="bg-white/5 text-left text-xs uppercase tracking-wider text-muted-foreground">
           <tr>
             <th className="px-4 py-3">Nombre</th>
+            <th className="px-4 py-3">Correo registrado</th>
             <th className="px-4 py-3">Teléfono</th>
             <th className="px-4 py-3">Estado</th>
             <th className="px-4 py-3">Rol</th>
