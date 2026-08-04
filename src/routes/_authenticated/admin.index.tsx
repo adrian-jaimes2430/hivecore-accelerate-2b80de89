@@ -136,6 +136,12 @@ interface ProfileWithRole extends ProfileRow { role: RoleType }
 
 function UsersTab() {
   const qc = useQueryClient();
+  const fetchEmails = useServerFn(listUserEmails);
+  const { data: emailMap = {} } = useQuery({
+    queryKey: ["admin-user-emails"],
+    queryFn: async () => (await fetchEmails({})).emails as Record<string, string>,
+    staleTime: 60_000,
+  });
   const { data: profiles = [] } = useQuery({
     queryKey: ["admin-profiles"],
     queryFn: async () => {
@@ -156,6 +162,7 @@ function UsersTab() {
       })) as ProfileWithRole[];
     },
   });
+
 
   const setStatus = async (id: string, status: "approved" | "blocked" | "pending") => {
     const { error } = await supabase.from("profiles").update({ status }).eq("id", id);
