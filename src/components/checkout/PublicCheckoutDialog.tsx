@@ -75,6 +75,9 @@ export function PublicCheckoutDialog({
           client_phone: form.client_phone,
           client_email: form.client_email || null,
           client_address: form.client_address,
+          client_city: form.client_city || null,
+          client_region: form.client_region || null,
+
           notes: form.notes || null,
           variations: variations || null,
           payment_method: method,
