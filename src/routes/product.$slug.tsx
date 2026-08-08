@@ -269,7 +269,15 @@ function OrderDialog({ product, impulsadorName }: { product: Product; impulsador
     e.preventDefault();
     if (!user) return;
     setBusy(true);
-    const total = Number(product.price) * form.quantity;
+    const total = bundleTotal(
+      {
+        price: Number(product.price),
+        bundle_pricing_enabled: product.bundle_pricing_enabled ?? false,
+        price_2: product.price_2 ?? null,
+        price_3: product.price_3 ?? null,
+      },
+      form.quantity,
+    );
     const { data, error } = await supabase.from("orders").insert({
       impulsador_id: user.id,
       product_id: product.id,
