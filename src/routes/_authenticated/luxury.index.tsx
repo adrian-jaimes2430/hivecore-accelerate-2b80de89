@@ -199,30 +199,31 @@ function LuxuryCatalog() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       {/* Hero */}
-      <div className="relative mb-10 overflow-hidden rounded-2xl border border-[color:var(--luxury-gold)]/30 bg-gradient-to-br from-black via-zinc-950 to-[#1a1208] p-8 sm:p-12">
+      <div className="luxury-shine animate-fade-up relative mb-10 overflow-hidden rounded-[28px] border border-[color:var(--luxury-gold)]/30 bg-gradient-to-br from-black via-zinc-950 to-[#1a1208] p-8 sm:p-12">
         <div className="absolute inset-0 hive-grid-bg opacity-20" />
         <div className="relative">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--luxury-gold)]/40 bg-black/40 px-3 py-1 text-xs uppercase tracking-[0.25em] text-[color:var(--luxury-gold)]">
+          <div className="mercury-tag border-[color:var(--luxury-gold)]/40 bg-black/40 text-[color:var(--luxury-gold)]">
             <Crown className="h-3 w-3" /> Premium Unit
           </div>
-          <h1 className="mt-4 font-display text-4xl font-bold sm:text-5xl">
+          <h1 className="mercury-display mt-5 text-4xl sm:text-5xl">
             <span className="luxury-gradient-text">AnMa Luxury Collection</span>
           </h1>
-          <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">
+          <p className="mercury-muted mt-3 max-w-2xl text-sm sm:text-base">
             Productos premium de alto valor percibido — perfumería, relojería, joyería AAA y marroquinería. Mayores márgenes para impulsadores A&O.
           </p>
-          <div className="mt-6 space-y-3">
+          <div className="mt-7 space-y-3">
             <a href={myCatalogUrl} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-md border border-[color:var(--luxury-gold)]/40 bg-[color:var(--luxury-gold)]/10 px-4 py-2 text-sm text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/20">
+              className="shop-btn-quiet border-[color:var(--luxury-gold)]/40 !text-[color:var(--luxury-gold)]">
               <ExternalLink className="h-4 w-4" /> Ver mi catálogo público
             </a>
             <div>
-              <p className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">Compartir mi catálogo</p>
+              <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Compartir mi catálogo</p>
               <ShareBar url={myCatalogUrl} title="AnMa Luxury Collection" text="Descubre piezas premium seleccionadas" />
             </div>
           </div>
         </div>
       </div>
+
 
       {promos.length > 0 && <PromoCarousel promos={promos} />}
 
