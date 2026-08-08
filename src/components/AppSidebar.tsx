@@ -35,7 +35,7 @@ export function AppSidebar() {
     <aside className="fixed left-0 top-0 z-50 flex h-screen w-[72px] flex-col items-center justify-between border-r border-border/50 bg-surface-elevated/70 py-5 backdrop-blur-xl">
       <div className="flex w-full flex-col items-center gap-6">
         <Link to="/app" className="transition-transform duration-300 hover:scale-105">
-          <HiveLogo iconOnly />
+          <HiveLogo size={30} withText={false} />
         </Link>
 
         <nav className="flex w-full flex-col items-center gap-2">
