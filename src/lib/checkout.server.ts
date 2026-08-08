@@ -155,6 +155,9 @@ export async function createPublicOrder(input: PublicOrderInput) {
     };
   }
 
+  const city =
+    input.client_city?.trim() || guessCityFromAddress(input.client_address) || null;
+
   const checkoutUrl = buildCheckoutUrl({
     cfg,
     reference,
@@ -162,9 +165,13 @@ export async function createPublicOrder(input: PublicOrderInput) {
     redirectUrl: `${SITE_URL}/gracias?ref=${encodeURIComponent(reference)}`,
     email: input.client_email ?? null,
     fullName: input.client_name,
-    phone: input.client_phone,
+    phone: input.client_phone.replace(/[^\d+]/g, ""),
     address: input.client_address,
+    city,
+    region: input.client_region?.trim() || city,
+    country: "CO",
   });
+
 
   return {
     ok: true as const,
