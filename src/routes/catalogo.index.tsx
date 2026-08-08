@@ -9,8 +9,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Crown, Filter, Sparkles, ArrowRight, Search, MessageCircle, Film } from "lucide-react";
 import { listLuxuryCatalog, getImpulsadorRef } from "@/lib/luxury-public.functions";
-import { PromoCarousel, type Promo } from "@/components/luxury/PromoCarousel";
+import { type Promo } from "@/components/luxury/PromoCarousel";
+import { PromoTicker } from "@/components/luxury/PromoTicker";
 import { Reveal } from "@/components/Reveal";
+import { waHref } from "@/lib/whatsapp";
 
 const searchSchema = z.object({
   cat: fallback(z.string().optional(), undefined).optional(),
