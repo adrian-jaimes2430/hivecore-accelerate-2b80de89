@@ -64,6 +64,7 @@ export const Route = createFileRoute("/product/$slug")({
 interface FunnelSection { title: string; content: string; image?: string; video?: string }
 interface Product {
   id: string; slug: string; sku: string; name: string; price: number; upsell_price: number | null;
+  bundle_pricing_enabled?: boolean | null; price_2?: number | null; price_3?: number | null;
   short_description: string | null; description: string | null;
   benefits: unknown; images: unknown; funnel_sections: unknown; cta_label: string | null;
 }
