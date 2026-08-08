@@ -172,6 +172,12 @@ function ProductFunnel() {
                 slug={product.slug}
                 productName={product.name}
                 unitPrice={Number(product.price)}
+                pricing={{
+                  price: Number(product.price),
+                  bundle_pricing_enabled: product.bundle_pricing_enabled ?? false,
+                  price_2: product.price_2 ?? null,
+                  price_3: product.price_3 ?? null,
+                }}
                 currencyPrefix="S/"
                 ctaLabel={product.cta_label ?? "Comprar ahora"}
                 ref={ref ?? null}
