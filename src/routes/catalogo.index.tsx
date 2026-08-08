@@ -254,7 +254,7 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
   const vids = Array.isArray(p.videos) ? (p.videos as string[]) : [];
   const cover = imgs[0];
   return (
-    <div className="shop-card group animate-fade-up" style={{ animationDelay: `${Math.min(index * 60, 600)}ms` }}>
+    <Reveal className="shop-card group" delay={Math.min((index % 6) * 70, 420)} from="up">
       <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="block">
         <div className="shop-media relative m-2 aspect-[4/5]">
           {cover ? (
