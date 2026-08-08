@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Sparkles, TrendingUp, Star, Flame, Layers, ArrowRight, Crown } from "lucide-react";
 import { ShareBar } from "@/components/luxury/ShareBar";
+import { Reveal } from "@/components/Reveal";
+
 import type { LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/app")({
