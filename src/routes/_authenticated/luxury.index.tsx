@@ -47,7 +47,7 @@ interface LuxProduct {
 
 function LuxuryCatalog() {
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/luxury" });
+  const navigate = useNavigate({ from: "/luxury/" });
   const { user } = useAuth();
   const [quickView, setQuickView] = useState<LuxProduct | null>(null);
   const SITE_URL = "https://hivecore-accelerate.lovable.app";
