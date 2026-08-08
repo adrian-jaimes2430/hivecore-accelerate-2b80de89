@@ -56,7 +56,7 @@ function PublicCatalog() {
     products: Product[]; categories: Cat[]; brands: Brand[]; promos: Promo[];
   };
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/catalogo" });
+  const navigate = useNavigate({ from: "/catalogo/" });
   const [quickView, setQuickView] = useState<Product | null>(null);
 
   const { data: impulsador } = useQuery({
