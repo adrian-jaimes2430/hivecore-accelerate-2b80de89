@@ -283,8 +283,8 @@ function LuxuryCatalog() {
             </div>
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {products.map((p) => (
-                <ProductCard key={p.id} p={p} brand={brands.find((b) => b.id === p.brand_id)?.name} onQuickView={() => setQuickView(p)} />
+              {products.map((p, i) => (
+                <ProductCard key={p.id} p={p} index={i} brand={brands.find((b) => b.id === p.brand_id)?.name} onQuickView={() => setQuickView(p)} />
               ))}
             </div>
           )}
