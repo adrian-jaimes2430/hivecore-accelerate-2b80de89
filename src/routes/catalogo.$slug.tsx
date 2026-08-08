@@ -70,12 +70,10 @@ function PublicProduct() {
   const price = Number(product.suggested_retail_price || product.price);
   const variantSummary = summarizeVariations(selectedVariations);
 
-  const waText = encodeURIComponent(
+  const waLink = waHref(
+    impulsador?.phone,
     `Hola, me interesa la pieza "${product.name}" del catálogo AnMa Luxury (S/ ${price.toFixed(2)}).${variantSummary ? `\nOpciones: ${variantSummary}` : ""}\n${url}`,
   );
-  const waHref = impulsador?.phone
-    ? `https://wa.me/${impulsador.phone.replace(/[^\d]/g, "")}?text=${waText}`
-    : `https://wa.me/?text=${waText}`;
 
   return (
     <div className="min-h-screen">
