@@ -35,6 +35,7 @@ interface Product {
   id: string; slug: string; sku: string; name: string; category_id: string | null;
   secondary_category_ids: string[];
   price: number; upsell_price: number | null;
+  bundle_pricing_enabled: boolean; price_2: number | null; price_3: number | null;
   short_description: string | null; description: string | null;
   benefits: string[]; images: string[]; funnel_sections: FunnelSection[];
   cta_label: string | null;
