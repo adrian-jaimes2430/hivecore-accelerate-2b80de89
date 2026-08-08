@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, useNavigate, Link } from "@tanstack/react-rout
 import { useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { AppSidebar } from "@/components/AppSidebar";
-import { HiveLogo } from "@/components/HiveLogo";
+
 import { Loader2, ShieldAlert, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
