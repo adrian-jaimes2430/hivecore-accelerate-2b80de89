@@ -95,11 +95,24 @@ export function PublicCheckoutDialog({
         setBusy(false);
         return;
       }
+      const purchaseParams = {
+        content_ids: [slug],
+        content_name: productName,
+        content_type: "product",
+        num_items: form.quantity,
+        value: total,
+        currency: "COP",
+        order_id: res.orderCode,
+      };
       if (res.checkoutUrl) {
+        // Pago en línea: registramos la intención antes de salir a la pasarela.
+        metaTrack("AddPaymentInfo", purchaseParams);
         window.location.href = res.checkoutUrl;
         return;
       }
+      metaTrack("Purchase", purchaseParams);
       setDone({ code: res.orderCode, method });
+
     } catch (err: any) {
       toast.error(err?.message ?? "Error al enviar el pedido");
     }
