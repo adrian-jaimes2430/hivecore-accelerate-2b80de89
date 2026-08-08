@@ -204,6 +204,33 @@ export function PublicCheckoutDialog({
                 />
               </div>
             </div>
+
+            {comboEnabled && (
+              <div className="grid grid-cols-3 gap-2">
+                {[1, 2, 3].map((q) => {
+                  const t = bundleTotal(priceModel, q);
+                  const available = q === 1 || (q === 2 ? Number(priceModel.price_2) > 0 : Number(priceModel.price_3) > 0);
+                  if (!available) return null;
+                  return (
+                    <button
+                      key={q}
+                      type="button"
+                      onClick={() => setForm({ ...form, quantity: q })}
+                      className={`rounded-lg border p-2 text-center text-xs transition ${
+                        form.quantity === q
+                          ? "border-hive bg-hive/10"
+                          : "border-border/60 bg-white/5 hover:border-hive/40"
+                      }`}
+                    >
+                      <span className="block font-semibold">{q} unidad{q > 1 ? "es" : ""}</span>
+                      <span className="block hive-gradient-text font-bold">
+                        {currencyPrefix} {t.toFixed(2)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             <div>
               <Label>Correo electrónico {method === "online" ? "" : "(opcional)"}</Label>
               <Input
