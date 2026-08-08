@@ -217,6 +217,82 @@
 .animate-fade-up { animation: fade-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 /* ============================================================
+   MOTION layer — shared easing, scroll reveals, micro-interactions
+   ============================================================ */
+:root {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+  --dur-fast: 180ms;
+  --dur-base: 320ms;
+  --dur-slow: 620ms;
+}
+
+html { scroll-behavior: smooth; }
+
+/* Scroll reveal — driven by <Reveal /> */
+[data-reveal] {
+  opacity: 0;
+  transition:
+    opacity var(--dur-slow) var(--ease-out-expo),
+    transform var(--dur-slow) var(--ease-out-expo),
+    filter var(--dur-slow) var(--ease-out-expo);
+  filter: blur(6px);
+  will-change: opacity, transform;
+}
+[data-reveal="up"] { transform: translate3d(0, 26px, 0); }
+[data-reveal="down"] { transform: translate3d(0, -26px, 0); }
+[data-reveal="left"] { transform: translate3d(-28px, 0, 0); }
+[data-reveal="right"] { transform: translate3d(28px, 0, 0); }
+[data-reveal="scale"] { transform: scale(0.96); }
+[data-reveal][data-shown="true"] {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  [data-reveal] { opacity: 1 !important; filter: none !important; transform: none !important; transition: none !important; }
+  .animate-fade-up, .hive-float, .hive-pulse, .luxury-shine::after { animation: none !important; }
+}
+
+/* Entrance stagger for hero content */
+@keyframes rise-in {
+  from { opacity: 0; transform: translate3d(0, 22px, 0); filter: blur(8px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+.animate-rise { animation: rise-in 0.85s var(--ease-out-expo) both; }
+
+/* Slow hero image drift for cinematic depth */
+@keyframes hero-drift {
+  from { transform: scale(1.06) translate3d(0, 0, 0); }
+  to { transform: scale(1.14) translate3d(0, -1.5%, 0); }
+}
+.hero-drift { animation: hero-drift 22s ease-in-out infinite alternate; }
+
+/* Underline sweep for text links */
+.link-sweep { position: relative; }
+.link-sweep::after {
+  content: "";
+  position: absolute;
+  left: 20px; right: 20px; bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-base) var(--ease-out-expo);
+}
+.link-sweep:hover::after { transform: scaleX(1); }
+
+/* Interactive lift used across cards and tiles */
+.lift {
+  transition: transform var(--dur-base) var(--ease-out-expo), box-shadow var(--dur-base) var(--ease-out-expo), border-color var(--dur-base) ease;
+}
+.lift:hover { transform: translateY(-4px); }
+.lift:active { transform: translateY(-1px) scale(0.995); }
+
+
+/* ============================================================
    MERCURY layer — alpine banking at blue hour (homepage)
    ============================================================ */
 @theme inline {
