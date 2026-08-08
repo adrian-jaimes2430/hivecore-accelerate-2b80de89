@@ -360,7 +360,7 @@ function ProductCard({ p, brand, index = 0, onQuickView }: { p: LuxProduct; bran
           </Link>
         </div>
       </div>
-    </div>
+    </Reveal>
   );
 }
 
