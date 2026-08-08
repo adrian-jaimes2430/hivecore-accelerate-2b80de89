@@ -579,6 +579,7 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
   const empty: Product = {
     id: "", slug: "", sku: "", name: "", category_id: null, secondary_category_ids: [],
     price: 0, upsell_price: null,
+    bundle_pricing_enabled: false, price_2: null, price_3: null,
     short_description: "", description: "", benefits: [], images: [], funnel_sections: [],
     cta_label: "Pedir ahora",
     is_active: true, is_featured: false, is_new: false, is_bestseller: false, is_recommended: false, is_trending: false,
