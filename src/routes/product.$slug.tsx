@@ -347,6 +347,20 @@ function OrderDialog({ product, impulsadorName }: { product: Product; impulsador
                 <Input type="number" min={1} value={form.quantity} onChange={(e) => setForm({ ...form, quantity: Number(e.target.value) })} className="bg-white/5" />
               </div>
             </div>
+            <div className="flex items-center justify-between rounded-md border border-border/60 bg-white/5 px-3 py-2 text-sm">
+              <span className="text-xs uppercase tracking-wider text-muted-foreground">Total</span>
+              <span className="font-display text-lg font-bold hive-gradient-text">
+                S/ {bundleTotal(
+                  {
+                    price: Number(product.price),
+                    bundle_pricing_enabled: product.bundle_pricing_enabled ?? false,
+                    price_2: product.price_2 ?? null,
+                    price_3: product.price_3 ?? null,
+                  },
+                  form.quantity,
+                ).toFixed(2)}
+              </span>
+            </div>
             <div>
               <Label>Dirección</Label>
               <Input value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className="bg-white/5" />
