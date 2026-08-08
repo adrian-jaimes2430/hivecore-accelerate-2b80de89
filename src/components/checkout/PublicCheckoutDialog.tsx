@@ -242,8 +242,31 @@ export function PublicCheckoutDialog({
                 className="bg-white/5"
               />
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Ciudad</Label>
+                <Input
+                  required
+                  minLength={2}
+                  maxLength={80}
+                  value={form.client_city}
+                  onChange={(e) => setForm({ ...form, client_city: e.target.value })}
+                  className="bg-white/5"
+                />
+              </div>
+              <div>
+                <Label>Departamento / Región</Label>
+                <Input
+                  maxLength={80}
+                  placeholder="Opcional"
+                  value={form.client_region}
+                  onChange={(e) => setForm({ ...form, client_region: e.target.value })}
+                  className="bg-white/5"
+                />
+              </div>
+            </div>
             <div>
-              <Label>Dirección de entrega (ciudad, barrio, dirección)</Label>
+              <Label>Dirección de entrega (barrio, calle, número)</Label>
               <Input
                 required
                 minLength={4}
@@ -253,6 +276,7 @@ export function PublicCheckoutDialog({
                 className="bg-white/5"
               />
             </div>
+
             <div>
               <Label>Observaciones (opcional)</Label>
               <Textarea
