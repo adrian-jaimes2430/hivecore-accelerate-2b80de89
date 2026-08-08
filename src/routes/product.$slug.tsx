@@ -16,6 +16,7 @@ import { forwardOrderToIntegrations } from "@/lib/integrations.functions";
 import { getProductPublic } from "@/lib/product-public.functions";
 import { getImpulsadorRef } from "@/lib/luxury-public.functions";
 import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
+import { bundleTotal } from "@/lib/pricing";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 
