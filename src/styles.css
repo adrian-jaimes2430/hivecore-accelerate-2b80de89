@@ -323,8 +323,17 @@ html { scroll-behavior: smooth; }
     background: var(--graphite-card);
     border-radius: 12px;
     padding: 32px;
-    border: 0;
+    border: 1px solid transparent;
     box-shadow: none;
+    transition:
+      transform var(--dur-base) var(--ease-out-expo),
+      background var(--dur-base) ease,
+      border-color var(--dur-base) ease;
+  }
+  .mercury-card:hover {
+    transform: translateY(-3px);
+    background: color-mix(in oklab, var(--graphite-card) 88%, #fff 12%);
+    border-color: rgba(237, 237, 243, 0.08);
   }
   .mercury-display {
     font-family: var(--font-display);
@@ -341,34 +350,63 @@ html { scroll-behavior: smooth; }
   .mercury-body { color: var(--ivory-text); font-size: 16px; line-height: 1.5; font-weight: 400; }
   .mercury-muted { color: var(--ash-text); }
   .mercury-btn {
+    position: relative;
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     background: var(--cobalt); color: #fff;
     font-size: 16px; font-weight: 400;
-    border-radius: 32px; border: 0; box-shadow: none;
+    border-radius: 32px; border: 0;
     padding: 12px 24px;
-    transition: filter 0.2s ease;
+    overflow: hidden;
+    box-shadow: 0 0 0 0 rgba(82, 102, 235, 0);
+    transition:
+      transform var(--dur-fast) var(--ease-spring),
+      box-shadow var(--dur-base) var(--ease-out-expo),
+      filter var(--dur-fast) ease;
   }
-  .mercury-btn:hover { filter: brightness(1.08); }
+  .mercury-btn::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.26) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 0.7s var(--ease-out-expo);
+  }
+  .mercury-btn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px -12px rgba(82, 102, 235, 0.75);
+  }
+  .mercury-btn:hover::before { transform: translateX(120%); }
+  .mercury-btn:active { transform: translateY(0) scale(0.98); }
+  .mercury-btn > * { position: relative; }
   .mercury-ghost {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     background: transparent; color: var(--ivory-text);
     border: 1px solid var(--mist-border); border-radius: 40px;
     padding: 10px 20px; font-size: 16px; font-weight: 400;
-    transition: background 0.2s ease;
+    transition:
+      background var(--dur-base) ease,
+      transform var(--dur-fast) var(--ease-spring),
+      border-color var(--dur-base) ease;
   }
-  .mercury-ghost:hover { background: rgba(237, 237, 243, 0.08); }
+  .mercury-ghost:hover { background: rgba(237, 237, 243, 0.08); transform: translateY(-2px); }
+  .mercury-ghost:active { transform: translateY(0) scale(0.98); }
   .mercury-nav-link {
+    position: relative;
+    display: inline-flex; align-items: center;
+    height: 40px;
     border-radius: 40px; padding: 0 20px;
     color: var(--ivory-text); font-size: 16px; font-weight: 400;
-    transition: opacity 0.2s ease;
+    transition: color var(--dur-fast) ease, background var(--dur-base) ease;
   }
-  .mercury-nav-link:hover { opacity: 0.7; }
+  .mercury-nav-link:hover { background: rgba(237, 237, 243, 0.06); }
   .mercury-tag {
     display: inline-flex; align-items: center; gap: 8px;
     border-radius: 40px; border: 1px solid var(--slate-border);
     padding: 6px 14px; font-size: 12px; letter-spacing: 0.12px;
     color: var(--ash-text);
+    transition: border-color var(--dur-base) ease, color var(--dur-base) ease;
   }
+  .mercury-tag:hover { border-color: var(--mist-border); color: var(--ivory-text); }
 
   /* ==========================================================
      SHOP layer — soft floating commerce cards (store surfaces)
@@ -378,39 +416,70 @@ html { scroll-behavior: smooth; }
     border-radius: 28px;
     border: 1px solid rgba(255, 255, 255, 0.06);
     overflow: hidden;
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+    transition:
+      transform var(--dur-slow) var(--ease-out-expo),
+      border-color var(--dur-base) ease,
+      box-shadow var(--dur-slow) var(--ease-out-expo);
   }
-  .shop-card:hover { transform: translateY(-4px); border-color: rgba(255, 255, 255, 0.14); }
+  .shop-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 28px 60px -32px rgba(0, 0, 0, 0.9);
+  }
   .shop-media { border-radius: 22px; overflow: hidden; background: #0f0f16; }
   .shop-pill {
     border-radius: 9999px !important;
     height: 46px;
     padding-inline: 20px;
+    transition: border-color var(--dur-base) ease, background var(--dur-base) ease, box-shadow var(--dur-base) ease;
+  }
+  .shop-pill:focus-visible {
+    border-color: rgba(255, 255, 255, 0.26);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.06);
   }
   .shop-chip {
     display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
     border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 8px 16px; font-size: 13px; color: var(--ash-text);
     background: rgba(255, 255, 255, 0.03);
-    transition: all 0.2s ease;
+    transition:
+      color var(--dur-fast) ease,
+      background var(--dur-base) ease,
+      border-color var(--dur-base) ease,
+      transform var(--dur-fast) var(--ease-spring);
   }
-  .shop-chip:hover { color: var(--ivory-text); border-color: rgba(255, 255, 255, 0.24); }
+  .shop-chip:hover { color: var(--ivory-text); border-color: rgba(255, 255, 255, 0.24); transform: translateY(-1px); }
+  .shop-chip:active { transform: scale(0.97); }
   .shop-chip[data-active="true"] {
     background: var(--ivory-text); color: #16161d; border-color: var(--ivory-text);
   }
   .shop-btn {
+    position: relative; overflow: hidden;
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     border-radius: 9999px; padding: 10px 18px; font-size: 13px; font-weight: 500;
     background: var(--ivory-text); color: #16161d;
-    transition: filter 0.2s ease;
+    transition: filter var(--dur-fast) ease, transform var(--dur-fast) var(--ease-spring), box-shadow var(--dur-base) ease;
   }
-  .shop-btn:hover { filter: brightness(0.92); }
+  .shop-btn:hover { filter: brightness(0.94); transform: translateY(-2px); box-shadow: 0 10px 24px -14px rgba(255, 255, 255, 0.5); }
+  .shop-btn:active { transform: translateY(0) scale(0.97); }
   .shop-btn-quiet {
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     border-radius: 9999px; padding: 10px 18px; font-size: 13px; font-weight: 500;
     background: rgba(255, 255, 255, 0.06); color: var(--ivory-text);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    transition: background 0.2s ease;
+    transition: background var(--dur-base) ease, transform var(--dur-fast) var(--ease-spring), border-color var(--dur-base) ease;
   }
-  .shop-btn-quiet:hover { background: rgba(255, 255, 255, 0.12); }
+  .shop-btn-quiet:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.18); transform: translateY(-2px); }
+  .shop-btn-quiet:active { transform: translateY(0) scale(0.97); }
+
+  /* Editorial section label + rule used across store surfaces */
+  .shop-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.22em;
+    color: var(--ash-text);
+  }
+  .shop-eyebrow::before {
+    content: ""; width: 26px; height: 1px; background: currentColor; opacity: 0.6;
+  }
 }
+
