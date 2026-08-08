@@ -16,6 +16,7 @@ import { forwardOrderToIntegrations } from "@/lib/integrations.functions";
 import { getProductPublic } from "@/lib/product-public.functions";
 import { getImpulsadorRef } from "@/lib/luxury-public.functions";
 import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
+import { MetaPixel } from "@/components/marketing/MetaPixel";
 import { bundleTotal } from "@/lib/pricing";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
@@ -68,7 +69,9 @@ interface Product {
   bundle_pricing_enabled?: boolean | null; price_2?: number | null; price_3?: number | null;
   short_description: string | null; description: string | null;
   benefits: unknown; images: unknown; funnel_sections: unknown; cta_label: string | null;
+  meta_pixel_enabled?: boolean | null; meta_pixel_id?: string | null; meta_test_event_code?: string | null;
 }
+
 
 function ProductFunnel() {
   const { slug } = Route.useParams();
@@ -102,7 +105,17 @@ function ProductFunnel() {
 
   return (
     <div>
+      {product.meta_pixel_enabled && product.meta_pixel_id ? (
+        <MetaPixel
+          pixelId={product.meta_pixel_id}
+          testEventCode={product.meta_test_event_code}
+          contentId={product.sku}
+          contentName={product.name}
+          value={Number(product.price)}
+        />
+      ) : null}
       <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
+
         {user ? (
           <Link to="/app" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4" /> Volver al catálogo

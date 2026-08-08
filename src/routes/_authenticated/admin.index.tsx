@@ -36,6 +36,8 @@ interface Product {
   secondary_category_ids: string[];
   price: number; upsell_price: number | null;
   bundle_pricing_enabled: boolean; price_2: number | null; price_3: number | null;
+  meta_pixel_enabled?: boolean; meta_pixel_id?: string | null; meta_test_event_code?: string | null;
+
   short_description: string | null; description: string | null;
   benefits: string[]; images: string[]; funnel_sections: FunnelSection[];
   cta_label: string | null;
@@ -580,6 +582,8 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
     id: "", slug: "", sku: "", name: "", category_id: null, secondary_category_ids: [],
     price: 0, upsell_price: null,
     bundle_pricing_enabled: false, price_2: null, price_3: null,
+    meta_pixel_enabled: false, meta_pixel_id: "", meta_test_event_code: "",
+
     short_description: "", description: "", benefits: [], images: [], funnel_sections: [],
     cta_label: "Pedir ahora",
     is_active: true, is_featured: false, is_new: false, is_bestseller: false, is_recommended: false, is_trending: false,
@@ -627,6 +631,10 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
       bundle_pricing_enabled: form.bundle_pricing_enabled,
       price_2: form.bundle_pricing_enabled ? form.price_2 : null,
       price_3: form.bundle_pricing_enabled ? form.price_3 : null,
+      meta_pixel_enabled: Boolean(form.meta_pixel_enabled && form.meta_pixel_id?.trim()),
+      meta_pixel_id: form.meta_pixel_id?.trim() || null,
+      meta_test_event_code: form.meta_test_event_code?.trim() || null,
+
       short_description: form.short_description,
       description: form.description,
       benefits: benefitsText.split("\n").map((s) => s.trim()).filter(Boolean),
@@ -752,6 +760,49 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
               <div><Label>Texto CTA</Label><Input value={form.cta_label ?? ""} onChange={(e) => update("cta_label", e.target.value)} className="bg-white/5" /></div>
             </div>
           </section>
+
+          {/* Meta Ads Pixel */}
+          <section className="space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-hive">Meta Ads · Pixel del funnel</h3>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={Boolean(form.meta_pixel_enabled)}
+                onChange={(e) => update("meta_pixel_enabled", e.target.checked)}
+                className="h-4 w-4 accent-[var(--hive)]"
+              />
+              Medir este funnel con Meta Pixel (tráfico directo al link público)
+            </label>
+            {form.meta_pixel_enabled && (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <Label>ID del Pixel</Label>
+                  <Input
+                    value={form.meta_pixel_id ?? ""}
+                    onChange={(e) => update("meta_pixel_id", e.target.value.replace(/\D/g, ""))}
+                    placeholder="Ej: 1234567890123456"
+                    className="bg-white/5"
+                  />
+                </div>
+                <div>
+                  <Label>Código de prueba (opcional)</Label>
+                  <Input
+                    value={form.meta_test_event_code ?? ""}
+                    onChange={(e) => update("meta_test_event_code", e.target.value)}
+                    placeholder="TEST12345"
+                    className="bg-white/5"
+                  />
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Se envían automáticamente los eventos <strong>PageView</strong>, <strong>ViewContent</strong>,{" "}
+              <strong>InitiateCheckout</strong>, <strong>AddPaymentInfo</strong> (pago en línea) y{" "}
+              <strong>Purchase</strong> (contra entrega) desde el link público del funnel.
+            </p>
+          </section>
+
+
 
           {/* Imágenes */}
           <section className="space-y-3">

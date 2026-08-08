@@ -15,6 +15,7 @@ import { CreditCard, Truck, Loader2, ShoppingBag, Check } from "lucide-react";
 import { toast } from "sonner";
 import { submitPublicOrder } from "@/lib/checkout.functions";
 import { bundleTotal, type BundlePricing } from "@/lib/pricing";
+import { metaTrack } from "@/components/marketing/MetaPixel";
 
 export function PublicCheckoutDialog({
   productKind,
@@ -94,11 +95,24 @@ export function PublicCheckoutDialog({
         setBusy(false);
         return;
       }
+      const purchaseParams = {
+        content_ids: [slug],
+        content_name: productName,
+        content_type: "product",
+        num_items: form.quantity,
+        value: total,
+        currency: "COP",
+        order_id: res.orderCode,
+      };
       if (res.checkoutUrl) {
+        // Pago en línea: registramos la intención antes de salir a la pasarela.
+        metaTrack("AddPaymentInfo", purchaseParams);
         window.location.href = res.checkoutUrl;
         return;
       }
+      metaTrack("Purchase", purchaseParams);
       setDone({ code: res.orderCode, method });
+
     } catch (err: any) {
       toast.error(err?.message ?? "Error al enviar el pedido");
     }
@@ -111,8 +125,19 @@ export function PublicCheckoutDialog({
       onOpenChange={(o) => {
         setOpen(o);
         if (!o) setDone(null);
+        if (o) {
+          metaTrack("InitiateCheckout", {
+            content_ids: [slug],
+            content_name: productName,
+            content_type: "product",
+            num_items: form.quantity,
+            value: total,
+            currency: "COP",
+          });
+        }
       }}
     >
+
       <DialogTrigger asChild>
         <Button className={triggerClassName}>
           <ShoppingBag className="mr-2 h-4 w-4" /> {ctaLabel}
