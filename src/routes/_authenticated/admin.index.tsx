@@ -761,6 +761,49 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
             </div>
           </section>
 
+          {/* Meta Ads Pixel */}
+          <section className="space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-hive">Meta Ads · Pixel del funnel</h3>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={Boolean(form.meta_pixel_enabled)}
+                onChange={(e) => update("meta_pixel_enabled", e.target.checked)}
+                className="h-4 w-4 accent-[var(--hive)]"
+              />
+              Medir este funnel con Meta Pixel (tráfico directo al link público)
+            </label>
+            {form.meta_pixel_enabled && (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <Label>ID del Pixel</Label>
+                  <Input
+                    value={form.meta_pixel_id ?? ""}
+                    onChange={(e) => update("meta_pixel_id", e.target.value.replace(/\D/g, ""))}
+                    placeholder="Ej: 1234567890123456"
+                    className="bg-white/5"
+                  />
+                </div>
+                <div>
+                  <Label>Código de prueba (opcional)</Label>
+                  <Input
+                    value={form.meta_test_event_code ?? ""}
+                    onChange={(e) => update("meta_test_event_code", e.target.value)}
+                    placeholder="TEST12345"
+                    className="bg-white/5"
+                  />
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Se envían automáticamente los eventos <strong>PageView</strong>, <strong>ViewContent</strong>,{" "}
+              <strong>InitiateCheckout</strong>, <strong>AddPaymentInfo</strong> (pago en línea) y{" "}
+              <strong>Purchase</strong> (contra entrega) desde el link público del funnel.
+            </p>
+          </section>
+
+
+
           {/* Imágenes */}
           <section className="space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-hive">Imágenes del producto</h3>
