@@ -229,7 +229,7 @@ function ImpulsadorCTA({ product, impulsador }: { product: Product; impulsador: 
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-emerald-500 px-6 text-base font-semibold text-black shadow-lg shadow-emerald-500/30 transition-transform hover:scale-[1.02]"
+      className="shop-btn-accent h-12 px-6 text-base"
     >
       <MessageCircle className="h-5 w-5" />
       Pedir a {impulsador.name?.split(" ")[0] ?? "tu impulsador"} por WhatsApp
