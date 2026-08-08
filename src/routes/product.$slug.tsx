@@ -140,7 +140,7 @@ function ProductFunnel() {
 
       {/* Final order section — minimal product data + CTA */}
       <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-        <div className="hive-card overflow-hidden">
+        <div className="shop-card overflow-hidden p-0">
           <table className="w-full text-sm">
             <tbody>
               <tr className="border-b border-border/40">
