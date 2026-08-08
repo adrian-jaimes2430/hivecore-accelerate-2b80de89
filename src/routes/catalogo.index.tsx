@@ -173,7 +173,6 @@ function PublicCatalog() {
         </section>
 
 
-        {promos.length > 0 && <PromoCarousel promos={promos} />}
 
 
 
