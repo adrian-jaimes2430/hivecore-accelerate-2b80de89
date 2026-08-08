@@ -138,11 +138,11 @@ function Dashboard() {
 
 function Section({ title, icon: Icon, children }: { title: string; icon: LucideIcon; children: React.ReactNode }) {
   return (
-    <section className="mb-12">
-      <div className="mb-4 flex items-center gap-2">
+    <section className="mb-14">
+      <Reveal className="mb-5 flex items-center gap-2">
         <Icon className="h-4 w-4 text-hive" />
-        <h2 className="font-display text-xl font-semibold">{title}</h2>
-      </div>
+        <h2 className="font-display text-xl font-semibold tracking-[-0.02em]">{title}</h2>
+      </Reveal>
       {children}
     </section>
   );
@@ -151,45 +151,48 @@ function Section({ title, icon: Icon, children }: { title: string; icon: LucideI
 function ProductGrid({ items }: { items: Product[] }) {
   if (items.length === 0) return <p className="text-sm text-muted-foreground">Sin productos por ahora.</p>;
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {items.map((p) => {
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {items.map((p, i) => {
         const imgs = Array.isArray(p.images) ? (p.images as string[]) : [];
         const cover = imgs[0];
         return (
-        <Link key={p.id} to="/product/$slug" params={{ slug: p.slug }} className="hive-card group overflow-hidden">
-          <div className="relative aspect-[4/5] w-full overflow-hidden bg-gradient-to-br from-hive/20 via-ao-red/10 to-anma-orange/15">
-            {cover ? (
-              <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-            ) : (
-              <>
-                <div className="absolute inset-0 hive-grid-bg opacity-40" />
-                <div className="absolute inset-0 flex items-center justify-center font-display text-5xl font-bold opacity-20">
-                  {p.name.charAt(0)}
-                </div>
-              </>
-            )}
-            <div className="absolute right-3 top-3 flex flex-col gap-1">
-              {p.is_new && <Badge color="bg-hive/90 text-black">NUEVO</Badge>}
-              {p.is_bestseller && <Badge color="bg-ao-red/90 text-white">TOP</Badge>}
-              {p.is_trending && <Badge color="bg-anma-orange/90 text-black">HOT</Badge>}
+        <Reveal key={p.id} delay={Math.min((i % 4) * 70, 280)}>
+          <Link to="/product/$slug" params={{ slug: p.slug }} className="shop-card group block h-full">
+            <div className="shop-media relative m-2 aspect-[4/5] w-[calc(100%-1rem)]">
+              {cover ? (
+                <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]" />
+              ) : (
+                <>
+                  <div className="absolute inset-0 hive-grid-bg opacity-40" />
+                  <div className="absolute inset-0 flex items-center justify-center font-display text-5xl font-bold opacity-20">
+                    {p.name.charAt(0)}
+                  </div>
+                </>
+              )}
+              <div className="absolute right-3 top-3 flex flex-col gap-1">
+                {p.is_new && <Badge color="bg-hive/90 text-black">NUEVO</Badge>}
+                {p.is_bestseller && <Badge color="bg-white/90 text-black">TOP</Badge>}
+                {p.is_trending && <Badge color="bg-black/70 text-white">HOT</Badge>}
+              </div>
             </div>
-          </div>
-          <div className="p-4">
-            <h3 className="font-semibold">{p.name}</h3>
-            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{p.short_description}</p>
-            <div className="mt-3 flex items-center justify-between">
-              <span className="font-display text-lg font-bold">S/ {Number(p.price).toFixed(2)}</span>
-              <span className="inline-flex items-center gap-1 text-xs text-hive opacity-0 transition group-hover:opacity-100">
-                Ver funnel <ArrowRight className="h-3 w-3" />
-              </span>
+            <div className="px-4 pb-4 pt-1">
+              <h3 className="text-[15px] font-semibold tracking-[-0.01em]">{p.name}</h3>
+              <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{p.short_description}</p>
+              <div className="mt-3 flex items-center justify-between">
+                <span className="shop-price text-lg">S/ {Number(p.price).toFixed(2)}</span>
+                <span className="inline-flex items-center gap-1 text-xs text-hive opacity-0 transition group-hover:opacity-100">
+                  Ver funnel <ArrowRight className="h-3 w-3" />
+                </span>
+              </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+        </Reveal>
         );
       })}
     </div>
   );
 }
+
 
 function Badge({ children, color }: { children: React.ReactNode; color: string }) {
   return <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider ${color}`}>{children}</span>;
