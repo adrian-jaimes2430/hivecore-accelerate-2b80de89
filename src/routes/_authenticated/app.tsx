@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { Sparkles, TrendingUp, Star, Flame, Layers, ArrowRight, Crown } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sparkles, TrendingUp, Star, Flame, Layers, ArrowRight, Crown, Eye } from "lucide-react";
 import { ShareBar } from "@/components/luxury/ShareBar";
 import { Reveal } from "@/components/Reveal";
 
