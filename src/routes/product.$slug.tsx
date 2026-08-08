@@ -104,7 +104,17 @@ function ProductFunnel() {
 
   return (
     <div>
+      {product.meta_pixel_enabled && product.meta_pixel_id ? (
+        <MetaPixel
+          pixelId={product.meta_pixel_id}
+          testEventCode={product.meta_test_event_code}
+          contentId={product.sku}
+          contentName={product.name}
+          value={Number(product.price)}
+        />
+      ) : null}
       <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
+
         {user ? (
           <Link to="/app" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4" /> Volver al catálogo
