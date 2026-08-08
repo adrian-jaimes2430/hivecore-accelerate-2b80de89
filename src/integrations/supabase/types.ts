@@ -498,6 +498,9 @@ export type Database = {
           is_new: boolean | null
           is_recommended: boolean | null
           is_trending: boolean | null
+          meta_pixel_enabled: boolean
+          meta_pixel_id: string | null
+          meta_test_event_code: string | null
           name: string
           price: number
           price_2: number | null
@@ -525,6 +528,9 @@ export type Database = {
           is_new?: boolean | null
           is_recommended?: boolean | null
           is_trending?: boolean | null
+          meta_pixel_enabled?: boolean
+          meta_pixel_id?: string | null
+          meta_test_event_code?: string | null
           name: string
           price?: number
           price_2?: number | null
@@ -552,6 +558,9 @@ export type Database = {
           is_new?: boolean | null
           is_recommended?: boolean | null
           is_trending?: boolean | null
+          meta_pixel_enabled?: boolean
+          meta_pixel_id?: string | null
+          meta_test_event_code?: string | null
           name?: string
           price?: number
           price_2?: number | null
