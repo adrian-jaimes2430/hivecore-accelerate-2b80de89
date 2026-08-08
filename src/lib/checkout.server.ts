@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { bundleTotal } from "./pricing";
-import { buildCheckoutUrl, getWompiConfig } from "./wompi.server";
+import { buildCheckoutUrl, getWompiConfig, guessCityFromAddress } from "./wompi.server";
 
 export const publicOrderSchema = z.object({
   productKind: z.enum(["funnel", "luxury"]),
@@ -10,6 +10,9 @@ export const publicOrderSchema = z.object({
   client_phone: z.string().trim().min(6).max(30),
   client_email: z.string().trim().email().max(180).optional().nullable(),
   client_address: z.string().trim().min(4).max(300),
+  client_city: z.string().trim().max(80).optional().nullable(),
+  client_region: z.string().trim().max(80).optional().nullable(),
+
   notes: z.string().trim().max(1000).optional().nullable(),
   variations: z.string().trim().max(300).optional().nullable(),
   payment_method: z.enum(["cod", "online"]),
@@ -152,6 +155,9 @@ export async function createPublicOrder(input: PublicOrderInput) {
     };
   }
 
+  const city =
+    input.client_city?.trim() || guessCityFromAddress(input.client_address) || null;
+
   const checkoutUrl = buildCheckoutUrl({
     cfg,
     reference,
@@ -159,9 +165,13 @@ export async function createPublicOrder(input: PublicOrderInput) {
     redirectUrl: `${SITE_URL}/gracias?ref=${encodeURIComponent(reference)}`,
     email: input.client_email ?? null,
     fullName: input.client_name,
-    phone: input.client_phone,
+    phone: input.client_phone.replace(/[^\d+]/g, ""),
     address: input.client_address,
+    city,
+    region: input.client_region?.trim() || city,
+    country: "CO",
   });
+
 
   return {
     ok: true as const,

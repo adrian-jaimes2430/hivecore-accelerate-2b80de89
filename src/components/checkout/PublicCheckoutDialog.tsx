@@ -49,9 +49,12 @@ export function PublicCheckoutDialog({
     client_phone: "",
     client_email: "",
     client_address: "",
+    client_city: "",
+    client_region: "",
     quantity: 1,
     notes: "",
   });
+
 
   const priceModel: BundlePricing = pricing ?? { price: unitPrice };
   const comboEnabled = Boolean(
@@ -72,6 +75,9 @@ export function PublicCheckoutDialog({
           client_phone: form.client_phone,
           client_email: form.client_email || null,
           client_address: form.client_address,
+          client_city: form.client_city || null,
+          client_region: form.client_region || null,
+
           notes: form.notes || null,
           variations: variations || null,
           payment_method: method,
@@ -242,8 +248,31 @@ export function PublicCheckoutDialog({
                 className="bg-white/5"
               />
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Ciudad</Label>
+                <Input
+                  required
+                  minLength={2}
+                  maxLength={80}
+                  value={form.client_city}
+                  onChange={(e) => setForm({ ...form, client_city: e.target.value })}
+                  className="bg-white/5"
+                />
+              </div>
+              <div>
+                <Label>Departamento / Región</Label>
+                <Input
+                  maxLength={80}
+                  placeholder="Opcional"
+                  value={form.client_region}
+                  onChange={(e) => setForm({ ...form, client_region: e.target.value })}
+                  className="bg-white/5"
+                />
+              </div>
+            </div>
             <div>
-              <Label>Dirección de entrega (ciudad, barrio, dirección)</Label>
+              <Label>Dirección de entrega (barrio, calle, número)</Label>
               <Input
                 required
                 minLength={4}
@@ -253,6 +282,7 @@ export function PublicCheckoutDialog({
                 className="bg-white/5"
               />
             </div>
+
             <div>
               <Label>Observaciones (opcional)</Label>
               <Textarea

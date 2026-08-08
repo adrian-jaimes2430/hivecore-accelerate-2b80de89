@@ -44,6 +44,9 @@ export function buildCheckoutUrl(opts: {
   fullName?: string | null;
   phone?: string | null;
   address?: string | null;
+  city?: string | null;
+  region?: string | null;
+  country?: string | null;
 }) {
   const { cfg } = opts;
   const params = new URLSearchParams();
@@ -59,9 +62,36 @@ export function buildCheckoutUrl(opts: {
   if (opts.email) params.set("customer-data:email", opts.email);
   if (opts.fullName) params.set("customer-data:full-name", opts.fullName);
   if (opts.phone) params.set("customer-data:phone-number", opts.phone);
-  if (opts.address) params.set("shipping-address:address-line-1", opts.address);
+
+  // Wompi requires the FULL shipping-address group when any part of it is sent:
+  // address-line-1, country, city, region and phone-number. Otherwise checkout
+  // fails with "Parámetro «shipping-address:...» no proveído".
+  const address = opts.address?.trim();
+  const phone = opts.phone?.trim();
+  const city = opts.city?.trim();
+  const region = opts.region?.trim() || city;
+  const country = (opts.country?.trim() || "CO").toUpperCase();
+  if (address && phone && city && region) {
+    params.set("shipping-address:address-line-1", address);
+    params.set("shipping-address:country", country);
+    params.set("shipping-address:city", city);
+    params.set("shipping-address:region", region);
+    params.set("shipping-address:phone-number", phone);
+  }
   return `${cfg.checkoutBase}?${params.toString()}`;
 }
+
+/** Best-effort city extraction from a free-form address ("bogota, calle 79c ..."). */
+export function guessCityFromAddress(address: string): string | null {
+  const first = address.split(",")[0]?.trim();
+  if (!first) return null;
+  // Ignore segments that look like a street ("calle 79c #83A-04").
+  if (/\d/.test(first) || /\b(calle|carrera|cra|av|avenida|kr|transversal|diagonal|mz|manzana)\b/i.test(first)) {
+    return null;
+  }
+  return first.slice(0, 60);
+}
+
 
 /** Read a dotted path (e.g. "transaction.status") out of the event payload. */
 function readPath(obj: unknown, path: string): unknown {
