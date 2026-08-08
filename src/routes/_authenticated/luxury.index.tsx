@@ -300,7 +300,7 @@ function LuxuryCatalog() {
   );
 }
 
-function ProductCard({ p, brand, onQuickView }: { p: LuxProduct; brand?: string; onQuickView: () => void }) {
+function ProductCard({ p, brand, index = 0, onQuickView }: { p: LuxProduct; brand?: string; index?: number; onQuickView: () => void }) {
   const imgs = Array.isArray(p.images) ? (p.images as string[]) : [];
   const vids = Array.isArray(p.videos) ? (p.videos as string[]) : [];
   const cover = imgs[0];
@@ -309,7 +309,7 @@ function ProductCard({ p, brand, onQuickView }: { p: LuxProduct; brand?: string;
   const finalPrice = Number(p.suggested_retail_price || p.price);
 
   return (
-    <div className="shop-card group">
+    <Reveal className="shop-card group" delay={Math.min((index % 6) * 70, 420)} from="up">
       <Link to="/luxury/$slug" params={{ slug: p.slug }} className="block">
         <div className="shop-media relative m-2 aspect-[4/5]">
           {cover ? (
