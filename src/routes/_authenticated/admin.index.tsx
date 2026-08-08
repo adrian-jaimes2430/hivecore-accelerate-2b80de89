@@ -631,6 +631,10 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
       bundle_pricing_enabled: form.bundle_pricing_enabled,
       price_2: form.bundle_pricing_enabled ? form.price_2 : null,
       price_3: form.bundle_pricing_enabled ? form.price_3 : null,
+      meta_pixel_enabled: Boolean(form.meta_pixel_enabled && form.meta_pixel_id?.trim()),
+      meta_pixel_id: form.meta_pixel_id?.trim() || null,
+      meta_test_event_code: form.meta_test_event_code?.trim() || null,
+
       short_description: form.short_description,
       description: form.description,
       benefits: benefitsText.split("\n").map((s) => s.trim()).filter(Boolean),
