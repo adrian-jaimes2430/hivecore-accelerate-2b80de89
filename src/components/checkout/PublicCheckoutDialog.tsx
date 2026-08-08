@@ -14,12 +14,14 @@ import {
 import { CreditCard, Truck, Loader2, ShoppingBag, Check } from "lucide-react";
 import { toast } from "sonner";
 import { submitPublicOrder } from "@/lib/checkout.functions";
+import { bundleTotal, type BundlePricing } from "@/lib/pricing";
 
 export function PublicCheckoutDialog({
   productKind,
   slug,
   productName,
   unitPrice,
+  pricing,
   currencyPrefix = "$",
   ctaLabel = "Comprar ahora",
   ref: refId,
@@ -30,6 +32,7 @@ export function PublicCheckoutDialog({
   slug: string;
   productName: string;
   unitPrice: number;
+  pricing?: BundlePricing | null;
   currencyPrefix?: string;
   ctaLabel?: string;
   ref?: string | null;
@@ -50,7 +53,11 @@ export function PublicCheckoutDialog({
     notes: "",
   });
 
-  const total = unitPrice * form.quantity;
+  const priceModel: BundlePricing = pricing ?? { price: unitPrice };
+  const comboEnabled = Boolean(
+    priceModel.bundle_pricing_enabled && (Number(priceModel.price_2) > 0 || Number(priceModel.price_3) > 0),
+  );
+  const total = bundleTotal(priceModel, form.quantity);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -197,6 +204,33 @@ export function PublicCheckoutDialog({
                 />
               </div>
             </div>
+
+            {comboEnabled && (
+              <div className="grid grid-cols-3 gap-2">
+                {[1, 2, 3].map((q) => {
+                  const t = bundleTotal(priceModel, q);
+                  const available = q === 1 || (q === 2 ? Number(priceModel.price_2) > 0 : Number(priceModel.price_3) > 0);
+                  if (!available) return null;
+                  return (
+                    <button
+                      key={q}
+                      type="button"
+                      onClick={() => setForm({ ...form, quantity: q })}
+                      className={`rounded-lg border p-2 text-center text-xs transition ${
+                        form.quantity === q
+                          ? "border-hive bg-hive/10"
+                          : "border-border/60 bg-white/5 hover:border-hive/40"
+                      }`}
+                    >
+                      <span className="block font-semibold">{q} unidad{q > 1 ? "es" : ""}</span>
+                      <span className="block hive-gradient-text font-bold">
+                        {currencyPrefix} {t.toFixed(2)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             <div>
               <Label>Correo electrónico {method === "online" ? "" : "(opcional)"}</Label>
               <Input

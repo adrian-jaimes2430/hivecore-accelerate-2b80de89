@@ -56,7 +56,7 @@ function PublicCatalog() {
     products: Product[]; categories: Cat[]; brands: Brand[]; promos: Promo[];
   };
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/catalogo" });
+  const navigate = useNavigate({ from: "/catalogo/" });
   const [quickView, setQuickView] = useState<Product | null>(null);
 
   const { data: impulsador } = useQuery({
@@ -66,7 +66,7 @@ function PublicCatalog() {
   });
 
   const setSearch = (patch: Record<string, unknown>) =>
-    navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, ...patch }) });
+    navigate({ search: ((prev: Record<string, unknown>) => ({ ...prev, ...patch })) as never });
 
   const roots = useMemo(() => categories.filter((c) => !c.parent_id), [categories]);
   const childrenOf = (id: string) => categories.filter((c) => c.parent_id === id);

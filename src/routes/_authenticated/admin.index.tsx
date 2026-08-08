@@ -35,6 +35,7 @@ interface Product {
   id: string; slug: string; sku: string; name: string; category_id: string | null;
   secondary_category_ids: string[];
   price: number; upsell_price: number | null;
+  bundle_pricing_enabled: boolean; price_2: number | null; price_3: number | null;
   short_description: string | null; description: string | null;
   benefits: string[]; images: string[]; funnel_sections: FunnelSection[];
   cta_label: string | null;
@@ -578,6 +579,7 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
   const empty: Product = {
     id: "", slug: "", sku: "", name: "", category_id: null, secondary_category_ids: [],
     price: 0, upsell_price: null,
+    bundle_pricing_enabled: false, price_2: null, price_3: null,
     short_description: "", description: "", benefits: [], images: [], funnel_sections: [],
     cta_label: "Pedir ahora",
     is_active: true, is_featured: false, is_new: false, is_bestseller: false, is_recommended: false, is_trending: false,
@@ -622,6 +624,9 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
       secondary_category_ids: form.secondary_category_ids.filter((id) => id && id !== form.category_id) as any,
       price: form.price,
       upsell_price: form.upsell_price,
+      bundle_pricing_enabled: form.bundle_pricing_enabled,
+      price_2: form.bundle_pricing_enabled ? form.price_2 : null,
+      price_3: form.bundle_pricing_enabled ? form.price_3 : null,
       short_description: form.short_description,
       description: form.description,
       benefits: benefitsText.split("\n").map((s) => s.trim()).filter(Boolean),
@@ -712,6 +717,32 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
               </div>
               <div><Label>Precio (S/)</Label><Input type="number" step="0.01" required value={form.price} onChange={(e) => update("price", Number(e.target.value))} className="bg-white/5" /></div>
               <div><Label>Precio antes (S/)</Label><Input type="number" step="0.01" value={form.upsell_price ?? ""} onChange={(e) => update("upsell_price", e.target.value ? Number(e.target.value) : null)} className="bg-white/5" /></div>
+              <div className="sm:col-span-2 rounded-md border border-border/40 bg-white/5 p-3 space-y-3">
+                <label className="flex items-center gap-2 text-sm font-medium">
+                  <input
+                    type="checkbox"
+                    checked={form.bundle_pricing_enabled}
+                    onChange={(e) => update("bundle_pricing_enabled", e.target.checked)}
+                    className="h-4 w-4 accent-[hsl(var(--hive))]"
+                  />
+                  Activar precios por combo (x2 / x3 unidades)
+                </label>
+                {form.bundle_pricing_enabled && (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <Label>Precio total x2 unidades (S/)</Label>
+                      <Input type="number" step="0.01" value={form.price_2 ?? ""} onChange={(e) => update("price_2", e.target.value ? Number(e.target.value) : null)} className="bg-white/5" />
+                    </div>
+                    <div>
+                      <Label>Precio total x3 unidades (S/)</Label>
+                      <Input type="number" step="0.01" value={form.price_3 ?? ""} onChange={(e) => update("price_3", e.target.value ? Number(e.target.value) : null)} className="bg-white/5" />
+                    </div>
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Si se desactiva, el pedido siempre calcula precio unitario × cantidad.
+                </p>
+              </div>
               <div className="sm:col-span-2"><Label>Descripción corta</Label><Input value={form.short_description ?? ""} onChange={(e) => update("short_description", e.target.value)} className="bg-white/5" /></div>
               <div className="sm:col-span-2"><Label>Descripción completa</Label><Textarea rows={4} value={form.description ?? ""} onChange={(e) => update("description", e.target.value)} className="bg-white/5" /></div>
               <div className="sm:col-span-2">

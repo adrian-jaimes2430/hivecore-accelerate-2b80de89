@@ -484,6 +484,7 @@ export type Database = {
       products: {
         Row: {
           benefits: Json | null
+          bundle_pricing_enabled: boolean
           category_id: string | null
           created_at: string
           cta_label: string | null
@@ -499,6 +500,8 @@ export type Database = {
           is_trending: boolean | null
           name: string
           price: number
+          price_2: number | null
+          price_3: number | null
           secondary_category_ids: Json
           short_description: string | null
           sku: string
@@ -508,6 +511,7 @@ export type Database = {
         }
         Insert: {
           benefits?: Json | null
+          bundle_pricing_enabled?: boolean
           category_id?: string | null
           created_at?: string
           cta_label?: string | null
@@ -523,6 +527,8 @@ export type Database = {
           is_trending?: boolean | null
           name: string
           price?: number
+          price_2?: number | null
+          price_3?: number | null
           secondary_category_ids?: Json
           short_description?: string | null
           sku: string
@@ -532,6 +538,7 @@ export type Database = {
         }
         Update: {
           benefits?: Json | null
+          bundle_pricing_enabled?: boolean
           category_id?: string | null
           created_at?: string
           cta_label?: string | null
@@ -547,6 +554,8 @@ export type Database = {
           is_trending?: boolean | null
           name?: string
           price?: number
+          price_2?: number | null
+          price_3?: number | null
           secondary_category_ids?: Json
           short_description?: string | null
           sku?: string

@@ -47,7 +47,7 @@ interface LuxProduct {
 
 function LuxuryCatalog() {
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/luxury" });
+  const navigate = useNavigate({ from: "/luxury/" });
   const { user } = useAuth();
   const [quickView, setQuickView] = useState<LuxProduct | null>(null);
   const SITE_URL = "https://hivecore-accelerate.lovable.app";
@@ -113,7 +113,7 @@ function LuxuryCatalog() {
   const childrenOf = (id: string) => categories.filter((c) => c.parent_id === id);
 
   const setSearch = (patch: Record<string, unknown>) =>
-    navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, ...patch }) });
+    navigate({ search: ((prev: Record<string, unknown>) => ({ ...prev, ...patch })) as never });
 
   const filtersPanel = (
     <div className="space-y-6">

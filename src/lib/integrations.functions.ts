@@ -41,14 +41,23 @@ async function buildOrderPayload(
   if ((order as any).product_id) {
     const { data: p } = await supabaseAdmin
       .from("products")
-      .select("name, sku, price")
+      .select("name, sku, price, bundle_pricing_enabled, price_2, price_3")
       .eq("id", (order as any).product_id)
       .maybeSingle();
     productName = p?.name ?? "";
     productSku = p?.sku ?? "";
     if (p?.price != null) {
-      unitPrice = Number(p.price);
-      authoritativeTotal = unitPrice * orderQty;
+      const { bundleTotal } = await import("./pricing");
+      authoritativeTotal = bundleTotal(
+        {
+          price: Number(p.price),
+          bundle_pricing_enabled: p.bundle_pricing_enabled,
+          price_2: p.price_2,
+          price_3: p.price_3,
+        },
+        orderQty,
+      );
+      unitPrice = Math.round((authoritativeTotal / orderQty) * 100) / 100;
     }
   } else if ((order as any).luxury_product_id) {
     productSource = "luxury";

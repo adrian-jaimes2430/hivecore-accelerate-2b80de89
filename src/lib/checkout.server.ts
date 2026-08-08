@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { bundleTotal } from "./pricing";
 import { buildCheckoutUrl, getWompiConfig } from "./wompi.server";
 
 export const publicOrderSchema = z.object({
@@ -20,6 +21,9 @@ export type PublicOrderInput = z.infer<typeof publicOrderSchema>;
 
 const SITE_URL = "https://hivecore-accelerate.lovable.app";
 
+/** Orders coming from this account's public links are treated as paid traffic. */
+const PAID_TRAFFIC_EMAILS = ["studio.ayosoluciones@gmail.com"];
+
 export async function createPublicOrder(input: PublicOrderInput) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -27,11 +31,12 @@ export async function createPublicOrder(input: PublicOrderInput) {
   let luxuryProductId: string | null = null;
   let unitPrice = 0;
   let productName = "";
+  let total = 0;
 
   if (input.productKind === "funnel") {
     const { data: p } = await supabaseAdmin
       .from("products")
-      .select("id,name,price")
+      .select("id,name,price,bundle_pricing_enabled,price_2,price_3")
       .eq("slug", input.slug)
       .eq("is_active", true)
       .maybeSingle();
@@ -39,6 +44,15 @@ export async function createPublicOrder(input: PublicOrderInput) {
     productId = p.id;
     productName = p.name;
     unitPrice = Number(p.price ?? 0);
+    total = bundleTotal(
+      {
+        price: unitPrice,
+        bundle_pricing_enabled: p.bundle_pricing_enabled,
+        price_2: p.price_2,
+        price_3: p.price_3,
+      },
+      input.quantity,
+    );
   } else {
     const { data: p } = await supabaseAdmin
       .from("luxury_products")
@@ -51,11 +65,11 @@ export async function createPublicOrder(input: PublicOrderInput) {
     productName = p.name;
     const retail = p.suggested_retail_price != null ? Number(p.suggested_retail_price) : 0;
     unitPrice = retail > 0 ? retail : Number(p.price ?? 0);
+    total = Math.round(unitPrice * input.quantity * 100) / 100;
   }
 
-  const total = Math.round(unitPrice * input.quantity * 100) / 100;
-
-  // Only accept a referral when the profile is an approved impulsador.
+  // Only accept a referral when the profile is an approved impulsador,
+  // and the referring account is not one of the paid-traffic accounts.
   let impulsadorId: string | null = null;
   if (input.ref) {
     const { data: prof } = await supabaseAdmin
@@ -65,7 +79,18 @@ export async function createPublicOrder(input: PublicOrderInput) {
       .eq("status", "approved")
       .maybeSingle();
     impulsadorId = prof?.id ?? null;
+
+    if (impulsadorId) {
+      try {
+        const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(impulsadorId);
+        const email = authUser?.user?.email?.toLowerCase() ?? "";
+        if (PAID_TRAFFIC_EMAILS.includes(email)) impulsadorId = null;
+      } catch (e) {
+        console.warn("[checkout] paid-traffic check failed", e);
+      }
+    }
   }
+
 
   const noteParts = [
     input.variations ? `Variaciones: ${input.variations}` : null,
