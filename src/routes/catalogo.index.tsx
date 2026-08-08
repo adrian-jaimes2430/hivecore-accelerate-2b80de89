@@ -254,9 +254,9 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
   const vids = Array.isArray(p.videos) ? (p.videos as string[]) : [];
   const cover = imgs[0];
   return (
-    <div className="hive-card group overflow-hidden animate-fade-up" style={{ animationDelay: `${Math.min(index * 60, 600)}ms` }}>
+    <div className="shop-card group animate-fade-up" style={{ animationDelay: `${Math.min(index * 60, 600)}ms` }}>
       <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="block">
-        <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-zinc-900 to-black">
+        <div className="shop-media relative m-2 aspect-[4/5]">
           {cover ? (
             <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
           ) : (
@@ -275,17 +275,17 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
           )}
         </div>
       </Link>
-      <div className="space-y-2 p-4">
+      <div className="space-y-2 px-4 pb-5 pt-2">
         {brand && <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{brand}</p>}
         <h3 className="font-semibold leading-tight">{p.name}</h3>
         {p.short_description && <p className="line-clamp-2 text-xs text-muted-foreground">{p.short_description}</p>}
         <div className="flex items-baseline gap-2 pt-1">
           <span className="font-display text-lg font-bold luxury-gradient-text">S/ {Number(p.suggested_retail_price || p.price).toFixed(2)}</span>
         </div>
-        <div className="flex items-center gap-2 pt-2">
-          <Button variant="ghost" size="sm" onClick={onQuickView} className="h-8 flex-1 border border-border/60 text-xs">Vista rápida</Button>
-          <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="inline-flex h-8 items-center gap-1 rounded-md border border-[color:var(--luxury-gold)]/40 px-3 text-xs text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/10">
-            Ver <ArrowRight className="h-3 w-3" />
+        <div className="flex items-center gap-2 pt-3">
+          <button onClick={onQuickView} className="shop-btn-quiet flex-1">Vista rápida</button>
+          <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="shop-btn">
+            Ver <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
       </div>
