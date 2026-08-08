@@ -91,35 +91,36 @@ function LuxuryProduct() {
 
           {product.short_description && <p className="text-muted-foreground">{product.short_description}</p>}
 
-          <div className="rounded-xl border border-[color:var(--luxury-gold)]/30 bg-black/40 p-5">
+          <div className="shop-panel">
             {showImp ? (
               <>
                 <div className="flex items-baseline gap-3">
-                  <span className="font-display text-3xl font-bold">S/ {Number(product.price).toFixed(2)}</span>
+                  <span className="shop-price text-3xl">S/ {Number(product.price).toFixed(2)}</span>
                   <span className="text-xs text-muted-foreground">precio impulsador</span>
                 </div>
                 {product.suggested_retail_price > 0 && (
                   <p className="mt-2 text-sm text-muted-foreground">Precio sugerido al cliente: <span className="text-foreground">S/ {Number(product.suggested_retail_price).toFixed(2)}</span></p>
                 )}
                 {utility > 0 && (
-                  <div className="mt-3 inline-flex items-center gap-1 rounded-md border border-[color:var(--luxury-gold)]/40 bg-[color:var(--luxury-gold)]/10 px-3 py-1 text-sm font-medium text-[color:var(--luxury-gold)]">
+                  <div className="mt-3 inline-flex items-center gap-1 rounded-full border border-hive/40 bg-hive/10 px-3 py-1 text-sm font-medium text-hive">
                     Utilidad estimada: +S/ {utility.toFixed(2)}
                   </div>
                 )}
               </>
             ) : (
               <div className="flex items-baseline gap-3">
-                <span className="font-display text-3xl font-bold luxury-gradient-text">S/ {Number(product.suggested_retail_price || product.price).toFixed(2)}</span>
+                <span className="shop-price text-3xl">S/ {Number(product.suggested_retail_price || product.price).toFixed(2)}</span>
                 <span className="text-xs text-muted-foreground">precio final</span>
               </div>
             )}
           </div>
 
           {variations.length > 0 && (
-            <div className="rounded-xl border border-border/40 bg-white/[0.02] p-4">
+            <div className="shop-panel">
               <VariationPicker variations={variations} value={selectedVariations} onChange={setSelectedVariations} />
             </div>
           )}
+
 
           <div className="space-y-2">
             <StockBadge status={product.stock_status} qty={product.stock_quantity} />
@@ -221,9 +222,10 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setCode(null); }}>
       <DialogTrigger asChild>
-        <Button className="w-full h-11 border-0 bg-gradient-to-r from-[color:var(--luxury-gold)] to-amber-500 text-black hover:opacity-90">
+        <Button className="shop-btn-accent h-12 w-full border-0 text-base hover:opacity-100">
           <ShoppingBag className="mr-2 h-4 w-4" /> Crear pedido
         </Button>
+
       </DialogTrigger>
       <DialogContent className="bg-surface-elevated border-border/60">
         <DialogHeader><DialogTitle>Nuevo pedido · {product.name}</DialogTitle></DialogHeader>
@@ -265,9 +267,10 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
               <Label>Observaciones</Label>
               <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="bg-white/5" />
             </div>
-            <Button type="submit" disabled={busy} className="w-full h-11 border-0 bg-gradient-to-r from-[color:var(--luxury-gold)] to-amber-500 text-black hover:opacity-90">
+            <Button type="submit" disabled={busy} className="shop-btn-accent h-12 w-full border-0 text-base hover:opacity-100">
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Generar pedido"}
             </Button>
+
           </form>
         )}
       </DialogContent>

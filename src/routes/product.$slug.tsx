@@ -140,7 +140,7 @@ function ProductFunnel() {
 
       {/* Final order section — minimal product data + CTA */}
       <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-        <div className="hive-card overflow-hidden">
+        <div className="shop-card overflow-hidden p-0">
           <table className="w-full text-sm">
             <tbody>
               <tr className="border-b border-border/40">
@@ -229,7 +229,7 @@ function ImpulsadorCTA({ product, impulsador }: { product: Product; impulsador: 
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-emerald-500 px-6 text-base font-semibold text-black shadow-lg shadow-emerald-500/30 transition-transform hover:scale-[1.02]"
+      className="shop-btn-accent h-12 px-6 text-base"
     >
       <MessageCircle className="h-5 w-5" />
       Pedir a {impulsador.name?.split(" ")[0] ?? "tu impulsador"} por WhatsApp
@@ -249,7 +249,7 @@ function FloatingImpulsadorCTA({ product, impulsador }: { product: Product; impu
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500 px-4 py-3 text-sm font-medium text-black shadow-2xl shadow-emerald-500/30 transition-transform hover:scale-105"
+      className="shop-btn-accent fixed bottom-5 right-5 z-50 text-sm shadow-2xl"
     >
       <MessageCircle className="h-4 w-4" />
       Pedir por WhatsApp
