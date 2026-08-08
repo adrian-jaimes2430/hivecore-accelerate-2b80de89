@@ -267,9 +267,10 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
               <Label>Observaciones</Label>
               <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="bg-white/5" />
             </div>
-            <Button type="submit" disabled={busy} className="w-full h-11 border-0 bg-gradient-to-r from-[color:var(--luxury-gold)] to-amber-500 text-black hover:opacity-90">
+            <Button type="submit" disabled={busy} className="shop-btn-accent h-12 w-full border-0 text-base hover:opacity-100">
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Generar pedido"}
             </Button>
+
           </form>
         )}
       </DialogContent>
