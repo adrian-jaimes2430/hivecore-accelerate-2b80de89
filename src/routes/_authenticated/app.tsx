@@ -60,39 +60,39 @@ function Dashboard() {
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       {/* Welcome */}
       <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm text-muted-foreground">Bienvenido de nuevo</p>
-          <h1 className="font-display text-3xl font-bold sm:text-4xl">
+        <div className="animate-rise">
+          <p className="shop-eyebrow">Bienvenido de nuevo</p>
+          <h1 className="mt-3 font-display text-3xl font-bold tracking-[-0.03em] sm:text-4xl">
             Hola, <span className="hive-gradient-text">{profile?.full_name?.split(" ")[0] ?? "Impulsador"}</span>
           </h1>
           <p className="mt-2 text-muted-foreground">Tu catálogo premium del ecosistema A&O.</p>
         </div>
-        <div className="hive-card flex items-center gap-4 px-5 py-3">
+        <div className="shop-panel flex items-center gap-4 px-5 py-3">
           <div className="h-2 w-2 rounded-full bg-hive hive-pulse" />
           <p className="text-xs text-muted-foreground">Estado</p>
           <p className="text-sm font-medium text-hive">Aprobado</p>
         </div>
       </div>
 
-      {/* Luxury hero */}
-      <div className="relative mb-10 overflow-hidden rounded-2xl border border-[color:var(--luxury-gold)]/30 bg-gradient-to-br from-black via-zinc-950 to-[#1a1208] p-6 sm:p-8 luxury-shine animate-fade-up">
+      {/* Luxury hero — shop-style floating panel */}
+      <Reveal className="shop-card relative mb-10 overflow-hidden p-6 sm:p-8" from="scale">
         <div className="absolute inset-0 hive-grid-bg opacity-15" />
         <div className="relative grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--luxury-gold)]/40 bg-black/40 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[color:var(--luxury-gold)]">
               <Crown className="h-3 w-3" /> Premium
             </div>
-            <h2 className="mt-3 font-display text-2xl font-bold sm:text-3xl">
-              <span className="luxury-gradient-text">AnMa Luxury Collection</span>
+            <h2 className="mt-3 font-display text-2xl font-bold tracking-[-0.03em] sm:text-3xl">
+              AnMa Luxury Collection
             </h2>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">
               Comparte tu catálogo premium con clientes — sin que ellos tengan que registrarse. Tus pedidos llegan por WhatsApp.
             </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Link to="/luxury" className="inline-flex items-center gap-1 rounded-md border border-[color:var(--luxury-gold)]/40 bg-[color:var(--luxury-gold)]/15 px-4 py-2 text-sm text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/25">
-                Explorar catálogo <ArrowRight className="h-3 w-3" />
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link to="/luxury" className="shop-btn-accent">
+                Explorar catálogo <ArrowRight className="h-3.5 w-3.5" />
               </Link>
-              <a href={myCatalogUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-md border border-border/60 px-4 py-2 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
+              <a href={myCatalogUrl} target="_blank" rel="noopener noreferrer" className="shop-btn-outline text-muted-foreground hover:text-foreground">
                 Ver mi vista pública
               </a>
             </div>
@@ -102,25 +102,28 @@ function Dashboard() {
             <ShareBar url={myCatalogUrl} title="AnMa Luxury Collection" text="Descubre piezas premium seleccionadas" />
           </div>
         </div>
-      </div>
+      </Reveal>
 
 
       {/* Categories */}
       <Section title="Categorías" icon={Layers}>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {categories.map((c) => (
-            <Link key={c.id} to="/category/$slug" params={{ slug: c.slug }} className="hive-card group p-5">
-              <div className={`mb-3 inline-flex h-8 items-center rounded-full px-3 text-xs font-medium ${colorChip(c.color)}`}>
-                {c.name}
-              </div>
-              <p className="text-sm text-muted-foreground">{c.description}</p>
-              <div className="mt-4 inline-flex items-center gap-1 text-xs text-hive opacity-0 transition group-hover:opacity-100">
-                Explorar <ArrowRight className="h-3 w-3" />
-              </div>
-            </Link>
+          {categories.map((c, i) => (
+            <Reveal key={c.id} delay={Math.min(i * 70, 350)}>
+              <Link to="/category/$slug" params={{ slug: c.slug }} className="shop-panel group block h-full">
+                <div className={`mb-3 inline-flex h-8 items-center rounded-full px-3 text-xs font-medium ${colorChip(c.color)}`}>
+                  {c.name}
+                </div>
+                <p className="text-sm text-muted-foreground">{c.description}</p>
+                <div className="mt-4 inline-flex items-center gap-1 text-xs text-hive opacity-0 transition group-hover:opacity-100">
+                  Explorar <ArrowRight className="h-3 w-3" />
+                </div>
+              </Link>
+            </Reveal>
           ))}
         </div>
       </Section>
+
 
       <Section title="Productos destacados" icon={Sparkles}><ProductGrid items={featured} /></Section>
       <Section title="Tendencia" icon={Flame}><ProductGrid items={trending} /></Section>
