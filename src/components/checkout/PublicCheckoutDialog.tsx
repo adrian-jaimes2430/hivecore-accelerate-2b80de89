@@ -14,12 +14,14 @@ import {
 import { CreditCard, Truck, Loader2, ShoppingBag, Check } from "lucide-react";
 import { toast } from "sonner";
 import { submitPublicOrder } from "@/lib/checkout.functions";
+import { bundleTotal, type BundlePricing } from "@/lib/pricing";
 
 export function PublicCheckoutDialog({
   productKind,
   slug,
   productName,
   unitPrice,
+  pricing,
   currencyPrefix = "$",
   ctaLabel = "Comprar ahora",
   ref: refId,
@@ -30,6 +32,7 @@ export function PublicCheckoutDialog({
   slug: string;
   productName: string;
   unitPrice: number;
+  pricing?: BundlePricing | null;
   currencyPrefix?: string;
   ctaLabel?: string;
   ref?: string | null;
@@ -50,7 +53,11 @@ export function PublicCheckoutDialog({
     notes: "",
   });
 
-  const total = unitPrice * form.quantity;
+  const priceModel: BundlePricing = pricing ?? { price: unitPrice };
+  const comboEnabled = Boolean(
+    priceModel.bundle_pricing_enabled && (Number(priceModel.price_2) > 0 || Number(priceModel.price_3) > 0),
+  );
+  const total = bundleTotal(priceModel, form.quantity);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
