@@ -11,6 +11,8 @@ import {
   Zap,
 } from "lucide-react";
 import heroImage from "@/assets/mercury-hero.jpg";
+import heroVideo from "@/assets/hero-bg.mp4.asset.json";
+
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -82,13 +84,18 @@ function Landing() {
 
       {/* Full-bleed photographic hero */}
       <section className="relative isolate min-h-[86vh] w-full overflow-hidden">
-        <img
-          src={heroImage}
-          alt="Cordillera con niebla al atardecer"
-          width={1920}
-          height={1088}
+        <video
           className="hero-drift absolute inset-0 -z-10 h-full w-full object-cover"
+          src={heroVideo.url}
+          poster={heroImage}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-hidden="true"
         />
+
         <div className="absolute inset-0 -z-10 bg-[color:var(--onyx-canvas)]/70" />
         <div className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-[color:var(--onyx-canvas)] to-transparent" />
 
