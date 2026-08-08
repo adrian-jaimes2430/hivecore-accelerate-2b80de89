@@ -10,6 +10,9 @@ export const publicOrderSchema = z.object({
   client_phone: z.string().trim().min(6).max(30),
   client_email: z.string().trim().email().max(180).optional().nullable(),
   client_address: z.string().trim().min(4).max(300),
+  client_city: z.string().trim().max(80).optional().nullable(),
+  client_region: z.string().trim().max(80).optional().nullable(),
+
   notes: z.string().trim().max(1000).optional().nullable(),
   variations: z.string().trim().max(300).optional().nullable(),
   payment_method: z.enum(["cod", "online"]),
