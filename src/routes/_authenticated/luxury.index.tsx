@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Checkbox } from "@/components/ui/checkbox";
 import { ShareBar } from "@/components/luxury/ShareBar";
 import { PromoCarousel, type Promo } from "@/components/luxury/PromoCarousel";
+import { Reveal } from "@/components/Reveal";
 import { Crown, Filter, Sparkles, Loader2, ArrowRight, Search, ExternalLink, Film } from "lucide-react";
 
 const searchSchema = z.object({
