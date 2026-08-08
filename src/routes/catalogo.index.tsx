@@ -9,8 +9,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Crown, Filter, Sparkles, ArrowRight, Search, MessageCircle, Film } from "lucide-react";
 import { listLuxuryCatalog, getImpulsadorRef } from "@/lib/luxury-public.functions";
-import { PromoCarousel, type Promo } from "@/components/luxury/PromoCarousel";
+import { type Promo } from "@/components/luxury/PromoCarousel";
+import { PromoTicker } from "@/components/luxury/PromoTicker";
 import { Reveal } from "@/components/Reveal";
+import { waHref } from "@/lib/whatsapp";
 
 const searchSchema = z.object({
   cat: fallback(z.string().optional(), undefined).optional(),
@@ -137,6 +139,7 @@ function PublicCatalog() {
 
   return (
     <div className="min-h-screen">
+      <PromoTicker promos={promos} />
       {/* Top bar */}
       <header className="sticky top-0 z-40 border-b border-[color:var(--luxury-gold)]/15 bg-black/60 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
@@ -171,7 +174,6 @@ function PublicCatalog() {
         </section>
 
 
-        {promos.length > 0 && <PromoCarousel promos={promos} />}
 
 
 
@@ -324,10 +326,7 @@ function QuickPreview({ p, brand, refQs }: { p: Product; brand?: string; refQs: 
 }
 
 function FloatingCTA({ impulsador }: { impulsador: { id: string; name: string | null; phone: string | null } | null }) {
-  const text = encodeURIComponent("Hola, vi tu catálogo AnMa Luxury y me interesa una pieza.");
-  const href = impulsador?.phone
-    ? `https://wa.me/${impulsador.phone.replace(/[^\d]/g, "")}?text=${text}`
-    : `https://wa.me/?text=${text}`;
+  const href = waHref(impulsador?.phone, "Hola, vi tu catálogo AnMa Luxury y me interesa una pieza.");
   return (
     <a
       href={href}
