@@ -350,11 +350,11 @@ html { scroll-behavior: smooth; }
 
 @layer components {
   .mercury-page { background: var(--onyx-canvas); color: var(--ivory-text); }
-  .mercury-section { max-width: 1200px; margin-inline: auto; padding-block: 72px; }
+  .mercury-section { max-width: var(--m-page-max); margin-inline: auto; padding-block: var(--m-section-gap); }
   .mercury-card {
     background: var(--graphite-card);
-    border-radius: 12px;
-    padding: 32px;
+    border-radius: var(--m-radius-cards);
+    padding: var(--m-card-padding);
     border: 1px solid transparent;
     box-shadow: none;
     transition:
@@ -369,17 +369,20 @@ html { scroll-behavior: smooth; }
   }
   .mercury-display {
     font-family: var(--font-display);
-    font-weight: 480;
+    font-weight: var(--m-w480);
     line-height: 1.1;
-    letter-spacing: 0.01em;
+    letter-spacing: 0;
   }
   .mercury-heading {
     font-family: var(--font-display);
-    font-weight: 480;
+    font-weight: var(--m-w480);
     line-height: 1.15;
-    letter-spacing: 0.015em;
+    letter-spacing: 0.48px;
   }
-  .mercury-body { color: var(--ivory-text); font-size: 16px; line-height: 1.5; font-weight: 400; }
+  .mercury-caption { font-size: var(--m-text-caption); line-height: 1; letter-spacing: 0.12px; color: var(--ash-text); }
+  .mercury-subheading { font-family: var(--font-display); font-weight: var(--m-w480); font-size: var(--m-text-subheading); line-height: 1.35; }
+  .mercury-body { color: var(--ivory-text); font-size: var(--m-text-body); line-height: 1.5; font-weight: var(--m-w400); }
+
   .mercury-muted { color: var(--ash-text); }
   .mercury-btn {
     position: relative;
