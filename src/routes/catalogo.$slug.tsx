@@ -110,14 +110,14 @@ function PublicProduct() {
 
             {product.short_description && <p className="text-muted-foreground">{product.short_description}</p>}
 
-            <div className="rounded-2xl border border-[color:var(--luxury-gold)]/30 bg-gradient-to-br from-black to-[#1a1208] p-6 luxury-shine">
+            <div className="shop-panel p-6">
               <p className="text-xs uppercase tracking-wider text-muted-foreground">Precio</p>
-              <p className="mt-1 font-display text-4xl font-bold luxury-gradient-text">S/ {price.toFixed(2)}</p>
+              <p className="shop-price mt-1 text-4xl">S/ {price.toFixed(2)}</p>
               <StockBadge status={product.stock_status} />
             </div>
 
             {variations.length > 0 && (
-              <div className="rounded-xl border border-border/40 bg-white/[0.02] p-4">
+              <div className="shop-panel">
                 <VariationPicker variations={variations} value={selectedVariations} onChange={setSelectedVariations} />
               </div>
             )}
@@ -132,17 +132,17 @@ function PublicProduct() {
                 ctaLabel="Comprar ahora"
                 ref={ref ?? null}
                 variations={variantSummary || null}
-                triggerClassName="h-12 w-full rounded-xl border border-[color:var(--luxury-gold)]/40 bg-[color:var(--luxury-gold)]/15 px-5 text-base font-semibold text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/25"
+                triggerClassName="shop-btn-accent h-12 w-full text-base"
               />
-              <a href={waHref} target="_blank" rel="noopener noreferrer"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 font-semibold text-black shadow-lg shadow-emerald-500/30 transition-transform hover:scale-[1.02]">
+              <a href={waHref} target="_blank" rel="noopener noreferrer" className="shop-btn-outline h-12 w-full text-base">
                 <MessageCircle className="h-5 w-5" /> {impulsador?.name ? `Pedir a ${impulsador.name.split(" ")[0]} por WhatsApp` : "Hacer mi pedido por WhatsApp"}
               </a>
               <a href={`mailto:?subject=${encodeURIComponent(product.name)}&body=${encodeURIComponent(`Me interesa: ${product.name}${variantSummary ? `\nOpciones: ${variantSummary}` : ""}\n${url}`)}`}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border/60 px-5 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
+                className="shop-btn-outline h-11 w-full text-sm text-muted-foreground hover:text-foreground">
                 <Mail className="h-4 w-4" /> Consultar por email
               </a>
             </div>
+
 
             <div className="pt-2">
               <p className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">Compartir esta pieza</p>
