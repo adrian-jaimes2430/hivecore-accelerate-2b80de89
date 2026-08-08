@@ -289,7 +289,7 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
           </Link>
         </div>
       </div>
-    </div>
+    </Reveal>
   );
 }
 
