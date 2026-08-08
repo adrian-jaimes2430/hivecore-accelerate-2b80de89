@@ -157,6 +157,20 @@ function ProductFunnel() {
                   {product.upsell_price && (
                     <span className="ml-2 text-sm text-muted-foreground line-through">S/ {Number(product.upsell_price).toFixed(2)}</span>
                   )}
+                  {product.bundle_pricing_enabled && (Number(product.price_2) > 0 || Number(product.price_3) > 0) && (
+                    <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                      {Number(product.price_2) > 0 && (
+                        <span className="rounded-full bg-hive/15 px-2 py-0.5 font-semibold text-hive">
+                          2 unidades · S/ {Number(product.price_2).toFixed(2)}
+                        </span>
+                      )}
+                      {Number(product.price_3) > 0 && (
+                        <span className="rounded-full bg-hive/15 px-2 py-0.5 font-semibold text-hive">
+                          3 unidades · S/ {Number(product.price_3).toFixed(2)}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </td>
               </tr>
             </tbody>
