@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { bundleTotal } from "./pricing";
-import { buildCheckoutUrl, getWompiConfig } from "./wompi.server";
+import { buildCheckoutUrl, getWompiConfig, guessCityFromAddress } from "./wompi.server";
 
 export const publicOrderSchema = z.object({
   productKind: z.enum(["funnel", "luxury"]),
