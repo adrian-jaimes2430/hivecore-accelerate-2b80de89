@@ -49,9 +49,12 @@ export function PublicCheckoutDialog({
     client_phone: "",
     client_email: "",
     client_address: "",
+    client_city: "",
+    client_region: "",
     quantity: 1,
     notes: "",
   });
+
 
   const priceModel: BundlePricing = pricing ?? { price: unitPrice };
   const comboEnabled = Boolean(
