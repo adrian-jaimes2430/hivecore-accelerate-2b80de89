@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { bundleTotal } from "./pricing";
 import { buildCheckoutUrl, getWompiConfig } from "./wompi.server";
 
 export const publicOrderSchema = z.object({
