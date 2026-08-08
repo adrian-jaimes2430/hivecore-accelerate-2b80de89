@@ -68,7 +68,9 @@ interface Product {
   bundle_pricing_enabled?: boolean | null; price_2?: number | null; price_3?: number | null;
   short_description: string | null; description: string | null;
   benefits: unknown; images: unknown; funnel_sections: unknown; cta_label: string | null;
+  meta_pixel_enabled?: boolean | null; meta_pixel_id?: string | null; meta_test_event_code?: string | null;
 }
+
 
 function ProductFunnel() {
   const { slug } = Route.useParams();
