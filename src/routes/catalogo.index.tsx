@@ -173,17 +173,22 @@ function PublicCatalog() {
 
 
 
-        {/* Toolbar */}
-        <div className="mb-6 flex flex-wrap items-center gap-3">
-          <div className="relative min-w-[200px] flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Buscar piezas..." defaultValue={search.q} onBlur={(e) => setSearch({ q: e.target.value || undefined })} className="pl-9" />
+        {/* Toolbar — pill search + category chips */}
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <div className="relative min-w-[220px] flex-1">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar piezas, marcas, categorías..."
+              defaultValue={search.q}
+              onBlur={(e) => setSearch({ q: e.target.value || undefined })}
+              className="shop-pill border-white/10 bg-white/[0.04] pl-11"
+            />
           </div>
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" className="border border-border/60 lg:hidden">
-                <Filter className="mr-2 h-4 w-4" /> Filtros
-              </Button>
+              <button className="shop-btn-quiet lg:hidden">
+                <Filter className="h-4 w-4" /> Filtros
+              </button>
             </SheetTrigger>
             <SheetContent side="left" className="w-80 overflow-y-auto">
               <SheetHeader><SheetTitle>Filtros</SheetTitle></SheetHeader>
@@ -192,6 +197,18 @@ function PublicCatalog() {
           </Sheet>
           <div className="text-xs text-muted-foreground">{filtered.length} piezas</div>
         </div>
+
+        <div className="mb-8 -mx-1 flex gap-2 overflow-x-auto px-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <button className="shop-chip" data-active={!search.cat} onClick={() => setSearch({ cat: undefined })}>
+            Todas
+          </button>
+          {roots.map((c) => (
+            <button key={c.id} className="shop-chip" data-active={search.cat === c.slug} onClick={() => setSearch({ cat: c.slug })}>
+              {c.name}
+            </button>
+          ))}
+        </div>
+
 
         <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
           <aside className="hidden lg:block">
