@@ -387,12 +387,12 @@ html { scroll-behavior: smooth; }
   .mercury-btn {
     position: relative;
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    background: var(--cobalt); color: #fff;
-    font-size: 16px; font-weight: 400;
+    background: var(--hive); color: #16161d;
+    font-size: 16px; font-weight: 500;
     border-radius: 32px; border: 0;
     padding: 12px 24px;
     overflow: hidden;
-    box-shadow: 0 0 0 0 rgba(82, 102, 235, 0);
+    box-shadow: 0 0 0 0 oklch(0.78 0.22 145 / 0);
     transition:
       transform var(--dur-fast) var(--ease-spring),
       box-shadow var(--dur-base) var(--ease-out-expo),
@@ -401,14 +401,14 @@ html { scroll-behavior: smooth; }
   .mercury-btn::before {
     content: "";
     position: absolute; inset: 0;
-    background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.26) 50%, transparent 70%);
+    background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.34) 50%, transparent 70%);
     transform: translateX(-120%);
     transition: transform 0.7s var(--ease-out-expo);
   }
   .mercury-btn:hover {
-    filter: brightness(1.08);
+    filter: brightness(1.06);
     transform: translateY(-2px);
-    box-shadow: 0 12px 30px -12px rgba(82, 102, 235, 0.75);
+    box-shadow: 0 12px 30px -12px oklch(0.78 0.22 145 / 0.65);
   }
   .mercury-btn:hover::before { transform: translateX(120%); }
   .mercury-btn:active { transform: translateY(0) scale(0.98); }
@@ -416,14 +416,15 @@ html { scroll-behavior: smooth; }
   .mercury-ghost {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     background: transparent; color: var(--ivory-text);
-    border: 1px solid var(--mist-border); border-radius: 40px;
+    border: 1px solid var(--hive); border-radius: 40px;
     padding: 10px 20px; font-size: 16px; font-weight: 400;
     transition:
       background var(--dur-base) ease,
       transform var(--dur-fast) var(--ease-spring),
-      border-color var(--dur-base) ease;
+      border-color var(--dur-base) ease,
+      color var(--dur-base) ease;
   }
-  .mercury-ghost:hover { background: rgba(237, 237, 243, 0.08); transform: translateY(-2px); }
+  .mercury-ghost:hover { background: oklch(0.78 0.22 145 / 0.12); color: var(--hive); transform: translateY(-2px); }
   .mercury-ghost:active { transform: translateY(0) scale(0.98); }
   .mercury-nav-link {
     position: relative;
