@@ -11,6 +11,8 @@ import {
   Zap,
 } from "lucide-react";
 import heroImage from "@/assets/mercury-hero.jpg";
+import heroVideo from "@/assets/hero-bg.mp4.asset.json";
+
 
 export const Route = createFileRoute("/")({
   component: Landing,
