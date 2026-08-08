@@ -10,6 +10,7 @@ import { MediaGallery, buildMedia } from "@/components/luxury/MediaGallery";
 import { VariationPicker, summarizeVariations } from "@/components/luxury/VariationPicker";
 import type { Variation } from "@/components/admin/VariationsEditor";
 import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
+import { waHref } from "@/lib/whatsapp";
 
 const SITE_URL = "https://hivecore-accelerate.lovable.app";
 
@@ -132,7 +133,7 @@ function PublicProduct() {
                 variations={variantSummary || null}
                 triggerClassName="shop-btn-accent h-12 w-full text-base"
               />
-              <a href={waHref} target="_blank" rel="noopener noreferrer" className="shop-btn-outline h-12 w-full text-base">
+              <a href={waLink} target="_blank" rel="noopener noreferrer" className="shop-btn-outline h-12 w-full text-base">
                 <MessageCircle className="h-5 w-5" /> {impulsador?.name ? `Pedir a ${impulsador.name.split(" ")[0]} por WhatsApp` : "Hacer mi pedido por WhatsApp"}
               </a>
               <a href={`mailto:?subject=${encodeURIComponent(product.name)}&body=${encodeURIComponent(`Me interesa: ${product.name}${variantSummary ? `\nOpciones: ${variantSummary}` : ""}\n${url}`)}`}
