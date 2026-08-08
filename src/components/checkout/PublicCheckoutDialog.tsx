@@ -26,7 +26,7 @@ export function PublicCheckoutDialog({
   ctaLabel = "Comprar ahora",
   ref: refId,
   variations,
-  triggerClassName = "hive-btn-primary h-12 border-0 px-6 text-base",
+  triggerClassName = "shop-btn-accent h-12 border-0 px-6 text-base",
 }: {
   productKind: "funnel" | "luxury";
   slug: string;
