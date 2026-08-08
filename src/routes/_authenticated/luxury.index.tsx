@@ -91,8 +91,13 @@ function LuxuryCatalog() {
       if (search.cat) {
         const cat = categories.find((c) => c.slug === search.cat);
         if (cat) {
-          const childIds = categories.filter((c) => c.parent_id === cat.id).map((c) => c.id);
-          q = q.in("category_id", [cat.id, ...childIds]);
+          const ids: string[] = [];
+          const walk = (id: string) => {
+            ids.push(id);
+            categories.filter((c) => c.parent_id === id).forEach((c) => walk(c.id));
+          };
+          walk(cat.id);
+          q = q.in("category_id", ids);
         }
       }
       if (search.brand) {
@@ -112,6 +117,12 @@ function LuxuryCatalog() {
 
   const roots = useMemo(() => categories.filter((c) => !c.parent_id), [categories]);
   const childrenOf = (id: string) => categories.filter((c) => c.parent_id === id);
+  const activeCat = categories.find((c) => c.slug === search.cat);
+  const activeRoot = activeCat
+    ? activeCat.parent_id
+      ? (categories.find((c) => c.id === activeCat.parent_id) ?? activeCat)
+      : activeCat
+    : undefined;
 
   const setSearch = (patch: Record<string, unknown>) =>
     navigate({ search: ((prev: Record<string, unknown>) => ({ ...prev, ...patch })) as never });
@@ -254,15 +265,45 @@ function LuxuryCatalog() {
         <div className="text-xs text-muted-foreground">{products.length} productos</div>
       </div>
 
-      {/* Category chips */}
-      <div className="mb-8 -mx-1 flex gap-2 overflow-x-auto px-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <button className="shop-chip" data-active={!search.cat} onClick={() => setSearch({ cat: undefined })}>Todas</button>
+      {/* Main categories — Shop.app circular chips */}
+      <div className="-mx-1 mb-4 flex gap-2 overflow-x-auto px-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <button className="shop-chip" data-active={!search.cat} onClick={() => setSearch({ cat: undefined })}>
+          <span className="shop-chip-dot">★</span> Todas
+        </button>
         {roots.map((c) => (
-          <button key={c.id} className="shop-chip" data-active={search.cat === c.slug} onClick={() => setSearch({ cat: c.slug })}>
-            {c.name}
+          <button
+            key={c.id}
+            className="shop-chip"
+            data-active={search.cat === c.slug || childrenOf(c.id).some((s) => s.slug === search.cat)}
+            onClick={() => setSearch({ cat: c.slug })}
+          >
+            <span className="shop-chip-dot">{c.name.charAt(0)}</span> {c.name}
           </button>
         ))}
       </div>
+
+      {/* Subcategories of the active main category */}
+      {activeRoot && childrenOf(activeRoot.id).length > 0 && (
+        <div className="-mx-1 mb-8 flex gap-2 overflow-x-auto px-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <button
+            className="rounded-full border border-white/10 px-4 py-1.5 text-xs text-muted-foreground transition hover:bg-white/5 hover:text-foreground data-[active=true]:border-[color:var(--luxury-gold)]/50 data-[active=true]:bg-[color:var(--luxury-gold)]/10 data-[active=true]:text-[color:var(--luxury-gold)]"
+            data-active={search.cat === activeRoot.slug}
+            onClick={() => setSearch({ cat: activeRoot.slug })}
+          >
+            Todo en {activeRoot.name}
+          </button>
+          {childrenOf(activeRoot.id).map((sub) => (
+            <button
+              key={sub.id}
+              className="rounded-full border border-white/10 px-4 py-1.5 text-xs text-muted-foreground transition hover:bg-white/5 hover:text-foreground data-[active=true]:border-[color:var(--luxury-gold)]/50 data-[active=true]:bg-[color:var(--luxury-gold)]/10 data-[active=true]:text-[color:var(--luxury-gold)]"
+              data-active={search.cat === sub.slug}
+              onClick={() => setSearch({ cat: sub.slug })}
+            >
+              {sub.name}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
         {/* Sidebar desktop */}
