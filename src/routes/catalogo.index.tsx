@@ -326,10 +326,7 @@ function QuickPreview({ p, brand, refQs }: { p: Product; brand?: string; refQs: 
 }
 
 function FloatingCTA({ impulsador }: { impulsador: { id: string; name: string | null; phone: string | null } | null }) {
-  const text = encodeURIComponent("Hola, vi tu catálogo AnMa Luxury y me interesa una pieza.");
-  const href = impulsador?.phone
-    ? `https://wa.me/${impulsador.phone.replace(/[^\d]/g, "")}?text=${text}`
-    : `https://wa.me/?text=${text}`;
+  const href = waHref(impulsador?.phone, "Hola, vi tu catálogo AnMa Luxury y me interesa una pieza.");
   return (
     <a
       href={href}
