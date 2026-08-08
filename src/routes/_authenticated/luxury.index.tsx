@@ -229,20 +229,20 @@ function LuxuryCatalog() {
 
       {/* Toolbar */}
       <div className="mb-6 flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <div className="relative flex-1 min-w-[220px]">
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Buscar productos..."
+            placeholder="Buscar productos, marcas, categorías..."
             defaultValue={search.q}
             onBlur={(e) => setSearch({ q: e.target.value || undefined })}
-            className="pl-9"
+            className="shop-pill border-white/10 bg-white/[0.04] pl-11"
           />
         </div>
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" className="border border-border/60 lg:hidden">
-              <Filter className="mr-2 h-4 w-4" /> Filtros
-            </Button>
+            <button className="shop-btn-quiet lg:hidden">
+              <Filter className="h-4 w-4" /> Filtros
+            </button>
           </SheetTrigger>
           <SheetContent side="left" className="w-80 overflow-y-auto">
             <SheetHeader><SheetTitle>Filtros</SheetTitle></SheetHeader>
@@ -250,6 +250,16 @@ function LuxuryCatalog() {
           </SheetContent>
         </Sheet>
         <div className="text-xs text-muted-foreground">{products.length} productos</div>
+      </div>
+
+      {/* Category chips */}
+      <div className="mb-8 -mx-1 flex gap-2 overflow-x-auto px-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <button className="shop-chip" data-active={!search.cat} onClick={() => setSearch({ cat: undefined })}>Todas</button>
+        {roots.map((c) => (
+          <button key={c.id} className="shop-chip" data-active={search.cat === c.slug} onClick={() => setSearch({ cat: c.slug })}>
+            {c.name}
+          </button>
+        ))}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
@@ -271,7 +281,7 @@ function LuxuryCatalog() {
               <p className="text-sm text-muted-foreground">El equipo A&O está cargando las piezas premium. Vuelve en breve.</p>
             </div>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {products.map((p) => (
                 <ProductCard key={p.id} p={p} brand={brands.find((b) => b.id === p.brand_id)?.name} onQuickView={() => setQuickView(p)} />
               ))}
@@ -298,9 +308,9 @@ function ProductCard({ p, brand, onQuickView }: { p: LuxProduct; brand?: string;
   const finalPrice = Number(p.suggested_retail_price || p.price);
 
   return (
-    <div className="hive-card group overflow-hidden transition-transform duration-300 hover:-translate-y-0.5">
+    <div className="shop-card group">
       <Link to="/luxury/$slug" params={{ slug: p.slug }} className="block">
-        <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-zinc-900 to-black">
+        <div className="shop-media relative m-2 aspect-[4/5]">
           {cover ? (
             <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
           ) : (
@@ -319,7 +329,7 @@ function ProductCard({ p, brand, onQuickView }: { p: LuxProduct; brand?: string;
           )}
         </div>
       </Link>
-      <div className="space-y-2 p-4">
+      <div className="space-y-2 px-4 pb-5 pt-2">
         {brand && <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{brand}</p>}
         <h3 className="font-semibold leading-tight">{p.name}</h3>
         {p.short_description && <p className="line-clamp-2 text-xs text-muted-foreground">{p.short_description}</p>}
@@ -342,12 +352,10 @@ function ProductCard({ p, brand, onQuickView }: { p: LuxProduct; brand?: string;
             <span className="font-display text-lg font-bold luxury-gradient-text">S/ {finalPrice.toFixed(2)}</span>
           </div>
         )}
-        <div className="flex items-center gap-2 pt-2">
-          <Button variant="ghost" size="sm" onClick={onQuickView} className="h-8 flex-1 border border-border/60 text-xs">
-            Vista rápida
-          </Button>
-          <Link to="/luxury/$slug" params={{ slug: p.slug }} className="inline-flex h-8 items-center gap-1 rounded-md border border-[color:var(--luxury-gold)]/40 px-3 text-xs text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/10">
-            Ver <ArrowRight className="h-3 w-3" />
+        <div className="flex items-center gap-2 pt-3">
+          <button onClick={onQuickView} className="shop-btn-quiet flex-1">Vista rápida</button>
+          <Link to="/luxury/$slug" params={{ slug: p.slug }} className="shop-btn">
+            Ver <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
       </div>

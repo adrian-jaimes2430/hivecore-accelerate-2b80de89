@@ -215,3 +215,126 @@
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-up { animation: fade-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* ============================================================
+   MERCURY layer — alpine banking at blue hour (homepage)
+   ============================================================ */
+@theme inline {
+  --color-onyx-canvas: var(--onyx-canvas);
+  --color-graphite-card: var(--graphite-card);
+  --color-obsidian-button: var(--obsidian-button);
+  --color-mist-border: var(--mist-border);
+  --color-ash-text: var(--ash-text);
+  --color-ivory-text: var(--ivory-text);
+  --color-cobalt: var(--cobalt);
+}
+
+:root, .dark {
+  --onyx-canvas: #171721;
+  --graphite-card: #1e1e2a;
+  --obsidian-button: #272735;
+  --slate-border: #70707d;
+  --mist-border: #e2e3ed;
+  --ash-text: #c3c3cc;
+  --ivory-text: #ededf3;
+  --cobalt: #5266eb;
+}
+
+@layer components {
+  .mercury-page { background: var(--onyx-canvas); color: var(--ivory-text); }
+  .mercury-section { max-width: 1200px; margin-inline: auto; padding-block: 72px; }
+  .mercury-card {
+    background: var(--graphite-card);
+    border-radius: 12px;
+    padding: 32px;
+    border: 0;
+    box-shadow: none;
+  }
+  .mercury-display {
+    font-family: var(--font-display);
+    font-weight: 480;
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+  }
+  .mercury-heading {
+    font-family: var(--font-display);
+    font-weight: 480;
+    line-height: 1.15;
+    letter-spacing: 0.015em;
+  }
+  .mercury-body { color: var(--ivory-text); font-size: 16px; line-height: 1.5; font-weight: 400; }
+  .mercury-muted { color: var(--ash-text); }
+  .mercury-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--cobalt); color: #fff;
+    font-size: 16px; font-weight: 400;
+    border-radius: 32px; border: 0; box-shadow: none;
+    padding: 12px 24px;
+    transition: filter 0.2s ease;
+  }
+  .mercury-btn:hover { filter: brightness(1.08); }
+  .mercury-ghost {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: transparent; color: var(--ivory-text);
+    border: 1px solid var(--mist-border); border-radius: 40px;
+    padding: 10px 20px; font-size: 16px; font-weight: 400;
+    transition: background 0.2s ease;
+  }
+  .mercury-ghost:hover { background: rgba(237, 237, 243, 0.08); }
+  .mercury-nav-link {
+    border-radius: 40px; padding: 0 20px;
+    color: var(--ivory-text); font-size: 16px; font-weight: 400;
+    transition: opacity 0.2s ease;
+  }
+  .mercury-nav-link:hover { opacity: 0.7; }
+  .mercury-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    border-radius: 40px; border: 1px solid var(--slate-border);
+    padding: 6px 14px; font-size: 12px; letter-spacing: 0.12px;
+    color: var(--ash-text);
+  }
+
+  /* ==========================================================
+     SHOP layer — soft floating commerce cards (store surfaces)
+     ========================================================== */
+  .shop-card {
+    background: var(--graphite-card);
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+  }
+  .shop-card:hover { transform: translateY(-4px); border-color: rgba(255, 255, 255, 0.14); }
+  .shop-media { border-radius: 22px; overflow: hidden; background: #0f0f16; }
+  .shop-pill {
+    border-radius: 9999px !important;
+    height: 46px;
+    padding-inline: 20px;
+  }
+  .shop-chip {
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+    border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 16px; font-size: 13px; color: var(--ash-text);
+    background: rgba(255, 255, 255, 0.03);
+    transition: all 0.2s ease;
+  }
+  .shop-chip:hover { color: var(--ivory-text); border-color: rgba(255, 255, 255, 0.24); }
+  .shop-chip[data-active="true"] {
+    background: var(--ivory-text); color: #16161d; border-color: var(--ivory-text);
+  }
+  .shop-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    border-radius: 9999px; padding: 10px 18px; font-size: 13px; font-weight: 500;
+    background: var(--ivory-text); color: #16161d;
+    transition: filter 0.2s ease;
+  }
+  .shop-btn:hover { filter: brightness(0.92); }
+  .shop-btn-quiet {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    border-radius: 9999px; padding: 10px 18px; font-size: 13px; font-weight: 500;
+    background: rgba(255, 255, 255, 0.06); color: var(--ivory-text);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: background 0.2s ease;
+  }
+  .shop-btn-quiet:hover { background: rgba(255, 255, 255, 0.12); }
+}

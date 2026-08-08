@@ -173,17 +173,22 @@ function PublicCatalog() {
 
 
 
-        {/* Toolbar */}
-        <div className="mb-6 flex flex-wrap items-center gap-3">
-          <div className="relative min-w-[200px] flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Buscar piezas..." defaultValue={search.q} onBlur={(e) => setSearch({ q: e.target.value || undefined })} className="pl-9" />
+        {/* Toolbar — pill search + category chips */}
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <div className="relative min-w-[220px] flex-1">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar piezas, marcas, categorías..."
+              defaultValue={search.q}
+              onBlur={(e) => setSearch({ q: e.target.value || undefined })}
+              className="shop-pill border-white/10 bg-white/[0.04] pl-11"
+            />
           </div>
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" className="border border-border/60 lg:hidden">
-                <Filter className="mr-2 h-4 w-4" /> Filtros
-              </Button>
+              <button className="shop-btn-quiet lg:hidden">
+                <Filter className="h-4 w-4" /> Filtros
+              </button>
             </SheetTrigger>
             <SheetContent side="left" className="w-80 overflow-y-auto">
               <SheetHeader><SheetTitle>Filtros</SheetTitle></SheetHeader>
@@ -192,6 +197,18 @@ function PublicCatalog() {
           </Sheet>
           <div className="text-xs text-muted-foreground">{filtered.length} piezas</div>
         </div>
+
+        <div className="mb-8 -mx-1 flex gap-2 overflow-x-auto px-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <button className="shop-chip" data-active={!search.cat} onClick={() => setSearch({ cat: undefined })}>
+            Todas
+          </button>
+          {roots.map((c) => (
+            <button key={c.id} className="shop-chip" data-active={search.cat === c.slug} onClick={() => setSearch({ cat: c.slug })}>
+              {c.name}
+            </button>
+          ))}
+        </div>
+
 
         <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
           <aside className="hidden lg:block">
@@ -237,9 +254,9 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
   const vids = Array.isArray(p.videos) ? (p.videos as string[]) : [];
   const cover = imgs[0];
   return (
-    <div className="hive-card group overflow-hidden animate-fade-up" style={{ animationDelay: `${Math.min(index * 60, 600)}ms` }}>
+    <div className="shop-card group animate-fade-up" style={{ animationDelay: `${Math.min(index * 60, 600)}ms` }}>
       <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="block">
-        <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-zinc-900 to-black">
+        <div className="shop-media relative m-2 aspect-[4/5]">
           {cover ? (
             <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
           ) : (
@@ -258,17 +275,17 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
           )}
         </div>
       </Link>
-      <div className="space-y-2 p-4">
+      <div className="space-y-2 px-4 pb-5 pt-2">
         {brand && <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{brand}</p>}
         <h3 className="font-semibold leading-tight">{p.name}</h3>
         {p.short_description && <p className="line-clamp-2 text-xs text-muted-foreground">{p.short_description}</p>}
         <div className="flex items-baseline gap-2 pt-1">
           <span className="font-display text-lg font-bold luxury-gradient-text">S/ {Number(p.suggested_retail_price || p.price).toFixed(2)}</span>
         </div>
-        <div className="flex items-center gap-2 pt-2">
-          <Button variant="ghost" size="sm" onClick={onQuickView} className="h-8 flex-1 border border-border/60 text-xs">Vista rápida</Button>
-          <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="inline-flex h-8 items-center gap-1 rounded-md border border-[color:var(--luxury-gold)]/40 px-3 text-xs text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/10">
-            Ver <ArrowRight className="h-3 w-3" />
+        <div className="flex items-center gap-2 pt-3">
+          <button onClick={onQuickView} className="shop-btn-quiet flex-1">Vista rápida</button>
+          <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="shop-btn">
+            Ver <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
       </div>
