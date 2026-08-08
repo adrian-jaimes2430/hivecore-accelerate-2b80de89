@@ -107,24 +107,60 @@ function Dashboard() {
       </Reveal>
 
 
-      {/* Categories */}
-      <Section title="Categorías" icon={Layers}>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {categories.map((c, i) => (
-            <Reveal key={c.id} delay={Math.min(i * 70, 350)}>
-              <Link to="/category/$slug" params={{ slug: c.slug }} className="shop-panel group block h-full">
-                <div className={`mb-3 inline-flex h-8 items-center rounded-full px-3 text-xs font-medium ${colorChip(c.color)}`}>
-                  {c.name}
+      {/* Category chips — Shop.app style */}
+      <div className="mb-8 flex flex-wrap gap-2">
+        {categories.map((c, i) => (
+          <Reveal key={c.id} delay={Math.min(i * 50, 300)}>
+            <Link to="/category/$slug" params={{ slug: c.slug }} className="shop-chip">
+              <span className={`shop-chip-dot ${colorChip(c.color)}`}>{c.name.charAt(0)}</span>
+              {c.name}
+            </Link>
+          </Reveal>
+        ))}
+      </div>
+
+      {/* Categories with product tiles — Shop.app columns */}
+      <Section title="Explorar categorías" icon={Layers}>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {categories.map((c, i) => {
+            const tiles = products.filter((p) => p.category_id === c.id).slice(0, 4);
+            return (
+              <Reveal key={c.id} delay={Math.min(i * 70, 350)}>
+                <div className="h-full">
+                  <Link
+                    to="/category/$slug"
+                    params={{ slug: c.slug }}
+                    className="group mb-3 inline-flex items-center gap-1.5 font-display text-lg font-semibold tracking-[-0.02em]"
+                  >
+                    {c.name}
+                    <ArrowRight className="h-4 w-4 text-hive transition-transform group-hover:translate-x-0.5" />
+                  </Link>
+                  <div className="grid grid-cols-2 gap-2">
+                    {tiles.length === 0 ? (
+                      <p className="col-span-2 text-xs text-muted-foreground">Sin productos aún.</p>
+                    ) : (
+                      tiles.map((p) => {
+                        const imgs = Array.isArray(p.images) ? (p.images as string[]) : [];
+                        return (
+                          <Link key={p.id} to="/product/$slug" params={{ slug: p.slug }} className="shop-tile group block">
+                            {imgs[0] ? (
+                              <img src={imgs[0]} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.07]" />
+                            ) : (
+                              <div className="absolute inset-0 flex items-center justify-center font-display text-3xl font-bold opacity-20">{p.name.charAt(0)}</div>
+                            )}
+                            <span className="shop-tile-label line-clamp-1">{p.name}</span>
+                          </Link>
+                        );
+                      })
+                    )}
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground">{c.description}</p>
-                <div className="mt-4 inline-flex items-center gap-1 text-xs text-hive opacity-0 transition group-hover:opacity-100">
-                  Explorar <ArrowRight className="h-3 w-3" />
-                </div>
-              </Link>
-            </Reveal>
-          ))}
+              </Reveal>
+            );
+          })}
         </div>
       </Section>
+
 
 
       <Section title="Productos destacados" icon={Sparkles}><ProductGrid items={featured} /></Section>

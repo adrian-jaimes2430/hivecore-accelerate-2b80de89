@@ -1,8 +1,8 @@
 import { createFileRoute, Outlet, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/lib/auth";
-import { AppNavbar } from "@/components/AppNavbar";
-import { HiveLogo } from "@/components/HiveLogo";
+import { AppSidebar } from "@/components/AppSidebar";
+
 import { Loader2, ShieldAlert, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -31,8 +31,8 @@ function AuthLayout() {
 
   return (
     <div className="min-h-screen">
-      <AppNavbar />
-      <main><Outlet /></main>
+      <AppSidebar />
+      <main className="pl-[72px]"><Outlet /></main>
     </div>
   );
 }
