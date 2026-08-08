@@ -222,9 +222,10 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setCode(null); }}>
       <DialogTrigger asChild>
-        <Button className="w-full h-11 border-0 bg-gradient-to-r from-[color:var(--luxury-gold)] to-amber-500 text-black hover:opacity-90">
+        <Button className="shop-btn-accent h-12 w-full border-0 text-base hover:opacity-100">
           <ShoppingBag className="mr-2 h-4 w-4" /> Crear pedido
         </Button>
+
       </DialogTrigger>
       <DialogContent className="bg-surface-elevated border-border/60">
         <DialogHeader><DialogTitle>Nuevo pedido · {product.name}</DialogTitle></DialogHeader>
