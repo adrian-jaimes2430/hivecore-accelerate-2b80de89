@@ -483,3 +483,76 @@ html { scroll-behavior: smooth; }
   }
 }
 
+
+/* ============================================================
+   SHOP layer · brand tokens (green / white / black)
+   Derived from the Shop style reference — soft floating surfaces,
+   pill controls, 28px radii — recolored to HIVECORE brand.
+   ============================================================ */
+:root, .dark {
+  --shop-radius-card: 28px;
+  --shop-radius-panel: 22px;
+  --shop-radius-pill: 9999px;
+  --shop-gap: 12px;
+  --shop-rhythm: 64px;
+  --shop-shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.28);
+  --shop-shadow-lift: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --shop-shadow-accent: 0 6px 24px -8px oklch(0.78 0.22 145 / 0.45);
+}
+
+@layer components {
+  /* Soft floating panel — the Shop "elevated card" recolored */
+  .shop-panel {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: var(--shop-radius-panel);
+    box-shadow: var(--shop-shadow-soft);
+    padding: 20px;
+    transition:
+      border-color var(--dur-base) ease,
+      box-shadow var(--dur-base) var(--ease-out-expo),
+      transform var(--dur-base) var(--ease-out-expo);
+  }
+  .shop-panel:hover { border-color: rgba(255, 255, 255, 0.14); box-shadow: var(--shop-shadow-lift); }
+
+  /* Primary action — brand green, pill, tinted halo (Shop's violet role) */
+  .shop-btn-accent {
+    position: relative; overflow: hidden;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    border-radius: var(--shop-radius-pill);
+    padding: 12px 22px;
+    font-size: 14px; font-weight: 600; letter-spacing: -0.01em;
+    background: linear-gradient(180deg, var(--hive-glow), var(--hive));
+    color: oklch(0.14 0.01 260);
+    box-shadow: var(--shop-shadow-accent);
+    transition:
+      transform var(--dur-fast) var(--ease-spring),
+      box-shadow var(--dur-base) ease,
+      filter var(--dur-fast) ease;
+  }
+  .shop-btn-accent:hover { transform: translateY(-2px); filter: brightness(1.04); box-shadow: 0 12px 34px -10px oklch(0.78 0.22 145 / 0.55); }
+  .shop-btn-accent:active { transform: translateY(0) scale(0.98); }
+
+  /* Outline pill on black */
+  .shop-btn-outline {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    border-radius: var(--shop-radius-pill);
+    padding: 11px 20px; font-size: 14px; font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--foreground);
+    transition: background var(--dur-base) ease, border-color var(--dur-base) ease, transform var(--dur-fast) var(--ease-spring);
+  }
+  .shop-btn-outline:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.24); transform: translateY(-2px); }
+  .shop-btn-outline:active { transform: translateY(0) scale(0.98); }
+
+  /* Price block — compact, tight tracking, near-white ink */
+  .shop-price {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--foreground);
+  }
+  .shop-section { max-width: 1200px; margin-inline: auto; padding-block: var(--shop-rhythm); }
+  .shop-grid { display: grid; gap: var(--shop-gap); }
+}
