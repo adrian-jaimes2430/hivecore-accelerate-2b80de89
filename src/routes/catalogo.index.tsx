@@ -139,6 +139,7 @@ function PublicCatalog() {
 
   return (
     <div className="min-h-screen">
+      <PromoTicker promos={promos} />
       {/* Top bar */}
       <header className="sticky top-0 z-40 border-b border-[color:var(--luxury-gold)]/15 bg-black/60 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
