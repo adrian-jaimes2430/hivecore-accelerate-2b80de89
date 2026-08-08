@@ -111,8 +111,19 @@ export function PublicCheckoutDialog({
       onOpenChange={(o) => {
         setOpen(o);
         if (!o) setDone(null);
+        if (o) {
+          metaTrack("InitiateCheckout", {
+            content_ids: [slug],
+            content_name: productName,
+            content_type: "product",
+            num_items: form.quantity,
+            value: total,
+            currency: "COP",
+          });
+        }
       }}
     >
+
       <DialogTrigger asChild>
         <Button className={triggerClassName}>
           <ShoppingBag className="mr-2 h-4 w-4" /> {ctaLabel}
