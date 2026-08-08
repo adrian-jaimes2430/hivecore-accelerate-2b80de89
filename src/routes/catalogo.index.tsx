@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Crown, Filter, Sparkles, ArrowRight, Search, MessageCircle, Film } from "lucide-react";
 import { listLuxuryCatalog, getImpulsadorRef } from "@/lib/luxury-public.functions";
 import { PromoCarousel, type Promo } from "@/components/luxury/PromoCarousel";
+import { Reveal } from "@/components/Reveal";
 
 const searchSchema = z.object({
   cat: fallback(z.string().optional(), undefined).optional(),
