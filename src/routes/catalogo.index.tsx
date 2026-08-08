@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Crown, Filter, Sparkles, ArrowRight, Search, MessageCircle, Film } from "lucide-react";
 import { listLuxuryCatalog, getImpulsadorRef } from "@/lib/luxury-public.functions";
 import { PromoCarousel, type Promo } from "@/components/luxury/PromoCarousel";
+import { Reveal } from "@/components/Reveal";
 
 const searchSchema = z.object({
   cat: fallback(z.string().optional(), undefined).optional(),
@@ -154,20 +155,21 @@ function PublicCatalog() {
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         {/* Hero */}
-        <section className="relative mb-10 overflow-hidden rounded-2xl border border-[color:var(--luxury-gold)]/30 bg-gradient-to-br from-black via-zinc-950 to-[#1a1208] p-8 sm:p-14 luxury-shine animate-fade-up">
+        <section className="relative mb-10 overflow-hidden rounded-[28px] border border-[color:var(--luxury-gold)]/30 bg-gradient-to-br from-black via-zinc-950 to-[#1a1208] p-8 sm:p-14 luxury-shine animate-fade-up">
           <div className="absolute inset-0 hive-grid-bg opacity-20" />
           <div className="relative">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--luxury-gold)]/40 bg-black/40 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[color:var(--luxury-gold)]">
+            <div className="mercury-tag border-[color:var(--luxury-gold)]/40 bg-black/40 text-[10px] uppercase tracking-[0.3em] text-[color:var(--luxury-gold)]">
               <Crown className="h-3 w-3" /> Colección Premium
             </div>
-            <h1 className="mt-5 font-display text-4xl font-bold sm:text-6xl">
+            <h1 className="mercury-display animate-rise mt-5 text-4xl sm:text-6xl" style={{ animationDelay: "120ms" }}>
               <span className="luxury-gradient-text">AnMa Luxury Collection</span>
             </h1>
-            <p className="mt-4 max-w-2xl text-sm text-muted-foreground sm:text-base">
+            <p className="mercury-muted animate-rise mt-4 max-w-2xl text-sm sm:text-base" style={{ animationDelay: "240ms" }}>
               Piezas seleccionadas a mano. Perfumería, relojería, joyería AAA y marroquinería de autor. Cada producto es una declaración.
             </p>
           </div>
         </section>
+
 
         {promos.length > 0 && <PromoCarousel promos={promos} />}
 
@@ -254,7 +256,7 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
   const vids = Array.isArray(p.videos) ? (p.videos as string[]) : [];
   const cover = imgs[0];
   return (
-    <div className="shop-card group animate-fade-up" style={{ animationDelay: `${Math.min(index * 60, 600)}ms` }}>
+    <Reveal className="shop-card group" delay={Math.min((index % 6) * 70, 420)} from="up">
       <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="block">
         <div className="shop-media relative m-2 aspect-[4/5]">
           {cover ? (
@@ -289,7 +291,7 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
           </Link>
         </div>
       </div>
-    </div>
+    </Reveal>
   );
 }
 

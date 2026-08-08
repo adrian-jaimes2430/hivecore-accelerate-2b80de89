@@ -12,25 +12,25 @@ export function AppNavbar() {
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-8">
-          <Link to="/app"><HiveLogo /></Link>
+          <Link to="/app" className="transition-transform duration-300 hover:scale-[1.03]"><HiveLogo /></Link>
           <nav className="flex items-center gap-1 overflow-x-auto">
             <Link
               to="/app"
-              className="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground [&.active]:text-foreground [&.active]:bg-white/5"
+              className="flex items-center gap-2 rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-all duration-300 hover:bg-white/5 hover:text-foreground [&.active]:text-foreground [&.active]:bg-white/8"
               activeProps={{ className: "active" }}
             >
               <LayoutDashboard className="h-4 w-4" /> Dashboard
             </Link>
             <Link
               to="/orders"
-              className="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground [&.active]:text-foreground [&.active]:bg-white/5"
+              className="flex items-center gap-2 rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-all duration-300 hover:bg-white/5 hover:text-foreground [&.active]:text-foreground [&.active]:bg-white/8"
               activeProps={{ className: "active" }}
             >
               <Package className="h-4 w-4" /> Pedidos
             </Link>
             <Link
               to="/luxury"
-              className="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-[color:var(--luxury-gold)] transition-colors hover:bg-[color:var(--luxury-gold)]/10 [&.active]:bg-[color:var(--luxury-gold)]/15"
+              className="flex items-center gap-2 rounded-full px-3 py-1.5 text-sm text-[color:var(--luxury-gold)] transition-all duration-300 hover:bg-[color:var(--luxury-gold)]/10 [&.active]:bg-[color:var(--luxury-gold)]/15"
               activeProps={{ className: "active" }}
             >
               <Crown className="h-4 w-4" /> Luxury
@@ -38,7 +38,7 @@ export function AppNavbar() {
             {isAdmin && (
               <Link
                 to="/admin"
-                className="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground [&.active]:text-foreground [&.active]:bg-white/5"
+                className="flex items-center gap-2 rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-all duration-300 hover:bg-white/5 hover:text-foreground [&.active]:text-foreground [&.active]:bg-white/8"
                 activeProps={{ className: "active" }}
               >
                 <ShieldCheck className="h-4 w-4" /> Admin
@@ -46,6 +46,7 @@ export function AppNavbar() {
             )}
           </nav>
         </div>
+
 
         <div className="flex items-center gap-3">
           <div className="hidden text-right text-xs sm:block">
