@@ -15,6 +15,7 @@ import { CreditCard, Truck, Loader2, ShoppingBag, Check } from "lucide-react";
 import { toast } from "sonner";
 import { submitPublicOrder } from "@/lib/checkout.functions";
 import { bundleTotal, type BundlePricing } from "@/lib/pricing";
+import { metaTrack } from "@/components/marketing/MetaPixel";
 
 export function PublicCheckoutDialog({
   productKind,
