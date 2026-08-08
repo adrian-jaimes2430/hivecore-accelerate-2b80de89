@@ -314,7 +314,39 @@ html { scroll-behavior: smooth; }
   --ash-text: #c3c3cc;
   --ivory-text: #ededf3;
   --cobalt: #5266eb;
+
+  /* Mercury — exact type scale */
+  --m-text-caption: 12px;
+  --m-text-body-sm: 14px;
+  --m-text-body: 16px;
+  --m-text-body-lg: 18px;
+  --m-text-subheading: 21px;
+  --m-text-heading-sm: 28px;
+  --m-text-heading: 32px;
+  --m-text-heading-lg: 42px;
+  --m-text-display: 65px;
+
+  /* Mercury — intermediate weight scale */
+  --m-w360: 360;
+  --m-w400: 400;
+  --m-w420: 420;
+  --m-w480: 480;
+  --m-w530: 530;
+
+  /* Mercury — layout rhythm */
+  --m-page-max: 1200px;
+  --m-section-gap: 72px;
+  --m-card-padding: 32px;
+  --m-element-gap: 12px;
+
+  /* Mercury — named radii */
+  --m-radius-nav: 40px;
+  --m-radius-tags: 40px;
+  --m-radius-cards: 12px;
+  --m-radius-inputs: 32px;
+  --m-radius-buttons: 32px;
 }
+
 
 @layer components {
   .mercury-page { background: var(--onyx-canvas); color: var(--ivory-text); }
