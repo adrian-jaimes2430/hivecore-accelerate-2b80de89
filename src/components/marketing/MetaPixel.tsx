@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useRouterState } from "@tanstack/react-router";
 
 declare global {
   interface Window {
@@ -7,9 +8,13 @@ declare global {
   }
 }
 
-/** Injects the Meta (Facebook) Pixel base code once and fires PageView. */
-function loadPixel(pixelId: string, testEventCode?: string | null) {
+const initialized = new Set<string>();
+
+/** Injects the Meta (Facebook) Pixel base code once (idempotent) and initializes the given id. */
+export function ensurePixel(pixelId: string, testEventCode?: string | null) {
   if (typeof window === "undefined") return;
+  const id = pixelId.trim();
+  if (!id) return;
 
   if (!window.fbq) {
     const n: any = function (...args: unknown[]) {
@@ -27,15 +32,32 @@ function loadPixel(pixelId: string, testEventCode?: string | null) {
     document.head.appendChild(s);
   }
 
+  if (initialized.has(id)) return;
+  initialized.add(id);
   const opts = testEventCode ? { test_event_code: testEventCode } : undefined;
-  window.fbq!("init", pixelId, undefined, opts);
-  window.fbq!("track", "PageView", undefined, opts);
+  window.fbq!("init", id, undefined, opts);
 }
 
 /** Fire a standard Meta Pixel event (safe no-op when no pixel is loaded). */
 export function metaTrack(event: string, params?: Record<string, unknown>) {
   if (typeof window === "undefined" || !window.fbq) return;
   window.fbq("track", event, params);
+}
+
+/** Site-wide base pixel: installed on every page and fires PageView on each navigation. */
+export const GLOBAL_META_PIXEL_ID: string =
+  (import.meta.env['VITE_META_PIXEL_ID'] as string | undefined)?.trim() ?? "";
+
+export function GlobalMetaPixel() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  useEffect(() => {
+    if (!GLOBAL_META_PIXEL_ID) return;
+    ensurePixel(GLOBAL_META_PIXEL_ID);
+    metaTrack("PageView");
+  }, [pathname]);
+
+  return null;
 }
 
 export function MetaPixel({
@@ -59,7 +81,8 @@ export function MetaPixel({
     const id = pixelId?.trim();
     if (!id || started.current) return;
     started.current = true;
-    loadPixel(id, testEventCode ?? null);
+    ensurePixel(id, testEventCode ?? null);
+    metaTrack("PageView");
     metaTrack("ViewContent", {
       content_ids: contentId ? [contentId] : undefined,
       content_name: contentName ?? undefined,
