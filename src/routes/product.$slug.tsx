@@ -107,6 +107,7 @@ function ProductFunnel() {
     <div>
       {product.meta_pixel_enabled && product.meta_pixel_id ? (
         <MetaPixel
+          paid={!ref}
           pixelId={product.meta_pixel_id}
           testEventCode={product.meta_test_event_code}
           contentId={product.sku}

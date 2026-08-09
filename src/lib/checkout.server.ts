@@ -95,7 +95,10 @@ export async function createPublicOrder(input: PublicOrderInput) {
   }
 
 
+  const isPaidTraffic = !impulsadorId;
+
   const noteParts = [
+    isPaidTraffic ? "TRÁFICO PAGO · META ADS (funnel público)" : null,
     input.variations ? `Variaciones: ${input.variations}` : null,
     input.client_email ? `Email: ${input.client_email}` : null,
     input.origin ? `Origen: ${input.origin}` : null,
@@ -145,6 +148,7 @@ export async function createPublicOrder(input: PublicOrderInput) {
       checkoutUrl: null as string | null,
     };
   }
+
 
   const cfg = getWompiConfig();
   if (!cfg) {
