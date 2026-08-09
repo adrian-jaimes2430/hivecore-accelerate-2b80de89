@@ -95,7 +95,10 @@ export async function createPublicOrder(input: PublicOrderInput) {
   }
 
 
+  const isPaidTraffic = !impulsadorId;
+
   const noteParts = [
+    isPaidTraffic ? "TRÁFICO PAGO · META ADS (funnel público)" : null,
     input.variations ? `Variaciones: ${input.variations}` : null,
     input.client_email ? `Email: ${input.client_email}` : null,
     input.origin ? `Origen: ${input.origin}` : null,
@@ -146,6 +149,7 @@ export async function createPublicOrder(input: PublicOrderInput) {
     };
   }
 
+
   const cfg = getWompiConfig();
   if (!cfg) {
     return {
@@ -171,6 +175,10 @@ export async function createPublicOrder(input: PublicOrderInput) {
     region: input.client_region?.trim() || city,
     country: "CO",
   });
+
+  // Los pedidos con pago en línea también se envían a A&O CORE OS al crearse
+  // (estado de pago "pending"); el webhook de Wompi enviará luego el update.
+  await forwardSafely(order.id, "order.created");
 
 
   return {

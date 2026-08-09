@@ -667,29 +667,60 @@ html { scroll-behavior: smooth; }
     border-block: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(10, 10, 14, 0.92);
     backdrop-filter: blur(14px);
-    padding-block: 8px;
-    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    padding-block: 7px;
+    mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
   }
   .promo-ticker-track {
     display: flex;
     width: max-content;
     align-items: center;
-    gap: 0;
-    animation: promo-scroll 40s linear infinite;
+    gap: 10px;
+    padding-inline: 10px;
+    animation: promo-scroll 48s linear infinite;
   }
   .promo-ticker:hover .promo-ticker-track { animation-play-state: paused; }
   .promo-ticker-item {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding-inline: 22px;
-    font-size: 12.5px; letter-spacing: -0.01em; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 5px 12px 5px 5px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.045);
+    white-space: nowrap;
     color: var(--foreground);
-    transition: opacity var(--dur-base, 300ms) ease;
+    transition: background var(--dur-base, 300ms) ease, border-color var(--dur-base, 300ms) ease, transform var(--dur-base, 300ms) ease;
   }
-  a.promo-ticker-item:hover { opacity: 0.75; }
+  a.promo-ticker-item:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.18);
+    transform: translateY(-1px);
+  }
+  .promo-ticker-thumb {
+    display: block;
+    height: 30px; width: 30px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .promo-ticker-thumb img,
+  .promo-ticker-thumb video {
+    height: 100%; width: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .promo-ticker-copy { display: inline-flex; flex-direction: column; line-height: 1.15; }
+  .promo-ticker-title { font-size: 12px; font-weight: 600; letter-spacing: -0.01em; }
+  .promo-ticker-sub { font-size: 10.5px; color: var(--muted-foreground); }
+  .promo-ticker-cta {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 11px; font-weight: 600;
+    color: var(--hive, #c7f384);
+  }
   @keyframes promo-scroll {
     from { transform: translate3d(0, 0, 0); }
     to { transform: translate3d(-50%, 0, 0); }
   }
+
   @media (prefers-reduced-motion: reduce) {
     .promo-ticker-track { animation: none; }
   }

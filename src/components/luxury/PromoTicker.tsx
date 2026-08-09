@@ -3,7 +3,7 @@ import type { Promo } from "./PromoCarousel";
 
 /**
  * Barra superior de publicidad estilo shop.app: cinta delgada con
- * items que se desplazan en bucle continuo.
+ * miniaturas en tarjetas que se desplazan en bucle continuo.
  */
 export function PromoTicker({ promos }: { promos: Promo[] }) {
   if (promos.length === 0) return null;
@@ -21,15 +21,31 @@ export function PromoTicker({ promos }: { promos: Promo[] }) {
   );
 }
 
+function Thumb({ p }: { p: Promo }) {
+  if (!p.media_url) return null;
+  return (
+    <span className="promo-ticker-thumb">
+      {p.media_type === "video" ? (
+        <video src={p.media_url} muted playsInline autoPlay loop preload="metadata" />
+      ) : (
+        <img src={p.media_url} alt="" loading="lazy" />
+      )}
+    </span>
+  );
+}
+
 function PromoItem({ p }: { p: Promo }) {
   const content = (
     <>
-      {p.media_type !== "video" && p.media_url && (
-        <img src={p.media_url} alt="" className="h-6 w-6 shrink-0 rounded-md object-cover" loading="lazy" />
-      )}
-      <span className="font-semibold">{p.title ?? "Novedades"}</span>
-      {p.subtitle && <span className="text-muted-foreground">{p.subtitle}</span>}
-      <ArrowRight className="h-3.5 w-3.5 shrink-0 text-hive" />
+      <Thumb p={p} />
+      <span className="promo-ticker-copy">
+        <span className="promo-ticker-title">{p.title ?? "Novedades"}</span>
+        {p.subtitle && <span className="promo-ticker-sub">{p.subtitle}</span>}
+      </span>
+      <span className="promo-ticker-cta">
+        {p.cta_label ?? "Ver"}
+        <ArrowRight className="h-3 w-3" />
+      </span>
     </>
   );
 

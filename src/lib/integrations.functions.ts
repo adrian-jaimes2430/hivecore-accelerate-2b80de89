@@ -7,6 +7,10 @@ const inputSchema = z.object({
 
 type OrderEvent = "order.created" | "order.updated" | "order.deleted";
 
+/** Cuenta de prueba usada para los pedidos de tráfico pago (Meta Ads). */
+const PAID_TRAFFIC_TEST_EMAIL = "studio.ayosoluciones@gmail.com";
+
+
 const eventSchema = z.object({
   orderId: z.string().uuid(),
   event: z.enum(["order.created", "order.updated", "order.deleted"]),
@@ -102,6 +106,18 @@ async function buildOrderPayload(
     }
   }
 
+  // Tráfico pago (funnel/catálogo público sin `ref` de impulsador): A&O CORE OS
+  // requiere una cuenta asociada, así que enviamos la cuenta de prueba oficial
+  // y marcamos explícitamente el origen como Meta Ads.
+  const orderSource = ((order as any).source ?? "impulsador") as string;
+  const isPaidTraffic = orderSource === "paid_traffic" || !impulsadorId;
+  if (isPaidTraffic) {
+    impulsadorName = impulsadorName ?? "Cuenta de prueba · Tráfico pago";
+    impulsadorEmail = impulsadorEmail ?? PAID_TRAFFIC_TEST_EMAIL;
+  }
+
+
+
   // If the DB total differs from the recomputed authoritative total (client
   // could have inserted with the wrong unit price, or the row predates a
   // pricing fix), self-heal the orders row so both HiveCore and A&O CORE OS
@@ -144,6 +160,10 @@ async function buildOrderPayload(
         notes: (order as any).notes,
         status: (order as any).status,
         source: (order as any).source ?? "impulsador",
+        traffic_source: isPaidTraffic ? "meta_ads" : "impulsador",
+        traffic_label: isPaidTraffic
+          ? "Tráfico pago Meta Ads (funnel público)"
+          : "Pedido de impulsador",
         payment_method: (order as any).payment_method ?? "cod",
         payment_status: (order as any).payment_status ?? "pending",
         payment_provider: (order as any).payment_provider ?? null,
@@ -165,7 +185,9 @@ async function buildOrderPayload(
         name: impulsadorName,
         email: impulsadorEmail,
         phone: impulsadorPhone,
+        is_test_account: isPaidTraffic,
       },
+
     },
     order,
   };

@@ -15,7 +15,7 @@ import { CreditCard, Truck, Loader2, ShoppingBag, Check } from "lucide-react";
 import { toast } from "sonner";
 import { submitPublicOrder } from "@/lib/checkout.functions";
 import { bundleTotal, type BundlePricing } from "@/lib/pricing";
-import { metaTrack } from "@/components/marketing/MetaPixel";
+import { metaTrackPaid, newEventId } from "@/components/marketing/MetaPixel";
 
 export function PublicCheckoutDialog({
   productKind,
@@ -95,10 +95,12 @@ export function PublicCheckoutDialog({
         setBusy(false);
         return;
       }
+      const isPaid = !refId;
       const purchaseParams = {
         content_ids: [slug],
         content_name: productName,
         content_type: "product",
+        contents: [{ id: slug, quantity: form.quantity }],
         num_items: form.quantity,
         value: total,
         currency: "COP",
@@ -106,11 +108,18 @@ export function PublicCheckoutDialog({
       };
       if (res.checkoutUrl) {
         // Pago en línea: registramos la intención antes de salir a la pasarela.
-        metaTrack("AddPaymentInfo", purchaseParams);
+        metaTrackPaid("AddPaymentInfo", purchaseParams, {
+          paid: isPaid,
+          eventID: newEventId(`api-${res.orderCode}`),
+        });
         window.location.href = res.checkoutUrl;
         return;
       }
-      metaTrack("Purchase", purchaseParams);
+      metaTrackPaid("Purchase", purchaseParams, {
+        paid: isPaid,
+        eventID: `purchase-${res.orderCode}`,
+      });
+
       setDone({ code: res.orderCode, method });
 
     } catch (err: any) {
@@ -126,15 +135,19 @@ export function PublicCheckoutDialog({
         setOpen(o);
         if (!o) setDone(null);
         if (o) {
-          metaTrack("InitiateCheckout", {
+          const params = {
             content_ids: [slug],
             content_name: productName,
             content_type: "product",
+            contents: [{ id: slug, quantity: form.quantity }],
             num_items: form.quantity,
             value: total,
             currency: "COP",
-          });
+          };
+          metaTrackPaid("AddToCart", params, { paid: !refId });
+          metaTrackPaid("InitiateCheckout", params, { paid: !refId });
         }
+
       }}
     >
 

@@ -39,22 +39,62 @@ export function ensurePixel(pixelId: string, testEventCode?: string | null) {
 }
 
 /** Fire a standard Meta Pixel event (safe no-op when no pixel is loaded). */
-export function metaTrack(event: string, params?: Record<string, unknown>) {
+export function metaTrack(event: string, params?: Record<string, unknown>, eventID?: string) {
   if (typeof window === "undefined" || !window.fbq) return;
-  window.fbq("track", event, params);
+  if (eventID) window.fbq("track", event, params, { eventID });
+  else window.fbq("track", event, params);
+}
+
+/**
+ * Tráfico pago: solo consideramos "paid traffic" las visitas al funnel/catálogo
+ * público que NO llegan con un `ref` de impulsador. Los pedidos de impulsadores
+ * no deben medirse en el pixel de Meta Ads.
+ */
+export function isPaidTraffic(): boolean {
+  if (typeof window === "undefined") return false;
+  const q = new URLSearchParams(window.location.search);
+  const ref = q.get("ref");
+  return !ref;
+}
+
+/** Genera un event_id único para deduplicar eventos en Meta. */
+export function newEventId(prefix = "ev") {
+  const rnd =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2);
+  return `${prefix}-${rnd}`;
+}
+
+/**
+ * Envía el evento SOLO si la visita es tráfico pago (sin `ref` de impulsador).
+ * Devuelve el eventID usado (o null si no se envió).
+ */
+export function metaTrackPaid(
+  event: string,
+  params?: Record<string, unknown>,
+  opts?: { paid?: boolean; eventID?: string },
+): string | null {
+  const paid = opts?.paid ?? isPaidTraffic();
+  if (!paid) return null;
+  const eventID = opts?.eventID ?? newEventId(event.toLowerCase());
+  metaTrack(event, params, eventID);
+  return eventID;
 }
 
 export const GLOBAL_META_PIXEL_ID: string =
   (import.meta.env['VITE_META_PIXEL_ID'] as string | undefined)?.trim() ?? "";
 
+
 /** Site-wide base pixel: the base code is already injected in __root.tsx head().
- *  This component only re-fires PageView on client-side navigations. */
+ *  This component only re-fires PageView on client-side navigations (solo tráfico pago). */
 export function GlobalMetaPixel() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
     if (!GLOBAL_META_PIXEL_ID) return;
-    metaTrack("PageView");
+    if (!isPaidTraffic()) return;
+    metaTrackPaid("PageView");
   }, [pathname]);
 
   return null;
@@ -67,6 +107,7 @@ export function MetaPixel({
   contentName,
   value,
   currency = "COP",
+  paid,
 }: {
   pixelId?: string | null;
   testEventCode?: string | null;
@@ -74,24 +115,34 @@ export function MetaPixel({
   contentName?: string | null;
   value?: number | null;
   currency?: string;
+  /** Fuerza el modo tráfico pago (por defecto se detecta por ausencia de `ref`). */
+  paid?: boolean;
 }) {
   const started = useRef(false);
 
   useEffect(() => {
     const id = pixelId?.trim();
     if (!id || started.current) return;
+    const isPaid = paid ?? isPaidTraffic();
+    if (!isPaid) return;
     started.current = true;
     ensurePixel(id, testEventCode ?? null);
-    metaTrack("PageView");
-    metaTrack("ViewContent", {
-      content_ids: contentId ? [contentId] : undefined,
-      content_name: contentName ?? undefined,
-      content_type: "product",
-      value: value ?? undefined,
-      currency,
-    });
+    metaTrackPaid("PageView", undefined, { paid: isPaid });
+    metaTrackPaid(
+      "ViewContent",
+      {
+        content_ids: contentId ? [contentId] : undefined,
+        content_name: contentName ?? undefined,
+        content_type: "product",
+        contents: contentId ? [{ id: contentId, quantity: 1 }] : undefined,
+        value: value ?? undefined,
+        currency,
+      },
+      { paid: isPaid },
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pixelId]);
+
 
   if (!pixelId?.trim()) return null;
 
