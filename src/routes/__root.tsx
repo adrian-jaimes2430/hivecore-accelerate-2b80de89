@@ -92,6 +92,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <GlobalMetaPixel />
         <Outlet />
         <Toaster />
       </AuthProvider>
