@@ -102,6 +102,18 @@ async function buildOrderPayload(
     }
   }
 
+  // Tráfico pago (funnel/catálogo público sin `ref` de impulsador): A&O CORE OS
+  // requiere una cuenta asociada, así que enviamos la cuenta de prueba oficial
+  // y marcamos explícitamente el origen como Meta Ads.
+  const orderSource = ((order as any).source ?? "impulsador") as string;
+  const isPaidTraffic = orderSource === "paid_traffic" || !impulsadorId;
+  if (isPaidTraffic) {
+    impulsadorName = impulsadorName ?? "Cuenta de prueba · Tráfico pago";
+    impulsadorEmail = impulsadorEmail ?? PAID_TRAFFIC_TEST_EMAIL;
+  }
+
+
+
   // If the DB total differs from the recomputed authoritative total (client
   // could have inserted with the wrong unit price, or the row predates a
   // pricing fix), self-heal the orders row so both HiveCore and A&O CORE OS
