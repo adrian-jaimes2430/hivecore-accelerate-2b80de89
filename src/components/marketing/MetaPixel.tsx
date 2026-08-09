@@ -87,13 +87,14 @@ export const GLOBAL_META_PIXEL_ID: string =
 
 
 /** Site-wide base pixel: the base code is already injected in __root.tsx head().
- *  This component only re-fires PageView on client-side navigations. */
+ *  This component only re-fires PageView on client-side navigations (solo tráfico pago). */
 export function GlobalMetaPixel() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
     if (!GLOBAL_META_PIXEL_ID) return;
-    metaTrack("PageView");
+    if (!isPaidTraffic()) return;
+    metaTrackPaid("PageView");
   }, [pathname]);
 
   return null;
@@ -106,6 +107,7 @@ export function MetaPixel({
   contentName,
   value,
   currency = "COP",
+  paid,
 }: {
   pixelId?: string | null;
   testEventCode?: string | null;
@@ -113,24 +115,34 @@ export function MetaPixel({
   contentName?: string | null;
   value?: number | null;
   currency?: string;
+  /** Fuerza el modo tráfico pago (por defecto se detecta por ausencia de `ref`). */
+  paid?: boolean;
 }) {
   const started = useRef(false);
 
   useEffect(() => {
     const id = pixelId?.trim();
     if (!id || started.current) return;
+    const isPaid = paid ?? isPaidTraffic();
+    if (!isPaid) return;
     started.current = true;
     ensurePixel(id, testEventCode ?? null);
-    metaTrack("PageView");
-    metaTrack("ViewContent", {
-      content_ids: contentId ? [contentId] : undefined,
-      content_name: contentName ?? undefined,
-      content_type: "product",
-      value: value ?? undefined,
-      currency,
-    });
+    metaTrackPaid("PageView", undefined, { paid: isPaid });
+    metaTrackPaid(
+      "ViewContent",
+      {
+        content_ids: contentId ? [contentId] : undefined,
+        content_name: contentName ?? undefined,
+        content_type: "product",
+        contents: contentId ? [{ id: contentId, quantity: 1 }] : undefined,
+        value: value ?? undefined,
+        currency,
+      },
+      { paid: isPaid },
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pixelId]);
+
 
   if (!pixelId?.trim()) return null;
 
