@@ -44,6 +44,9 @@ export function metaTrack(event: string, params?: Record<string, unknown>) {
   window.fbq("track", event, params);
 }
 
+export const GLOBAL_META_PIXEL_ID: string =
+  (import.meta.env['VITE_META_PIXEL_ID'] as string | undefined)?.trim() ?? "";
+
 /** Site-wide base pixel: the base code is already injected in __root.tsx head().
  *  This component only re-fires PageView on client-side navigations. */
 export function GlobalMetaPixel() {
