@@ -160,6 +160,10 @@ async function buildOrderPayload(
         notes: (order as any).notes,
         status: (order as any).status,
         source: (order as any).source ?? "impulsador",
+        traffic_source: isPaidTraffic ? "meta_ads" : "impulsador",
+        traffic_label: isPaidTraffic
+          ? "Tráfico pago Meta Ads (funnel público)"
+          : "Pedido de impulsador",
         payment_method: (order as any).payment_method ?? "cod",
         payment_status: (order as any).payment_status ?? "pending",
         payment_provider: (order as any).payment_provider ?? null,
@@ -181,7 +185,9 @@ async function buildOrderPayload(
         name: impulsadorName,
         email: impulsadorEmail,
         phone: impulsadorPhone,
+        is_test_account: isPaidTraffic,
       },
+
     },
     order,
   };
