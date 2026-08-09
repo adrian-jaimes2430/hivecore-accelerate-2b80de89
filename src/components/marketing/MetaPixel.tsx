@@ -44,16 +44,13 @@ export function metaTrack(event: string, params?: Record<string, unknown>) {
   window.fbq("track", event, params);
 }
 
-/** Site-wide base pixel: installed on every page and fires PageView on each navigation. */
-export const GLOBAL_META_PIXEL_ID: string =
-  (import.meta.env['VITE_META_PIXEL_ID'] as string | undefined)?.trim() ?? "";
-
+/** Site-wide base pixel: the base code is already injected in __root.tsx head().
+ *  This component only re-fires PageView on client-side navigations. */
 export function GlobalMetaPixel() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
     if (!GLOBAL_META_PIXEL_ID) return;
-    ensurePixel(GLOBAL_META_PIXEL_ID);
     metaTrack("PageView");
   }, [pathname]);
 
