@@ -7,6 +7,10 @@ const inputSchema = z.object({
 
 type OrderEvent = "order.created" | "order.updated" | "order.deleted";
 
+/** Cuenta de prueba usada para los pedidos de tráfico pago (Meta Ads). */
+const PAID_TRAFFIC_TEST_EMAIL = "studio.ayosoluciones@gmail.com";
+
+
 const eventSchema = z.object({
   orderId: z.string().uuid(),
   event: z.enum(["order.created", "order.updated", "order.deleted"]),
