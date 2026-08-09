@@ -96,7 +96,18 @@ fbq('track', 'PageView');`,
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className="dark">
-      <head><HeadContent /></head>
+      <head>
+        <HeadContent />
+        <noscript>
+          <img
+            height={1}
+            width={1}
+            style={{ display: "none" }}
+            alt=""
+            src="https://www.facebook.com/tr?id=472716435746433&ev=PageView&noscript=1"
+          />
+        </noscript>
+      </head>
       <body>{children}<Scripts /></body>
     </html>
   );
