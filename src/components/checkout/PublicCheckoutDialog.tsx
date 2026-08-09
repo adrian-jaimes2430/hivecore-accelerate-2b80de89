@@ -135,15 +135,19 @@ export function PublicCheckoutDialog({
         setOpen(o);
         if (!o) setDone(null);
         if (o) {
-          metaTrack("InitiateCheckout", {
+          const params = {
             content_ids: [slug],
             content_name: productName,
             content_type: "product",
+            contents: [{ id: slug, quantity: form.quantity }],
             num_items: form.quantity,
             value: total,
             currency: "COP",
-          });
+          };
+          metaTrackPaid("AddToCart", params, { paid: !refId });
+          metaTrackPaid("InitiateCheckout", params, { paid: !refId });
         }
+
       }}
     >
 
