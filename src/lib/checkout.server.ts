@@ -176,6 +176,10 @@ export async function createPublicOrder(input: PublicOrderInput) {
     country: "CO",
   });
 
+  // Los pedidos con pago en línea también se envían a A&O CORE OS al crearse
+  // (estado de pago "pending"); el webhook de Wompi enviará luego el update.
+  await forwardSafely(order.id, "order.created");
+
 
   return {
     ok: true as const,
