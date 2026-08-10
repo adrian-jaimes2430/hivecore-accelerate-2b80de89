@@ -191,38 +191,41 @@ function ProductFunnel() {
             </tbody>
           </table>
         </div>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          {user ? (
+        {user && (
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
             <OrderDialog product={product} impulsadorName={profile?.full_name ?? null} />
-          ) : (
-            <>
-              <PublicCheckoutDialog
-                productKind="funnel"
-                slug={product.slug}
-                productName={product.name}
-                unitPrice={Number(product.price)}
-                pricing={{
-                  price: Number(product.price),
-                  bundle_pricing_enabled: product.bundle_pricing_enabled ?? false,
-                  price_2: product.price_2 ?? null,
-                  price_3: product.price_3 ?? null,
-                }}
-                
-                ctaLabel={product.cta_label ?? "Comprar ahora"}
-                ref={ref ?? null}
-              />
-              {impulsador && <ImpulsadorCTA product={product} impulsador={impulsador} />}
-            </>
-          )}
-          <ShareDialog product={product} impulsadorId={user?.id ?? ref ?? null} />
-        </div>
-
+            <ShareDialog product={product} impulsadorId={user.id} />
+          </div>
+        )}
       </section>
 
-      {!user && impulsador && <FloatingImpulsadorCTA product={product} impulsador={impulsador} />}
+      {!user && (
+        <>
+          {/* Espacio para que la barra flotante no tape el contenido final */}
+          <div className="h-28" aria-hidden />
+          <div className="cta-dock">
+            <PublicCheckoutDialog
+              productKind="funnel"
+              slug={product.slug}
+              productName={product.name}
+              unitPrice={Number(product.price)}
+              pricing={{
+                price: Number(product.price),
+                bundle_pricing_enabled: product.bundle_pricing_enabled ?? false,
+                price_2: product.price_2 ?? null,
+                price_3: product.price_3 ?? null,
+              }}
+              ctaLabel={product.cta_label ?? "¡COMPRA AHORA PAGA EN CASA!"}
+              ref={ref ?? null}
+              triggerClassName="cta-3d"
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }
+
 
 function ImpulsadorCTA({ product, impulsador }: { product: Product; impulsador: { id: string; name: string | null; phone: string | null } | null }) {
   if (!impulsador) {
