@@ -327,7 +327,7 @@ function QuickPreview({ p, brand, refQs }: { p: Product; brand?: string; refQs: 
 }
 
 function FloatingCTA({ impulsador }: { impulsador: { id: string; name: string | null; phone: string | null } | null }) {
-  const href = waHref(impulsador?.phone, "Hola, vi tu catálogo AnMa Luxury y me interesa una pieza.");
+  const href = waHref(impulsador?.phone, "Hola 😊 Vi el catálogo AnMa Luxury ✨ y quisiera conocer precios, cómo funciona y qué incluye.");
   return (
     <a
       href={href}
