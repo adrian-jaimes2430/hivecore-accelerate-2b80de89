@@ -10,7 +10,7 @@ import { MediaGallery, buildMedia } from "@/components/luxury/MediaGallery";
 import { VariationPicker, summarizeVariations } from "@/components/luxury/VariationPicker";
 import type { Variation } from "@/components/admin/VariationsEditor";
 import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
-import { waHref } from "@/lib/whatsapp";
+import { waHref, productOrderMessage } from "@/lib/whatsapp";
 import { formatCOP } from "@/lib/pricing";
 import { MetaViewContent } from "@/components/marketing/MetaPixel";
 
@@ -75,7 +75,7 @@ function PublicProduct() {
 
   const waLink = waHref(
     impulsador?.phone,
-    `Hola, me interesa la pieza "${product.name}" del catálogo AnMa Luxury (${formatCOP(price)}).${variantSummary ? `\nOpciones: ${variantSummary}` : ""}\n${url}`,
+    productOrderMessage(product.name, { price: formatCOP(price), options: variantSummary || null, url }),
   );
 
   return (

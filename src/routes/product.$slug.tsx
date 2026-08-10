@@ -14,6 +14,9 @@ import { Check, Share2, Mail, MessageCircle, Link as LinkIcon, ShoppingBag, Arro
 import { sendOrderNotification } from "@/lib/order-email.functions";
 import { forwardOrderToIntegrations } from "@/lib/integrations.functions";
 import { getProductPublic } from "@/lib/product-public.functions";
+import { getImpulsadorRef } from "@/lib/luxury-public.functions";
+import { WhatsAppFab } from "@/components/marketing/WhatsAppFab";
+import { productInquiryMessage } from "@/lib/whatsapp";
 import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
 import { MetaPixel, MetaViewContent } from "@/components/marketing/MetaPixel";
 import { bundleTotal, formatCOP} from "@/lib/pricing";
@@ -88,6 +91,12 @@ function ProductFunnel() {
     },
   });
 
+
+  const { data: impulsador } = useQuery({
+    queryKey: ["impulsador-ref", ref],
+    enabled: !!ref,
+    queryFn: () => getImpulsadorRef({ data: { ref: ref! } }),
+  });
 
   if (isLoading || !product) {
     return <div className="flex min-h-[60vh] items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-hive" /></div>;
@@ -221,6 +230,7 @@ function ProductFunnel() {
               triggerClassName="cta-3d"
             />
           </div>
+          <WhatsAppFab phone={impulsador?.phone} message={productInquiryMessage(product.name)} />
         </>
       )}
     </div>
