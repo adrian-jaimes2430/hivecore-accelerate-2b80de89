@@ -1,8 +1,12 @@
+import { useEffect, useRef } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { readPublicOrderStatus } from "@/lib/checkout.functions";
+import { formatCOP } from "@/lib/pricing";
+import { metaTrackPaid } from "@/components/marketing/MetaPixel";
 import { Check, Clock, XCircle, Truck } from "lucide-react";
+
 
 const searchSchema = z.object({
   ref: fallback(z.string(), "").default(""),
@@ -61,8 +65,30 @@ function Shell({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
+
 function GraciasPage() {
   const { order } = Route.useLoaderData();
+  const fired = useRef(false);
+
+  const paidOrder = order?.payment_status === "paid";
+
+  useEffect(() => {
+    if (!order || !paidOrder || fired.current) return;
+    fired.current = true;
+    // Purchase del pago en línea (Wompi). Mismo eventID que el flujo contra
+    // entrega para que Meta deduplique si ya se envió.
+    metaTrackPaid(
+      "Purchase",
+      {
+        content_type: "product",
+        num_items: Number(order.quantity ?? 1),
+        value: Number(order.total ?? 0),
+        currency: "COP",
+        order_id: order.order_code,
+      },
+      { eventID: `purchase-${order.order_code}` },
+    );
+  }, [order, paidOrder]);
 
   if (!order) {
     return (
@@ -74,12 +100,13 @@ function GraciasPage() {
     );
   }
 
-  const paid = order.payment_status === "paid";
+  const paid = paidOrder;
   const failed = order.payment_status === "failed" || order.payment_status === "voided";
   const cod = order.payment_method === "cod";
 
   return (
     <Shell title={paid ? "¡Pago confirmado!" : failed ? "Pago no completado" : "Pedido recibido"}>
+
       <div className="hive-card p-6">
         <div className="mb-4 flex items-center gap-3">
           <span
@@ -109,7 +136,7 @@ function GraciasPage() {
         <dl className="space-y-2 text-sm">
           <Row label="Cliente" value={order.client_name} />
           <Row label="Cantidad" value={String(order.quantity)} />
-          <Row label="Total" value={`$ ${Number(order.total ?? 0).toFixed(2)}`} />
+          <Row label="Total" value={formatCOP(Number(order.total ?? 0))} />
           <Row
             label="Método de pago"
             value={cod ? "Contra entrega" : "Pago en línea (Wompi)"}

@@ -100,6 +100,51 @@ export function GlobalMetaPixel() {
   return null;
 }
 
+/**
+ * Envía `ViewContent` con el píxel global del sitio (el que ya está inicializado
+ * en el <head>). Se usa en fichas de producto que no tienen píxel propio, para
+ * que Meta pueda medir vistas de producto y optimizar campañas.
+ */
+export function MetaViewContent({
+  contentId,
+  contentName,
+  value,
+  currency = "COP",
+  paid,
+}: {
+  contentId?: string | null;
+  contentName?: string | null;
+  value?: number | null;
+  currency?: string;
+  paid?: boolean;
+}) {
+  const sent = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!GLOBAL_META_PIXEL_ID) return;
+    const key = String(contentId ?? contentName ?? "");
+    if (!key || sent.current === key) return;
+    const isPaid = paid ?? isPaidTraffic();
+    if (!isPaid) return;
+    sent.current = key;
+    metaTrackPaid(
+      "ViewContent",
+      {
+        content_ids: contentId ? [contentId] : undefined,
+        content_name: contentName ?? undefined,
+        content_type: "product",
+        contents: contentId ? [{ id: contentId, quantity: 1 }] : undefined,
+        value: value ?? undefined,
+        currency,
+      },
+      { paid: isPaid },
+    );
+  }, [contentId, contentName, value, currency, paid]);
+
+  return null;
+}
+
+
 export function MetaPixel({
   pixelId,
   testEventCode,
