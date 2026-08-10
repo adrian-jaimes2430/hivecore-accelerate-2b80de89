@@ -38,7 +38,7 @@ export const sendOrderNotification = createServerFn({ method: "POST" })
           <tr><td style="padding:8px; background:#f5f5f5;"><b>Producto</b></td><td style="padding:8px;">${escape(data.productName)}</td></tr>
           <tr><td style="padding:8px; background:#f5f5f5;"><b>SKU</b></td><td style="padding:8px; font-family:monospace;">${data.productSku}</td></tr>
           <tr><td style="padding:8px; background:#f5f5f5;"><b>Cantidad</b></td><td style="padding:8px;">${data.quantity}</td></tr>
-          <tr><td style="padding:8px; background:#f5f5f5;"><b>Total</b></td><td style="padding:8px;"><b>S/ ${data.total.toFixed(2)}</b></td></tr>
+          <tr><td style="padding:8px; background:#f5f5f5;"><b>Total</b></td><td style="padding:8px;"><b>$ ${Math.round(data.total).toLocaleString("es-CO")} COP</b></td></tr>
           <tr><td style="padding:8px; background:#f5f5f5;"><b>Cliente</b></td><td style="padding:8px;">${escape(data.clientName)}</td></tr>
           <tr><td style="padding:8px; background:#f5f5f5;"><b>Teléfono</b></td><td style="padding:8px;">${escape(data.clientPhone)}</td></tr>
           <tr><td style="padding:8px; background:#f5f5f5;"><b>Dirección</b></td><td style="padding:8px;">${escape(data.clientAddress ?? "—")}</td></tr>

@@ -14,7 +14,7 @@ import {
 import { CreditCard, Truck, Loader2, ShoppingBag, Check } from "lucide-react";
 import { toast } from "sonner";
 import { submitPublicOrder } from "@/lib/checkout.functions";
-import { bundleTotal, type BundlePricing } from "@/lib/pricing";
+import { bundleTotal, formatCOP, type BundlePricing } from "@/lib/pricing";
 import { metaTrackPaid, newEventId } from "@/components/marketing/MetaPixel";
 
 export function PublicCheckoutDialog({
@@ -268,7 +268,7 @@ export function PublicCheckoutDialog({
                     >
                       <span className="block font-semibold">{q} unidad{q > 1 ? "es" : ""}</span>
                       <span className="block hive-gradient-text font-bold">
-                        {currencyPrefix} {t.toFixed(2)}
+                        {formatCOP(t)}
                       </span>
                     </button>
                   );
@@ -334,7 +334,7 @@ export function PublicCheckoutDialog({
             <div className="flex items-center justify-between rounded-lg border border-border/60 bg-white/5 px-4 py-3">
               <span className="text-xs uppercase tracking-wider text-muted-foreground">Total</span>
               <span className="font-display text-xl font-bold hive-gradient-text">
-                {currencyPrefix} {total.toFixed(2)}
+                {formatCOP(total)}
               </span>
             </div>
 

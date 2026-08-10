@@ -46,3 +46,10 @@ export function bundleUnitLabel(p: BundlePricing, quantity: number): number {
 }
 
 const round = (n: number) => Math.round(n * 100) / 100;
+
+/** Formato de moneda colombiana: "$ 289.900 COP" (evita confusión con soles). */
+export function formatCOP(value: number | string | null | undefined): string {
+  const n = num(value);
+  const whole = Math.round(n);
+  return `$ ${whole.toLocaleString("es-CO")} COP`;
+}

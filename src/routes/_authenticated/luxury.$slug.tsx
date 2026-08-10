@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { sendOrderNotification } from "@/lib/order-email.functions";
 import { forwardOrderToIntegrations } from "@/lib/integrations.functions";
 import type { Variation } from "@/components/admin/VariationsEditor";
+import { formatCOP } from "@/lib/pricing";
 
 export const Route = createFileRoute("/_authenticated/luxury/$slug")({
   component: LuxuryProduct,
@@ -95,21 +96,21 @@ function LuxuryProduct() {
             {showImp ? (
               <>
                 <div className="flex items-baseline gap-3">
-                  <span className="shop-price text-3xl">S/ {Number(product.price).toFixed(2)}</span>
+                  <span className="shop-price text-3xl">{formatCOP(Number(product.price))}</span>
                   <span className="text-xs text-muted-foreground">precio impulsador</span>
                 </div>
                 {product.suggested_retail_price > 0 && (
-                  <p className="mt-2 text-sm text-muted-foreground">Precio sugerido al cliente: <span className="text-foreground">S/ {Number(product.suggested_retail_price).toFixed(2)}</span></p>
+                  <p className="mt-2 text-sm text-muted-foreground">Precio sugerido al cliente: <span className="text-foreground">{formatCOP(Number(product.suggested_retail_price))}</span></p>
                 )}
                 {utility > 0 && (
                   <div className="mt-3 inline-flex items-center gap-1 rounded-full border border-hive/40 bg-hive/10 px-3 py-1 text-sm font-medium text-hive">
-                    Utilidad estimada: +S/ {utility.toFixed(2)}
+                    Utilidad estimada: +{formatCOP(utility)}
                   </div>
                 )}
               </>
             ) : (
               <div className="flex items-baseline gap-3">
-                <span className="shop-price text-3xl">S/ {Number(product.suggested_retail_price || product.price).toFixed(2)}</span>
+                <span className="shop-price text-3xl">{formatCOP(Number(product.suggested_retail_price || product.price))}</span>
                 <span className="text-xs text-muted-foreground">precio final</span>
               </div>
             )}

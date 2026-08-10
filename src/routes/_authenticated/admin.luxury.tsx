@@ -13,6 +13,7 @@ import { VariationsEditor, type Variation } from "@/components/admin/VariationsE
 import { MediaUploader } from "@/components/admin/MediaUploader";
 import { toast } from "sonner";
 import { ArrowLeft, Crown, ExternalLink, Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { formatCOP } from "@/lib/pricing";
 
 export const Route = createFileRoute("/_authenticated/admin/luxury")({
   component: LuxuryAdmin,
@@ -251,7 +252,7 @@ function ProductsTab() {
                 <div>
                   <p className="font-medium">{p.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {p.sku && <>{p.sku} · </>}S/ {Number(p.price).toFixed(2)} · {p.stock_status}
+                    {p.sku && <>{p.sku} · </>}{formatCOP(Number(p.price))} · {p.stock_status}
                     {vidCount > 0 && <> · 🎬 {vidCount}</>}
                     {p.is_featured && <> · ⭐</>}
                     {!p.is_active && <> · inactivo</>}

@@ -14,10 +14,9 @@ import { Check, Share2, Mail, MessageCircle, Link as LinkIcon, ShoppingBag, Arro
 import { sendOrderNotification } from "@/lib/order-email.functions";
 import { forwardOrderToIntegrations } from "@/lib/integrations.functions";
 import { getProductPublic } from "@/lib/product-public.functions";
-import { getImpulsadorRef } from "@/lib/luxury-public.functions";
 import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
 import { MetaPixel } from "@/components/marketing/MetaPixel";
-import { bundleTotal } from "@/lib/pricing";
+import { bundleTotal, formatCOP} from "@/lib/pricing";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 
@@ -89,11 +88,6 @@ function ProductFunnel() {
     },
   });
 
-  const { data: impulsador } = useQuery({
-    queryKey: ["impulsador-ref", ref],
-    enabled: !!ref,
-    queryFn: () => getImpulsadorRef({ data: { ref: ref! } }),
-  });
 
   if (isLoading || !product) {
     return <div className="flex min-h-[60vh] items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-hive" /></div>;
@@ -134,9 +128,9 @@ function ProductFunnel() {
           {funnel.map((s, i) => {
             const mediaOnly = Boolean((s.image || s.video) && !s.content?.trim());
             const media = s.video ? (
-              <video key={`v-${i}`} src={s.video} controls playsInline className="block h-auto w-full object-contain" />
+              <video key={`v-${i}`} src={s.video} controls playsInline preload={i < 1 ? "metadata" : "none"} className="block h-auto w-full object-contain" />
             ) : s.image ? (
-              <img key={`i-${i}`} src={s.image} alt={product.name} className="block h-auto w-full object-contain" />
+              <img key={`i-${i}`} src={s.image} alt={`${product.name} — sección ${i + 1}`} loading={i < 1 ? "eager" : "lazy"} decoding="async" fetchPriority={i < 1 ? "high" : "low"} className="block h-auto w-full object-contain" />
             ) : null;
             return mediaOnly ? (
               <div key={i}>{media}</div>
@@ -168,20 +162,20 @@ function ProductFunnel() {
               <tr>
                 <td className="px-4 py-3 text-xs uppercase tracking-wider text-muted-foreground">Precio</td>
                 <td className="px-4 py-3">
-                  <span className="font-display text-2xl font-bold hive-gradient-text">S/ {Number(product.price).toFixed(2)}</span>
+                  <span className="font-display text-2xl font-bold hive-gradient-text">{formatCOP(Number(product.price))}</span>
                   {product.upsell_price && (
-                    <span className="ml-2 text-sm text-muted-foreground line-through">S/ {Number(product.upsell_price).toFixed(2)}</span>
+                    <span className="ml-2 text-sm text-muted-foreground line-through">{formatCOP(Number(product.upsell_price))}</span>
                   )}
                   {product.bundle_pricing_enabled && (Number(product.price_2) > 0 || Number(product.price_3) > 0) && (
                     <div className="mt-2 flex flex-wrap gap-2 text-xs">
                       {Number(product.price_2) > 0 && (
                         <span className="rounded-full bg-hive/15 px-2 py-0.5 font-semibold text-hive">
-                          2 unidades · S/ {Number(product.price_2).toFixed(2)}
+                          2 unidades · {formatCOP(Number(product.price_2))}
                         </span>
                       )}
                       {Number(product.price_3) > 0 && (
                         <span className="rounded-full bg-hive/15 px-2 py-0.5 font-semibold text-hive">
-                          3 unidades · S/ {Number(product.price_3).toFixed(2)}
+                          3 unidades · {formatCOP(Number(product.price_3))}
                         </span>
                       )}
                     </div>
@@ -191,85 +185,43 @@ function ProductFunnel() {
             </tbody>
           </table>
         </div>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          {user ? (
+        {user && (
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
             <OrderDialog product={product} impulsadorName={profile?.full_name ?? null} />
-          ) : (
-            <>
-              <PublicCheckoutDialog
-                productKind="funnel"
-                slug={product.slug}
-                productName={product.name}
-                unitPrice={Number(product.price)}
-                pricing={{
-                  price: Number(product.price),
-                  bundle_pricing_enabled: product.bundle_pricing_enabled ?? false,
-                  price_2: product.price_2 ?? null,
-                  price_3: product.price_3 ?? null,
-                }}
-                currencyPrefix="S/"
-                ctaLabel={product.cta_label ?? "Comprar ahora"}
-                ref={ref ?? null}
-              />
-              {impulsador && <ImpulsadorCTA product={product} impulsador={impulsador} />}
-            </>
-          )}
-          <ShareDialog product={product} impulsadorId={user?.id ?? ref ?? null} />
-        </div>
-
+            <ShareDialog product={product} impulsadorId={user.id} />
+          </div>
+        )}
       </section>
 
-      {!user && impulsador && <FloatingImpulsadorCTA product={product} impulsador={impulsador} />}
+      {!user && (
+        <>
+          {/* Espacio para que la barra flotante no tape el contenido final */}
+          <div className="h-28" aria-hidden />
+          <div className="cta-dock">
+            <PublicCheckoutDialog
+              productKind="funnel"
+              slug={product.slug}
+              productName={product.name}
+              unitPrice={Number(product.price)}
+              pricing={{
+                price: Number(product.price),
+                bundle_pricing_enabled: product.bundle_pricing_enabled ?? false,
+                price_2: product.price_2 ?? null,
+                price_3: product.price_3 ?? null,
+              }}
+              ctaLabel="¡Compra ahora, paga en casa!"
+              ref={ref ?? null}
+              triggerClassName="cta-3d"
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
-function ImpulsadorCTA({ product, impulsador }: { product: Product; impulsador: { id: string; name: string | null; phone: string | null } | null }) {
-  if (!impulsador) {
-    return (
-      <Button disabled className="h-12 border border-border/60 bg-white/5 px-6 text-base text-muted-foreground opacity-100">
-        <Lock className="mr-2 h-4 w-4" /> Pedido gestionado por tu impulsador
-      </Button>
-    );
-  }
-  const url = typeof window !== "undefined" ? window.location.href : `${SITE_URL}/product/${product.slug}`;
-  const text = encodeURIComponent(
-    `Hola ${impulsador.name?.split(" ")[0] ?? ""}, me interesa "${product.name}" (SKU ${product.sku}) — S/ ${Number(product.price).toFixed(2)}.\n${url}`,
-  );
-  const phone = impulsador.phone?.replace(/[^\d]/g, "") ?? "";
-  const href = phone ? `https://wa.me/${phone}?text=${text}` : `https://wa.me/?text=${text}`;
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="shop-btn-accent h-12 px-6 text-base"
-    >
-      <MessageCircle className="h-5 w-5" />
-      Pedir a {impulsador.name?.split(" ")[0] ?? "tu impulsador"} por WhatsApp
-    </a>
-  );
-}
 
-function FloatingImpulsadorCTA({ product, impulsador }: { product: Product; impulsador: { id: string; name: string | null; phone: string | null } }) {
-  const url = typeof window !== "undefined" ? window.location.href : `${SITE_URL}/product/${product.slug}`;
-  const text = encodeURIComponent(
-    `Hola ${impulsador.name?.split(" ")[0] ?? ""}, me interesa "${product.name}" (SKU ${product.sku}).\n${url}`,
-  );
-  const phone = impulsador.phone?.replace(/[^\d]/g, "") ?? "";
-  const href = phone ? `https://wa.me/${phone}?text=${text}` : `https://wa.me/?text=${text}`;
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="shop-btn-accent fixed bottom-5 right-5 z-50 text-sm shadow-2xl"
-    >
-      <MessageCircle className="h-4 w-4" />
-      Pedir por WhatsApp
-    </a>
-  );
-}
+
 
 function OrderDialog({ product, impulsadorName }: { product: Product; impulsadorName: string | null }) {
   const { user } = useAuth();
@@ -364,7 +316,7 @@ function OrderDialog({ product, impulsadorName }: { product: Product; impulsador
             <div className="flex items-center justify-between rounded-md border border-border/60 bg-white/5 px-3 py-2 text-sm">
               <span className="text-xs uppercase tracking-wider text-muted-foreground">Total</span>
               <span className="font-display text-lg font-bold hive-gradient-text">
-                S/ {bundleTotal(
+                {formatCOP(bundleTotal(
                   {
                     price: Number(product.price),
                     bundle_pricing_enabled: product.bundle_pricing_enabled ?? false,
@@ -372,7 +324,7 @@ function OrderDialog({ product, impulsadorName }: { product: Product; impulsador
                     price_3: product.price_3 ?? null,
                   },
                   form.quantity,
-                ).toFixed(2)}
+                ))}
               </span>
             </div>
             <div>

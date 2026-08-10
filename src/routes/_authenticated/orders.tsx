@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Loader2, Package } from "lucide-react";
+import { formatCOP } from "@/lib/pricing";
 
 export const Route = createFileRoute("/_authenticated/orders")({
   component: OrdersPage,
@@ -61,7 +62,7 @@ function OrdersPage() {
                   <td className="px-4 py-3">{o.client_name}</td>
                   <td className="px-4 py-3 text-muted-foreground">{o.client_phone}</td>
                   <td className="px-4 py-3">{o.quantity}</td>
-                  <td className="px-4 py-3">S/ {Number(o.total ?? 0).toFixed(2)}</td>
+                  <td className="px-4 py-3">{formatCOP(Number(o.total ?? 0))}</td>
                   <td className="px-4 py-3">
                     <span className="rounded-full bg-anma-orange/15 px-2 py-0.5 text-[10px] font-bold uppercase text-anma-orange">{o.status}</span>
                   </td>

@@ -11,6 +11,7 @@ import { VariationPicker, summarizeVariations } from "@/components/luxury/Variat
 import type { Variation } from "@/components/admin/VariationsEditor";
 import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
 import { waHref } from "@/lib/whatsapp";
+import { formatCOP } from "@/lib/pricing";
 
 const SITE_URL = "https://hivecore-accelerate.lovable.app";
 
@@ -73,7 +74,7 @@ function PublicProduct() {
 
   const waLink = waHref(
     impulsador?.phone,
-    `Hola, me interesa la pieza "${product.name}" del catálogo AnMa Luxury (S/ ${price.toFixed(2)}).${variantSummary ? `\nOpciones: ${variantSummary}` : ""}\n${url}`,
+    `Hola, me interesa la pieza "${product.name}" del catálogo AnMa Luxury (${formatCOP(price)}).${variantSummary ? `\nOpciones: ${variantSummary}` : ""}\n${url}`,
   );
 
   return (
@@ -111,7 +112,7 @@ function PublicProduct() {
 
             <div className="shop-panel p-6">
               <p className="text-xs uppercase tracking-wider text-muted-foreground">Precio</p>
-              <p className="shop-price mt-1 text-4xl">S/ {price.toFixed(2)}</p>
+              <p className="shop-price mt-1 text-4xl">{formatCOP(price)}</p>
               <StockBadge status={product.stock_status} />
             </div>
 
@@ -127,7 +128,7 @@ function PublicProduct() {
                 slug={product.slug}
                 productName={product.name}
                 unitPrice={price}
-                currencyPrefix="S/"
+                
                 ctaLabel="Comprar ahora"
                 ref={ref ?? null}
                 variations={variantSummary || null}
