@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { formatCOP } from "@/lib/pricing";
 
 export const Route = createFileRoute("/_authenticated/category/$slug")({
   component: CategoryPage,
@@ -66,7 +67,7 @@ function CategoryPage() {
                 <h3 className="font-semibold">{p.name}</h3>
                 <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{p.short_description}</p>
                 <div className="mt-3 flex items-center justify-between">
-                  <span className="font-display text-lg font-bold">S/ {Number(p.price).toFixed(2)}</span>
+                  <span className="font-display text-lg font-bold">{formatCOP(Number(p.price))}</span>
                   <ArrowRight className="h-4 w-4 text-hive opacity-0 group-hover:opacity-100" />
                 </div>
               </div>

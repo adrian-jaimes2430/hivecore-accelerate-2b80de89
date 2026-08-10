@@ -9,6 +9,7 @@ import { ShareBar } from "@/components/luxury/ShareBar";
 import { Reveal } from "@/components/Reveal";
 
 import type { LucideIcon } from "lucide-react";
+import { formatCOP } from "@/lib/pricing";
 
 export const Route = createFileRoute("/_authenticated/app")({
   component: Dashboard,
@@ -223,7 +224,7 @@ function ProductGrid({ items }: { items: Product[] }) {
               </Link>
               <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{p.short_description}</p>
               <div className="mt-3 flex items-center justify-between">
-                <span className="shop-price text-lg">S/ {Number(p.price).toFixed(2)}</span>
+                <span className="shop-price text-lg">{formatCOP(Number(p.price))}</span>
                 {imgs.length > 1 && (
                   <span className="text-[10px] text-muted-foreground">{imgs.length} fotos</span>
                 )}
@@ -287,7 +288,7 @@ function QuickView({ p }: { p: Product }) {
         </DialogHeader>
         {p.short_description && <p className="text-sm text-muted-foreground">{p.short_description}</p>}
         <div className="shop-panel px-4 py-3">
-          <span className="shop-price text-2xl">S/ {Number(p.price).toFixed(2)}</span>
+          <span className="shop-price text-2xl">{formatCOP(Number(p.price))}</span>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {p.is_new && <Badge color="bg-hive/90 text-black">NUEVO</Badge>}

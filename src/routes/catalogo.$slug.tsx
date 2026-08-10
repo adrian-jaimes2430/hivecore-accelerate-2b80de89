@@ -11,6 +11,7 @@ import { VariationPicker, summarizeVariations } from "@/components/luxury/Variat
 import type { Variation } from "@/components/admin/VariationsEditor";
 import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
 import { waHref } from "@/lib/whatsapp";
+import { formatCOP } from "@/lib/pricing";
 
 const SITE_URL = "https://hivecore-accelerate.lovable.app";
 
@@ -111,7 +112,7 @@ function PublicProduct() {
 
             <div className="shop-panel p-6">
               <p className="text-xs uppercase tracking-wider text-muted-foreground">Precio</p>
-              <p className="shop-price mt-1 text-4xl">S/ {price.toFixed(2)}</p>
+              <p className="shop-price mt-1 text-4xl">{formatCOP(price)}</p>
               <StockBadge status={product.stock_status} />
             </div>
 

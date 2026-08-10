@@ -14,6 +14,7 @@ import { ShareBar } from "@/components/luxury/ShareBar";
 import { PromoCarousel, type Promo } from "@/components/luxury/PromoCarousel";
 import { Reveal } from "@/components/Reveal";
 import { Crown, Filter, Sparkles, Loader2, ArrowRight, Search, ExternalLink, Film } from "lucide-react";
+import { formatCOP } from "@/lib/pricing";
 
 const searchSchema = z.object({
   cat: fallback(z.string().optional(), undefined).optional(),
@@ -379,20 +380,20 @@ function ProductCard({ p, brand, index = 0, onQuickView }: { p: LuxProduct; bran
         {showImp ? (
           <>
             <div className="flex items-baseline gap-2">
-              <span className="font-display text-lg font-bold">S/ {Number(p.price).toFixed(2)}</span>
+              <span className="font-display text-lg font-bold">{formatCOP(Number(p.price))}</span>
               {p.suggested_retail_price > p.price && (
-                <span className="text-xs text-muted-foreground line-through">S/ {Number(p.suggested_retail_price).toFixed(2)}</span>
+                <span className="text-xs text-muted-foreground line-through">{formatCOP(Number(p.suggested_retail_price))}</span>
               )}
             </div>
             {utility > 0 && (
               <div className="inline-flex items-center gap-1 rounded-md border border-[color:var(--luxury-gold)]/30 bg-[color:var(--luxury-gold)]/10 px-2 py-0.5 text-[11px] font-medium text-[color:var(--luxury-gold)]">
-                +S/ {utility.toFixed(2)} utilidad
+                +{formatCOP(utility)} utilidad
               </div>
             )}
           </>
         ) : (
           <div className="flex items-baseline gap-2">
-            <span className="font-display text-lg font-bold luxury-gradient-text">S/ {finalPrice.toFixed(2)}</span>
+            <span className="font-display text-lg font-bold luxury-gradient-text">{formatCOP(finalPrice)}</span>
           </div>
         )}
         <div className="flex items-center gap-2 pt-3">
@@ -429,17 +430,17 @@ function QuickView({ p, brand }: { p: LuxProduct; brand?: string }) {
           {p.show_impulsador_price !== false ? (
             <>
               <div className="flex items-baseline gap-3">
-                <span className="font-display text-2xl font-bold">S/ {Number(p.price).toFixed(2)}</span>
+                <span className="font-display text-2xl font-bold">{formatCOP(Number(p.price))}</span>
                 <span className="text-xs text-muted-foreground">precio impulsador</span>
               </div>
               {p.suggested_retail_price > 0 && (
-                <p className="mt-1 text-sm text-muted-foreground">Sugerido al cliente: <span className="text-foreground">S/ {Number(p.suggested_retail_price).toFixed(2)}</span></p>
+                <p className="mt-1 text-sm text-muted-foreground">Sugerido al cliente: <span className="text-foreground">{formatCOP(Number(p.suggested_retail_price))}</span></p>
               )}
-              {utility > 0 && <p className="mt-1 text-sm text-[color:var(--luxury-gold)]">Utilidad estimada: +S/ {utility.toFixed(2)}</p>}
+              {utility > 0 && <p className="mt-1 text-sm text-[color:var(--luxury-gold)]">Utilidad estimada: +{formatCOP(utility)}</p>}
             </>
           ) : (
             <div className="flex items-baseline gap-3">
-              <span className="font-display text-2xl font-bold luxury-gradient-text">S/ {Number(p.suggested_retail_price || p.price).toFixed(2)}</span>
+              <span className="font-display text-2xl font-bold luxury-gradient-text">{formatCOP(Number(p.suggested_retail_price || p.price))}</span>
               <span className="text-xs text-muted-foreground">precio final</span>
             </div>
           )}

@@ -13,6 +13,7 @@ import { type Promo } from "@/components/luxury/PromoCarousel";
 import { PromoTicker } from "@/components/luxury/PromoTicker";
 import { Reveal } from "@/components/Reveal";
 import { waHref } from "@/lib/whatsapp";
+import { formatCOP } from "@/lib/pricing";
 
 const searchSchema = z.object({
   cat: fallback(z.string().optional(), undefined).optional(),
@@ -284,7 +285,7 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
         <h3 className="font-semibold leading-tight">{p.name}</h3>
         {p.short_description && <p className="line-clamp-2 text-xs text-muted-foreground">{p.short_description}</p>}
         <div className="flex items-baseline gap-2 pt-1">
-          <span className="font-display text-lg font-bold luxury-gradient-text">S/ {Number(p.suggested_retail_price || p.price).toFixed(2)}</span>
+          <span className="font-display text-lg font-bold luxury-gradient-text">{formatCOP(Number(p.suggested_retail_price || p.price))}</span>
         </div>
         <div className="flex items-center gap-2 pt-3">
           <button onClick={onQuickView} className="shop-btn-quiet flex-1">Vista rápida</button>
@@ -315,7 +316,7 @@ function QuickPreview({ p, brand, refQs }: { p: Product; brand?: string; refQs: 
         </DialogHeader>
         {p.short_description && <p className="text-sm text-muted-foreground">{p.short_description}</p>}
         <div className="rounded-lg border border-[color:var(--luxury-gold)]/30 bg-black/40 p-4">
-          <span className="font-display text-2xl font-bold luxury-gradient-text">S/ {Number(p.suggested_retail_price || p.price).toFixed(2)}</span>
+          <span className="font-display text-2xl font-bold luxury-gradient-text">{formatCOP(Number(p.suggested_retail_price || p.price))}</span>
         </div>
         <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="inline-flex items-center gap-1 rounded-md bg-[color:var(--luxury-gold)]/15 px-3 py-2 text-sm text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/25">
           Ver ficha y reservar <ArrowRight className="h-3 w-3" />

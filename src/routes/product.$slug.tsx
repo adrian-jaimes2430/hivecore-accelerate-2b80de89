@@ -17,7 +17,7 @@ import { getProductPublic } from "@/lib/product-public.functions";
 import { getImpulsadorRef } from "@/lib/luxury-public.functions";
 import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
 import { MetaPixel } from "@/components/marketing/MetaPixel";
-import { bundleTotal } from "@/lib/pricing";
+import { bundleTotal, formatCOP} from "@/lib/pricing";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 
@@ -168,20 +168,20 @@ function ProductFunnel() {
               <tr>
                 <td className="px-4 py-3 text-xs uppercase tracking-wider text-muted-foreground">Precio</td>
                 <td className="px-4 py-3">
-                  <span className="font-display text-2xl font-bold hive-gradient-text">S/ {Number(product.price).toFixed(2)}</span>
+                  <span className="font-display text-2xl font-bold hive-gradient-text">{formatCOP(Number(product.price))}</span>
                   {product.upsell_price && (
-                    <span className="ml-2 text-sm text-muted-foreground line-through">S/ {Number(product.upsell_price).toFixed(2)}</span>
+                    <span className="ml-2 text-sm text-muted-foreground line-through">{formatCOP(Number(product.upsell_price))}</span>
                   )}
                   {product.bundle_pricing_enabled && (Number(product.price_2) > 0 || Number(product.price_3) > 0) && (
                     <div className="mt-2 flex flex-wrap gap-2 text-xs">
                       {Number(product.price_2) > 0 && (
                         <span className="rounded-full bg-hive/15 px-2 py-0.5 font-semibold text-hive">
-                          2 unidades · S/ {Number(product.price_2).toFixed(2)}
+                          2 unidades · {formatCOP(Number(product.price_2))}
                         </span>
                       )}
                       {Number(product.price_3) > 0 && (
                         <span className="rounded-full bg-hive/15 px-2 py-0.5 font-semibold text-hive">
-                          3 unidades · S/ {Number(product.price_3).toFixed(2)}
+                          3 unidades · {formatCOP(Number(product.price_3))}
                         </span>
                       )}
                     </div>
@@ -364,7 +364,7 @@ function OrderDialog({ product, impulsadorName }: { product: Product; impulsador
             <div className="flex items-center justify-between rounded-md border border-border/60 bg-white/5 px-3 py-2 text-sm">
               <span className="text-xs uppercase tracking-wider text-muted-foreground">Total</span>
               <span className="font-display text-lg font-bold hive-gradient-text">
-                S/ {bundleTotal(
+                {formatCOP(bundleTotal(
                   {
                     price: Number(product.price),
                     bundle_pricing_enabled: product.bundle_pricing_enabled ?? false,
@@ -372,7 +372,7 @@ function OrderDialog({ product, impulsadorName }: { product: Product; impulsador
                     price_3: product.price_3 ?? null,
                   },
                   form.quantity,
-                ).toFixed(2)}
+                ))}
               </span>
             </div>
             <div>

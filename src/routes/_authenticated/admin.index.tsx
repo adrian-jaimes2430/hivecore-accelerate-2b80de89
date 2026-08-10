@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { MediaUploader } from "@/components/admin/MediaUploader";
 import {
+import { formatCOP } from "@/lib/pricing";
   ShieldCheck, Users, ShoppingBag, BarChart3, Check, Ban, Loader2,
   Plus, Pencil, Trash2, Package, Tag, Sparkles, GripVertical, ClipboardList, X,
 } from "lucide-react";
@@ -539,7 +540,7 @@ function ProductsTab() {
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="font-display text-base font-bold truncate">{p.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">S/ {Number(p.price).toFixed(2)} · /{p.slug}</p>
+                  <p className="text-xs text-muted-foreground truncate">{formatCOP(Number(p.price))} · /{p.slug}</p>
                   <p className="mt-1 text-[10px] font-mono font-bold text-hive">SKU: {p.sku}</p>
                 </div>
 
@@ -1026,7 +1027,7 @@ function OrdersTab() {
               <td className="px-4 py-3">{o.client_name}</td>
               <td className="px-4 py-3 text-muted-foreground">{o.client_phone}</td>
               <td className="px-4 py-3">{o.quantity}</td>
-              <td className="px-4 py-3">S/ {Number(o.total ?? 0).toFixed(2)}</td>
+              <td className="px-4 py-3">{formatCOP(Number(o.total ?? 0))}</td>
               <td className="px-4 py-3">
                 <Select value={o.status} onValueChange={(v) => updateStatus(o, v)}>
                   <SelectTrigger className="h-7 w-32 bg-white/5 text-xs"><SelectValue /></SelectTrigger>
