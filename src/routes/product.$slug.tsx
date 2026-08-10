@@ -209,7 +209,7 @@ function ProductFunnel() {
                 price_2: product.price_2 ?? null,
                 price_3: product.price_3 ?? null,
               }}
-              ctaLabel={product.cta_label ?? "¡COMPRA AHORA PAGA EN CASA!"}
+              ctaLabel="¡Compra ahora, paga en casa!"
               ref={ref ?? null}
               triggerClassName="cta-3d"
             />
