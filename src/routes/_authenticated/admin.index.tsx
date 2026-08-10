@@ -724,8 +724,8 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
                   </Select>
                 </div>
               </div>
-              <div><Label>Precio (S/)</Label><Input type="number" step="0.01" required value={form.price} onChange={(e) => update("price", Number(e.target.value))} className="bg-white/5" /></div>
-              <div><Label>Precio antes (S/)</Label><Input type="number" step="0.01" value={form.upsell_price ?? ""} onChange={(e) => update("upsell_price", e.target.value ? Number(e.target.value) : null)} className="bg-white/5" /></div>
+              <div><Label>Precio (COP)</Label><Input type="number" step="0.01" required value={form.price} onChange={(e) => update("price", Number(e.target.value))} className="bg-white/5" /></div>
+              <div><Label>Precio antes (COP)</Label><Input type="number" step="0.01" value={form.upsell_price ?? ""} onChange={(e) => update("upsell_price", e.target.value ? Number(e.target.value) : null)} className="bg-white/5" /></div>
               <div className="sm:col-span-2 rounded-md border border-border/40 bg-white/5 p-3 space-y-3">
                 <label className="flex items-center gap-2 text-sm font-medium">
                   <input
@@ -739,11 +739,11 @@ function ProductDialog({ open, onOpenChange, product, categories }: {
                 {form.bundle_pricing_enabled && (
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div>
-                      <Label>Precio total x2 unidades (S/)</Label>
+                      <Label>Precio total x2 unidades (COP)</Label>
                       <Input type="number" step="0.01" value={form.price_2 ?? ""} onChange={(e) => update("price_2", e.target.value ? Number(e.target.value) : null)} className="bg-white/5" />
                     </div>
                     <div>
-                      <Label>Precio total x3 unidades (S/)</Label>
+                      <Label>Precio total x3 unidades (COP)</Label>
                       <Input type="number" step="0.01" value={form.price_3 ?? ""} onChange={(e) => update("price_3", e.target.value ? Number(e.target.value) : null)} className="bg-white/5" />
                     </div>
                   </div>

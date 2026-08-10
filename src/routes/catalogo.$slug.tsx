@@ -74,7 +74,7 @@ function PublicProduct() {
 
   const waLink = waHref(
     impulsador?.phone,
-    `Hola, me interesa la pieza "${product.name}" del catálogo AnMa Luxury (S/ ${price.toFixed(2)}).${variantSummary ? `\nOpciones: ${variantSummary}` : ""}\n${url}`,
+    `Hola, me interesa la pieza "${product.name}" del catálogo AnMa Luxury (${formatCOP(price)}).${variantSummary ? `\nOpciones: ${variantSummary}` : ""}\n${url}`,
   );
 
   return (
@@ -128,7 +128,7 @@ function PublicProduct() {
                 slug={product.slug}
                 productName={product.name}
                 unitPrice={price}
-                currencyPrefix="S/"
+                
                 ctaLabel="Comprar ahora"
                 ref={ref ?? null}
                 variations={variantSummary || null}

@@ -207,7 +207,7 @@ function ProductFunnel() {
                   price_2: product.price_2 ?? null,
                   price_3: product.price_3 ?? null,
                 }}
-                currencyPrefix="S/"
+                
                 ctaLabel={product.cta_label ?? "Comprar ahora"}
                 ref={ref ?? null}
               />
@@ -234,7 +234,7 @@ function ImpulsadorCTA({ product, impulsador }: { product: Product; impulsador: 
   }
   const url = typeof window !== "undefined" ? window.location.href : `${SITE_URL}/product/${product.slug}`;
   const text = encodeURIComponent(
-    `Hola ${impulsador.name?.split(" ")[0] ?? ""}, me interesa "${product.name}" (SKU ${product.sku}) — S/ ${Number(product.price).toFixed(2)}.\n${url}`,
+    `Hola ${impulsador.name?.split(" ")[0] ?? ""}, me interesa "${product.name}" (SKU ${product.sku}) — ${formatCOP(product.price)}.\n${url}`,
   );
   const phone = impulsador.phone?.replace(/[^\d]/g, "") ?? "";
   const href = phone ? `https://wa.me/${phone}?text=${text}` : `https://wa.me/?text=${text}`;
