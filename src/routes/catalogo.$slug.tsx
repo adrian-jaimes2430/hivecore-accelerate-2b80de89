@@ -12,6 +12,7 @@ import type { Variation } from "@/components/admin/VariationsEditor";
 import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
 import { waHref } from "@/lib/whatsapp";
 import { formatCOP } from "@/lib/pricing";
+import { MetaViewContent } from "@/components/marketing/MetaPixel";
 
 const SITE_URL = "https://hivecore-accelerate.lovable.app";
 
@@ -123,6 +124,12 @@ function PublicProduct() {
             )}
 
             <div className="flex flex-col gap-3">
+              <MetaViewContent
+                contentId={product.slug}
+                contentName={product.name}
+                value={price}
+                paid={!ref}
+              />
               <PublicCheckoutDialog
                 productKind="luxury"
                 slug={product.slug}

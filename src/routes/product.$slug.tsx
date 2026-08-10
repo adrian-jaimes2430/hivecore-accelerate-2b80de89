@@ -15,7 +15,7 @@ import { sendOrderNotification } from "@/lib/order-email.functions";
 import { forwardOrderToIntegrations } from "@/lib/integrations.functions";
 import { getProductPublic } from "@/lib/product-public.functions";
 import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
-import { MetaPixel } from "@/components/marketing/MetaPixel";
+import { MetaPixel, MetaViewContent } from "@/components/marketing/MetaPixel";
 import { bundleTotal, formatCOP} from "@/lib/pricing";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
@@ -108,7 +108,14 @@ function ProductFunnel() {
           contentName={product.name}
           value={Number(product.price)}
         />
-      ) : null}
+      ) : (
+        <MetaViewContent
+          contentId={product.slug}
+          contentName={product.name}
+          value={Number(product.price)}
+          paid={!ref}
+        />
+      )}
       <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
 
         {user ? (
