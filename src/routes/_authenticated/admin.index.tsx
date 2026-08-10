@@ -17,11 +17,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { MediaUploader } from "@/components/admin/MediaUploader";
-import {
 import { formatCOP } from "@/lib/pricing";
+import {
   ShieldCheck, Users, ShoppingBag, BarChart3, Check, Ban, Loader2,
   Plus, Pencil, Trash2, Package, Tag, Sparkles, GripVertical, ClipboardList, X,
 } from "lucide-react";
+
 
 
 export const Route = createFileRoute("/_authenticated/admin/")({
