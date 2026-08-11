@@ -203,7 +203,7 @@ export async function dispatchOrderAlert(alert: OrderAlert) {
     .eq("id", 1)
     .maybeSingle();
 
-  const results: Record<string, unknown> = {};
+  const results: Record<string, { ok: boolean; error?: string; sent?: number }> = {};
 
   if (settings?.telegram_enabled && settings.telegram_chat_id) {
     results["telegram"] = await sendTelegramAlert(
