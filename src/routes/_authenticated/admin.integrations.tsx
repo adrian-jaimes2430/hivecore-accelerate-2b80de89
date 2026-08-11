@@ -184,6 +184,8 @@ function IntegrationsPage() {
         </Dialog>
       </div>
 
+      <NotificationsPanel />
+
       {/* Docs card */}
       <div className="hive-card mb-6 p-5">
         <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
