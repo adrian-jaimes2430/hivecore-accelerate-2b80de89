@@ -167,11 +167,14 @@ export async function sendEmailAlert(recipients: string[], subject: string, aler
   if (!apiKey || recipients.length === 0) return { ok: false, error: "email_not_configured" };
 
   const { sendLovableEmail } = await import("@lovable.dev/email-js");
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const html = alertEmailHtml(alert);
   const text = alertEmailText(alert);
   let sent = 0;
   for (const to of recipients) {
     try {
+      const token = crypto.randomUUID().replace(/-/g, "");
+      await supabaseAdmin.from("email_unsubscribe_tokens").insert({ token, email: to } as never);
       await sendLovableEmail(
         {
           to,
@@ -182,6 +185,7 @@ export async function sendEmailAlert(recipients: string[], subject: string, aler
           text,
           purpose: "transactional",
           label: "new_order_alert",
+          unsubscribe_token: token,
           message_id: `order-alert-${alert.orderCode}-${to}`,
           idempotency_key: `order-alert-${alert.orderCode}-${to}`,
         },
