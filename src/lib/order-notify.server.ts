@@ -175,8 +175,8 @@ export async function sendEmailAlert(recipients: string[], subject: string, aler
       await sendLovableEmail(
         {
           to,
-          from: "HIVECORE <pedidos@ayoecosystem.com>",
-          sender_domain: "ayoecosystem.com",
+          from: "HIVECORE <pedidos@notify.ayoecosystem.com>",
+          sender_domain: "notify.ayoecosystem.com",
           subject,
           html,
           text,
