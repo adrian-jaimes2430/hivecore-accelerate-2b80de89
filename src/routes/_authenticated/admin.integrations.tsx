@@ -13,8 +13,14 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { toast } from "sonner";
 import { testIntegration } from "@/lib/integrations.functions";
 import {
+  getNotificationSettings,
+  saveNotificationSettings,
+  detectTelegramChat,
+  sendTestOrderAlert,
+} from "@/lib/notifications.functions";
+import {
   Plug, Plus, Copy, RefreshCw, Trash2, Play, Loader2, ArrowLeft,
-  CheckCircle2, XCircle, Eye, EyeOff, Webhook, KeyRound,
+  CheckCircle2, XCircle, Eye, EyeOff, Webhook, KeyRound, Bell, Send, Search,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/integrations")({
@@ -178,6 +184,8 @@ function IntegrationsPage() {
         </Dialog>
       </div>
 
+      <NotificationsPanel />
+
       {/* Docs card */}
       <div className="hive-card mb-6 p-5">
         <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
@@ -285,6 +293,212 @@ function IntegrationsPage() {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function NotificationsPanel() {
+  const qc = useQueryClient();
+  const load = useServerFn(getNotificationSettings);
+  const save = useServerFn(saveNotificationSettings);
+  const detect = useServerFn(detectTelegramChat);
+  const test = useServerFn(sendTestOrderAlert);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["notification-settings"],
+    queryFn: () => load({}) as any,
+  });
+
+  const [form, setForm] = useState({
+    telegram_enabled: true,
+    telegram_chat_id: "",
+    email_enabled: true,
+    emails: "",
+  });
+  const [busy, setBusy] = useState<null | "save" | "detect" | "test">(null);
+  const [chats, setChats] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    if (!data) return;
+    setForm({
+      telegram_enabled: Boolean(data.telegram_enabled),
+      telegram_chat_id: data.telegram_chat_id ?? "",
+      email_enabled: Boolean(data.email_enabled),
+      emails: (data.notify_emails ?? []).join(", "),
+    });
+  }, [data]);
+
+  const onSave = async () => {
+    setBusy("save");
+    try {
+      const emails = form.emails
+        .split(/[,\s;]+/)
+        .map((e) => e.trim())
+        .filter(Boolean);
+      await save({
+        data: {
+          telegram_enabled: form.telegram_enabled,
+          telegram_chat_id: form.telegram_chat_id.trim() || null,
+          email_enabled: form.email_enabled,
+          notify_emails: emails,
+        },
+      });
+      toast.success("Avisos guardados");
+      qc.invalidateQueries({ queryKey: ["notification-settings"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "No se pudo guardar");
+    }
+    setBusy(null);
+  };
+
+  const onDetect = async () => {
+    setBusy("detect");
+    try {
+      const r: any = await detect({});
+      if (!r?.ok) toast.error(`No se pudo leer Telegram: ${r?.error ?? "error"}`);
+      else if (!r.chats?.length)
+        toast.info("Escribe /start al bot @Vatsalya_anma_bot desde tu Telegram y vuelve a intentar.");
+      else {
+        setChats(r.chats);
+        setForm((f) => ({ ...f, telegram_chat_id: r.chats[0].id }));
+        toast.success(`Chat detectado: ${r.chats[0].name}`);
+      }
+    } catch (e: any) {
+      toast.error(e?.message ?? "Error");
+    }
+    setBusy(null);
+  };
+
+  const onTest = async () => {
+    setBusy("test");
+    try {
+      const r: any = await test({});
+      const tg = r?.results?.telegram;
+      const em = r?.results?.email;
+      if (tg?.ok) toast.success("Aviso de prueba enviado por Telegram");
+      else toast.error(`Telegram: ${tg?.error ?? "no enviado"}`);
+      if (em?.ok) toast.success("Aviso de prueba enviado por correo");
+      else toast.message(`Correo: ${em?.error ?? "no enviado"}`);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Error");
+    }
+    setBusy(null);
+  };
+
+  return (
+    <div className="hive-card mb-6 p-5">
+      <div className="mb-1 flex items-center gap-2 text-sm font-semibold">
+        <Bell className="h-4 w-4 text-hive" /> Avisos automáticos de nuevos pedidos
+      </div>
+      <p className="mb-4 text-xs text-muted-foreground">
+        Cada pedido nuevo (impulsador, catálogo público, tráfico pago o pago con Wompi) dispara un
+        aviso con vendedor, producto, unidades y valor total. No necesitas entrar a la app.
+      </p>
+
+      {isLoading ? (
+        <div className="flex h-24 items-center justify-center">
+          <Loader2 className="h-4 w-4 animate-spin text-hive" />
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="rounded-lg border border-border/50 bg-black/20 p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-sm font-semibold">Telegram (instantáneo)</span>
+              <Switch
+                checked={form.telegram_enabled}
+                onCheckedChange={(v) => setForm({ ...form, telegram_enabled: v })}
+              />
+            </div>
+            <Label className="text-[10px] uppercase text-muted-foreground">Chat ID</Label>
+            <div className="flex gap-2">
+              <Input
+                value={form.telegram_chat_id}
+                onChange={(e) => setForm({ ...form, telegram_chat_id: e.target.value })}
+                placeholder="123456789"
+                className="bg-white/5"
+              />
+              <Button
+                variant="ghost"
+                onClick={onDetect}
+                disabled={busy !== null}
+                className="border border-border/60"
+              >
+                {busy === "detect" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Search className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Abre Telegram en tu celular (+57 320 483 6063), busca{" "}
+              <b>@Vatsalya_anma_bot</b>, envía <code>/start</code> y pulsa el botón de buscar para
+              detectar tu chat.
+            </p>
+            {chats.length > 1 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {chats.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setForm({ ...form, telegram_chat_id: c.id })}
+                    className={`rounded-full border px-3 py-1 text-xs ${
+                      form.telegram_chat_id === c.id
+                        ? "border-hive bg-hive/10"
+                        : "border-border/60 bg-white/5"
+                    }`}
+                  >
+                    {c.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-lg border border-border/50 bg-black/20 p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-sm font-semibold">Correo electrónico</span>
+              <Switch
+                checked={form.email_enabled}
+                onCheckedChange={(v) => setForm({ ...form, email_enabled: v })}
+              />
+            </div>
+            <Label className="text-[10px] uppercase text-muted-foreground">
+              Correos (separados por coma)
+            </Label>
+            <Textarea
+              value={form.emails}
+              onChange={(e) => setForm({ ...form, emails: e.target.value })}
+              placeholder="operaciones@ayoecosystem.com, ceo@ayoecosystem.com"
+              className="bg-white/5"
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Button
+          onClick={onSave}
+          disabled={busy !== null}
+          className="border-0 bg-hive text-white hover:bg-hive/90"
+        >
+          {busy === "save" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+          Guardar avisos
+        </Button>
+        <Button
+          variant="ghost"
+          onClick={onTest}
+          disabled={busy !== null}
+          className="border border-border/60"
+        >
+          {busy === "test" ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="mr-2 h-4 w-4" />
+          )}
+          Enviar prueba
+        </Button>
+      </div>
     </div>
   );
 }

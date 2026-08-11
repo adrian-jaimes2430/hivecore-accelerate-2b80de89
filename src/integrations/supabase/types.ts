@@ -385,6 +385,33 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_settings: {
+        Row: {
+          email_enabled: boolean
+          id: number
+          notify_emails: string[]
+          telegram_chat_id: string | null
+          telegram_enabled: boolean
+          updated_at: string
+        }
+        Insert: {
+          email_enabled?: boolean
+          id?: number
+          notify_emails?: string[]
+          telegram_chat_id?: string | null
+          telegram_enabled?: boolean
+          updated_at?: string
+        }
+        Update: {
+          email_enabled?: boolean
+          id?: number
+          notify_emails?: string[]
+          telegram_chat_id?: string | null
+          telegram_enabled?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           client_address: string | null

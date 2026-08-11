@@ -26,6 +26,7 @@ import { Route as AuthenticatedAdminLuxuryRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminIntegrationsRouteImport } from './routes/_authenticated/admin.integrations'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiPublicWebhooksWompiRouteImport } from './routes/api/public/webhooks/wompi'
+import { Route as ApiPublicNotificationsOrderRouteImport } from './routes/api/public/notifications/order'
 import { Route as ApiPublicIntegrationsAocoreOrderRouteImport } from './routes/api/public/integrations/aocore/order'
 
 const LoginRoute = LoginRouteImport.update({
@@ -117,6 +118,12 @@ const ApiPublicWebhooksWompiRoute = ApiPublicWebhooksWompiRouteImport.update({
   path: '/api/public/webhooks/wompi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicNotificationsOrderRoute =
+  ApiPublicNotificationsOrderRouteImport.update({
+    id: '/api/public/notifications/order',
+    path: '/api/public/notifications/order',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicIntegrationsAocoreOrderRoute =
   ApiPublicIntegrationsAocoreOrderRouteImport.update({
     id: '/api/public/integrations/aocore/order',
@@ -139,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/luxury/': typeof AuthenticatedLuxuryIndexRoute
+  '/api/public/notifications/order': typeof ApiPublicNotificationsOrderRoute
   '/api/public/webhooks/wompi': typeof ApiPublicWebhooksWompiRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/api/public/integrations/aocore/order': typeof ApiPublicIntegrationsAocoreOrderRoute
@@ -158,6 +166,7 @@ export interface FileRoutesByTo {
   '/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/luxury': typeof AuthenticatedLuxuryIndexRoute
+  '/api/public/notifications/order': typeof ApiPublicNotificationsOrderRoute
   '/api/public/webhooks/wompi': typeof ApiPublicWebhooksWompiRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/api/public/integrations/aocore/order': typeof ApiPublicIntegrationsAocoreOrderRoute
@@ -179,6 +188,7 @@ export interface FileRoutesById {
   '/_authenticated/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/luxury/': typeof AuthenticatedLuxuryIndexRoute
+  '/api/public/notifications/order': typeof ApiPublicNotificationsOrderRoute
   '/api/public/webhooks/wompi': typeof ApiPublicWebhooksWompiRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/api/public/integrations/aocore/order': typeof ApiPublicIntegrationsAocoreOrderRoute
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/luxury/$slug'
     | '/admin/'
     | '/luxury/'
+    | '/api/public/notifications/order'
     | '/api/public/webhooks/wompi'
     | '/lovable/email/queue/process'
     | '/api/public/integrations/aocore/order'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/luxury/$slug'
     | '/admin'
     | '/luxury'
+    | '/api/public/notifications/order'
     | '/api/public/webhooks/wompi'
     | '/lovable/email/queue/process'
     | '/api/public/integrations/aocore/order'
@@ -239,6 +251,7 @@ export interface FileRouteTypes {
     | '/_authenticated/luxury/$slug'
     | '/_authenticated/admin/'
     | '/_authenticated/luxury/'
+    | '/api/public/notifications/order'
     | '/api/public/webhooks/wompi'
     | '/lovable/email/queue/process'
     | '/api/public/integrations/aocore/order'
@@ -252,6 +265,7 @@ export interface RootRouteChildren {
   CatalogoSlugRoute: typeof CatalogoSlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
   CatalogoIndexRoute: typeof CatalogoIndexRoute
+  ApiPublicNotificationsOrderRoute: typeof ApiPublicNotificationsOrderRoute
   ApiPublicWebhooksWompiRoute: typeof ApiPublicWebhooksWompiRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   ApiPublicIntegrationsAocoreOrderRoute: typeof ApiPublicIntegrationsAocoreOrderRoute
@@ -378,6 +392,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWebhooksWompiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/notifications/order': {
+      id: '/api/public/notifications/order'
+      path: '/api/public/notifications/order'
+      fullPath: '/api/public/notifications/order'
+      preLoaderRoute: typeof ApiPublicNotificationsOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/integrations/aocore/order': {
       id: '/api/public/integrations/aocore/order'
       path: '/api/public/integrations/aocore/order'
@@ -422,6 +443,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogoSlugRoute: CatalogoSlugRoute,
   ProductSlugRoute: ProductSlugRoute,
   CatalogoIndexRoute: CatalogoIndexRoute,
+  ApiPublicNotificationsOrderRoute: ApiPublicNotificationsOrderRoute,
   ApiPublicWebhooksWompiRoute: ApiPublicWebhooksWompiRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   ApiPublicIntegrationsAocoreOrderRoute: ApiPublicIntegrationsAocoreOrderRoute,
@@ -429,13 +451,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
