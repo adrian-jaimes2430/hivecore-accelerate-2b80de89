@@ -13,8 +13,14 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { toast } from "sonner";
 import { testIntegration } from "@/lib/integrations.functions";
 import {
+  getNotificationSettings,
+  saveNotificationSettings,
+  detectTelegramChat,
+  sendTestOrderAlert,
+} from "@/lib/notifications.functions";
+import {
   Plug, Plus, Copy, RefreshCw, Trash2, Play, Loader2, ArrowLeft,
-  CheckCircle2, XCircle, Eye, EyeOff, Webhook, KeyRound,
+  CheckCircle2, XCircle, Eye, EyeOff, Webhook, KeyRound, Bell, Send, Search,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/integrations")({
