@@ -101,7 +101,7 @@ export const sendTestOrderAlert = createServerFn({ method: "POST" })
     await assertAdmin(context as never);
     const { dispatchOrderAlert } = await import("@/lib/order-notify.server");
     const results = await dispatchOrderAlert({
-      orderCode: "HC-PRUEBA1",
+      orderCode: `HC-PRUEBA-${Date.now().toString(36).toUpperCase()}`,
       productName: "Pedido de prueba HIVECORE",
       quantity: 2,
       total: 289900,
