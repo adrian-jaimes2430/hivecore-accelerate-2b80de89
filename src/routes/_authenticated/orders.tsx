@@ -51,13 +51,15 @@ function OrdersPage() {
               <tr>
                 <th className="px-4 py-3">Código</th>
                 <th className="px-4 py-3">Cliente</th>
-                <th className="px-4 py-3">Teléfono</th>
+                <th className="px-4 py-3">Contacto</th>
+                <th className="px-4 py-3">Envío (dirección / ciudad / región)</th>
                 <th className="px-4 py-3">Cant.</th>
                 <th className="px-4 py-3">Total</th>
                 <th className="px-4 py-3">Estado</th>
                 <th className="px-4 py-3">Fecha</th>
               </tr>
             </thead>
+
             <tbody>
               {orders.map((o) => (
                 <tr key={o.id} className="border-t border-border/40">
