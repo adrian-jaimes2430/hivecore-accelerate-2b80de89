@@ -8,10 +8,11 @@ export const publicOrderSchema = z.object({
   quantity: z.number().int().min(1).max(50).default(1),
   client_name: z.string().trim().min(2).max(120),
   client_phone: z.string().trim().min(6).max(30),
-  client_email: z.string().trim().email().max(180).optional().nullable(),
+  client_email: z.string().trim().email().max(180),
   client_address: z.string().trim().min(4).max(300),
-  client_city: z.string().trim().max(80).optional().nullable(),
-  client_region: z.string().trim().max(80).optional().nullable(),
+  client_city: z.string().trim().min(2).max(80),
+  client_region: z.string().trim().min(2).max(80),
+
 
   notes: z.string().trim().max(1000).optional().nullable(),
   variations: z.string().trim().max(300).optional().nullable(),
