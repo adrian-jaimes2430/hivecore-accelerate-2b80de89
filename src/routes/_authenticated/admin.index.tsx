@@ -898,8 +898,10 @@ function Flag({ label, v, on }: { label: string; v: boolean; on: (v: boolean) =>
 interface OrderRow {
   id: string; order_code: string; client_name: string; client_phone: string;
   client_address: string | null; notes: string | null; quantity: number;
+  client_city?: string | null; client_region?: string | null; client_email?: string | null;
   total: number | null; status: string; created_at: string;
   product_id: string | null;
+
   luxury_product_id: string | null;
   impulsador_id: string | null;
   impulsador_name?: string | null;
