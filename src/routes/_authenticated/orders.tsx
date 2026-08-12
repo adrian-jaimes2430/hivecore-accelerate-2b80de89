@@ -12,9 +12,12 @@ export const Route = createFileRoute("/_authenticated/orders")({
 
 interface Order {
   id: string; order_code: string; client_name: string; client_phone: string;
+  client_email: string | null; client_address: string | null;
+  client_city: string | null; client_region: string | null;
   quantity: number; total: number | null; status: string; created_at: string;
   product_id: string | null;
 }
+
 
 function OrdersPage() {
   const { user } = useAuth();
