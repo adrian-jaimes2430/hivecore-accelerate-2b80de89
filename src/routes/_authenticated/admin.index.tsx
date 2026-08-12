@@ -1030,7 +1030,17 @@ function OrdersTab() {
               </td>
 
               <td className="px-4 py-3">{o.client_name}</td>
-              <td className="px-4 py-3 text-muted-foreground">{o.client_phone}</td>
+              <td className="px-4 py-3 text-xs text-muted-foreground">
+                <div>{o.client_phone}</div>
+                {o.client_email && <div className="text-[10px]">{o.client_email}</div>}
+              </td>
+              <td className="px-4 py-3 text-xs">
+                <div>{o.client_address || "—"}</div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  {[o.client_city, o.client_region].filter(Boolean).join(" · ") || "Sin ciudad/región"}
+                </div>
+              </td>
+
               <td className="px-4 py-3">{o.quantity}</td>
               <td className="px-4 py-3">{formatCOP(Number(o.total ?? 0))}</td>
               <td className="px-4 py-3">
