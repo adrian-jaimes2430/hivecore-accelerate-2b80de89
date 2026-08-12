@@ -1108,6 +1108,10 @@ function EditOrderDialog({ order, onClose }: { order: OrderRow | null; onClose: 
       client_name: form.client_name,
       client_phone: form.client_phone,
       client_address: form.client_address || null,
+      client_city: form.client_city || null,
+      client_region: form.client_region || null,
+      client_email: form.client_email || null,
+
       quantity: form.quantity,
       notes: form.notes || null,
     }).eq("id", order.id);
