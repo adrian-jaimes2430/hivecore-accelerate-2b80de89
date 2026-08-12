@@ -46,7 +46,7 @@ function OrdersPage() {
         </div>
       ) : (
         <div className="hive-card overflow-hidden">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[900px]">
             <thead className="bg-white/5 text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-4 py-3">Código</th>
