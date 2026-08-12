@@ -115,6 +115,10 @@ export async function createPublicOrder(input: PublicOrderInput) {
       client_name: input.client_name,
       client_phone: input.client_phone,
       client_address: input.client_address,
+      client_city: input.client_city,
+      client_region: input.client_region,
+      client_email: input.client_email,
+
       quantity: input.quantity,
       notes: noteParts.join(" | ") || null,
       total,
