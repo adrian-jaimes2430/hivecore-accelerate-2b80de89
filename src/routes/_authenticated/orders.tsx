@@ -45,7 +45,7 @@ function OrdersPage() {
           Aún no has generado pedidos. Abre cualquier producto del catálogo y crea tu primera orden.
         </div>
       ) : (
-        <div className="hive-card overflow-hidden">
+        <div className="hive-card overflow-x-auto">
           <table className="w-full text-sm min-w-[900px]">
             <thead className="bg-white/5 text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
