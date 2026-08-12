@@ -151,6 +151,10 @@ async function buildOrderPayload(
         client_name: (order as any).client_name,
         client_phone: (order as any).client_phone,
         client_address: (order as any).client_address,
+        client_city: (order as any).client_city ?? null,
+        client_region: (order as any).client_region ?? null,
+        client_email: (order as any).client_email ?? null,
+
         quantity: orderQty,
         total: finalTotal,
         unit_price: unitPrice,

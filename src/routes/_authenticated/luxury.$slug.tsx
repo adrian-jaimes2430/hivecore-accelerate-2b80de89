@@ -177,7 +177,7 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [code, setCode] = useState<string | null>(null);
-  const [form, setForm] = useState({ client_name: "", client_phone: "", client_address: "", quantity: 1, notes: "" });
+  const [form, setForm] = useState({ client_name: "", client_phone: "", client_email: "", client_address: "", client_city: "", client_region: "", quantity: 1, notes: "" });
   const variantSummary = summarizeVariations(selectedVariations);
 
   const submit = async (e: React.FormEvent) => {
@@ -194,6 +194,10 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
       client_name: form.client_name,
       client_phone: form.client_phone,
       client_address: form.client_address,
+      client_city: form.client_city,
+      client_region: form.client_region,
+      client_email: form.client_email,
+
       quantity: form.quantity,
       notes: fullNotes,
       total,
@@ -247,7 +251,7 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
               </p>
             )}
             <div>
-              <Label>Nombre cliente</Label>
+              <Label>Nombres y apellidos completos del cliente</Label>
               <Input required value={form.client_name} onChange={(e) => setForm({ ...form, client_name: e.target.value })} className="bg-white/5" />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -261,9 +265,24 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
               </div>
             </div>
             <div>
-              <Label>Dirección</Label>
-              <Input value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className="bg-white/5" />
+              <Label>Correo electrónico</Label>
+              <Input type="email" required maxLength={180} value={form.client_email} onChange={(e) => setForm({ ...form, client_email: e.target.value })} className="bg-white/5" />
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Ciudad</Label>
+                <Input required minLength={2} value={form.client_city} onChange={(e) => setForm({ ...form, client_city: e.target.value })} className="bg-white/5" />
+              </div>
+              <div>
+                <Label>Departamento / Región</Label>
+                <Input required minLength={2} value={form.client_region} onChange={(e) => setForm({ ...form, client_region: e.target.value })} className="bg-white/5" />
+              </div>
+            </div>
+            <div>
+              <Label>Dirección de entrega (barrio, calle, número)</Label>
+              <Input required minLength={4} value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className="bg-white/5" />
+            </div>
+
             <div>
               <Label>Observaciones</Label>
               <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="bg-white/5" />

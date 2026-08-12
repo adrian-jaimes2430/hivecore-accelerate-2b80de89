@@ -22,7 +22,7 @@ export async function loadOrderAlert(orderId: string): Promise<OrderAlert | null
   const { data: order } = await supabaseAdmin
     .from("orders")
     .select(
-      "order_code, quantity, total, client_name, client_phone, client_address, source, impulsador_id, product_id, luxury_product_id, payment_method, payment_status, created_at",
+      "order_code, quantity, total, client_name, client_phone, client_address, client_city, client_region, source, impulsador_id, product_id, luxury_product_id, payment_method, payment_status, created_at",
     )
     .eq("id", orderId)
     .maybeSingle();
@@ -72,7 +72,11 @@ export async function loadOrderAlert(orderId: string): Promise<OrderAlert | null
     seller,
     clientName: order.client_name,
     clientPhone: order.client_phone,
-    clientAddress: order.client_address ?? null,
+    clientAddress:
+      [order.client_address, (order as any).client_city, (order as any).client_region]
+        .filter((v) => typeof v === "string" && v.trim())
+        .join(" · ") || null,
+
     paymentMethod: order.payment_method === "online" ? "Pago en línea" : "Contra entrega",
     paymentStatus: order.payment_status ?? "pending",
     createdAt: order.created_at,

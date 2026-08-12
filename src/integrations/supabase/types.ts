@@ -415,8 +415,11 @@ export type Database = {
       orders: {
         Row: {
           client_address: string | null
+          client_city: string | null
+          client_email: string | null
           client_name: string
           client_phone: string
+          client_region: string | null
           created_at: string
           external_error: string | null
           external_ref: string | null
@@ -441,8 +444,11 @@ export type Database = {
         }
         Insert: {
           client_address?: string | null
+          client_city?: string | null
+          client_email?: string | null
           client_name: string
           client_phone: string
+          client_region?: string | null
           created_at?: string
           external_error?: string | null
           external_ref?: string | null
@@ -467,8 +473,11 @@ export type Database = {
         }
         Update: {
           client_address?: string | null
+          client_city?: string | null
+          client_email?: string | null
           client_name?: string
           client_phone?: string
+          client_region?: string | null
           created_at?: string
           external_error?: string | null
           external_ref?: string | null

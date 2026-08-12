@@ -898,8 +898,10 @@ function Flag({ label, v, on }: { label: string; v: boolean; on: (v: boolean) =>
 interface OrderRow {
   id: string; order_code: string; client_name: string; client_phone: string;
   client_address: string | null; notes: string | null; quantity: number;
+  client_city?: string | null; client_region?: string | null; client_email?: string | null;
   total: number | null; status: string; created_at: string;
   product_id: string | null;
+
   luxury_product_id: string | null;
   impulsador_id: string | null;
   impulsador_name?: string | null;
@@ -977,8 +979,10 @@ function OrdersTab() {
             <th className="px-4 py-3">Impulsador</th>
             <th className="px-4 py-3">Pago</th>
             <th className="px-4 py-3">Cliente</th>
-            <th className="px-4 py-3">Teléfono</th>
+            <th className="px-4 py-3">Contacto</th>
+            <th className="px-4 py-3">Envío (dirección / ciudad / región)</th>
             <th className="px-4 py-3">Cant.</th>
+
             <th className="px-4 py-3">Total</th>
             <th className="px-4 py-3">Estado</th>
             <th className="px-4 py-3">Fecha</th>
@@ -1026,7 +1030,17 @@ function OrdersTab() {
               </td>
 
               <td className="px-4 py-3">{o.client_name}</td>
-              <td className="px-4 py-3 text-muted-foreground">{o.client_phone}</td>
+              <td className="px-4 py-3 text-xs text-muted-foreground">
+                <div>{o.client_phone}</div>
+                {o.client_email && <div className="text-[10px]">{o.client_email}</div>}
+              </td>
+              <td className="px-4 py-3 text-xs">
+                <div>{o.client_address || "—"}</div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  {[o.client_city, o.client_region].filter(Boolean).join(" · ") || "Sin ciudad/región"}
+                </div>
+              </td>
+
               <td className="px-4 py-3">{o.quantity}</td>
               <td className="px-4 py-3">{formatCOP(Number(o.total ?? 0))}</td>
               <td className="px-4 py-3">
@@ -1055,7 +1069,7 @@ function OrdersTab() {
             </tr>
           ))}
           {orders.length === 0 && (
-            <tr><td colSpan={11} className="px-4 py-10 text-center text-muted-foreground">Aún no hay pedidos.</td></tr>
+            <tr><td colSpan={12} className="px-4 py-10 text-center text-muted-foreground">Aún no hay pedidos.</td></tr>
           )}
         </tbody>
       </table>
@@ -1067,7 +1081,7 @@ function OrdersTab() {
 function EditOrderDialog({ order, onClose }: { order: OrderRow | null; onClose: () => void }) {
   const qc = useQueryClient();
   const forwardEvent = useServerFn(forwardOrderEvent);
-  const [form, setForm] = useState({ client_name: "", client_phone: "", client_address: "", quantity: 1, notes: "" });
+  const [form, setForm] = useState({ client_name: "", client_phone: "", client_email: "", client_address: "", client_city: "", client_region: "", quantity: 1, notes: "" });
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -1075,10 +1089,14 @@ function EditOrderDialog({ order, onClose }: { order: OrderRow | null; onClose: 
       setForm({
         client_name: order.client_name,
         client_phone: order.client_phone,
+        client_email: order.client_email ?? "",
         client_address: order.client_address ?? "",
+        client_city: order.client_city ?? "",
+        client_region: order.client_region ?? "",
         quantity: order.quantity,
         notes: order.notes ?? "",
       });
+
     }
   }, [order]);
 
@@ -1090,6 +1108,10 @@ function EditOrderDialog({ order, onClose }: { order: OrderRow | null; onClose: 
       client_name: form.client_name,
       client_phone: form.client_phone,
       client_address: form.client_address || null,
+      client_city: form.client_city || null,
+      client_region: form.client_region || null,
+      client_email: form.client_email || null,
+
       quantity: form.quantity,
       notes: form.notes || null,
     }).eq("id", order.id);
@@ -1115,8 +1137,14 @@ function EditOrderDialog({ order, onClose }: { order: OrderRow | null; onClose: 
             <div><Label>Teléfono</Label><Input required value={form.client_phone} onChange={(e) => setForm({ ...form, client_phone: e.target.value })} className="bg-white/5" /></div>
             <div><Label>Cantidad</Label><Input type="number" min={1} value={form.quantity} onChange={(e) => setForm({ ...form, quantity: Number(e.target.value) })} className="bg-white/5" /></div>
           </div>
-          <div><Label>Dirección</Label><Input value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className="bg-white/5" /></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>Correo electrónico</Label><Input type="email" value={form.client_email} onChange={(e) => setForm({ ...form, client_email: e.target.value })} className="bg-white/5" /></div>
+            <div><Label>Ciudad</Label><Input value={form.client_city} onChange={(e) => setForm({ ...form, client_city: e.target.value })} className="bg-white/5" /></div>
+          </div>
+          <div><Label>Departamento / Región</Label><Input value={form.client_region} onChange={(e) => setForm({ ...form, client_region: e.target.value })} className="bg-white/5" /></div>
+          <div><Label>Dirección de entrega</Label><Input value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className="bg-white/5" /></div>
           <div><Label>Observaciones</Label><Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="bg-white/5" /></div>
+
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
             <Button type="submit" disabled={busy} className="hive-btn-primary border-0">

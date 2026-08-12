@@ -12,9 +12,12 @@ export const Route = createFileRoute("/_authenticated/orders")({
 
 interface Order {
   id: string; order_code: string; client_name: string; client_phone: string;
+  client_email: string | null; client_address: string | null;
+  client_city: string | null; client_region: string | null;
   quantity: number; total: number | null; status: string; created_at: string;
   product_id: string | null;
 }
+
 
 function OrdersPage() {
   const { user } = useAuth();
@@ -42,25 +45,37 @@ function OrdersPage() {
           Aún no has generado pedidos. Abre cualquier producto del catálogo y crea tu primera orden.
         </div>
       ) : (
-        <div className="hive-card overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="hive-card overflow-x-auto">
+          <table className="w-full text-sm min-w-[900px]">
             <thead className="bg-white/5 text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-4 py-3">Código</th>
                 <th className="px-4 py-3">Cliente</th>
-                <th className="px-4 py-3">Teléfono</th>
+                <th className="px-4 py-3">Contacto</th>
+                <th className="px-4 py-3">Envío (dirección / ciudad / región)</th>
                 <th className="px-4 py-3">Cant.</th>
                 <th className="px-4 py-3">Total</th>
                 <th className="px-4 py-3">Estado</th>
                 <th className="px-4 py-3">Fecha</th>
               </tr>
             </thead>
+
             <tbody>
               {orders.map((o) => (
                 <tr key={o.id} className="border-t border-border/40">
                   <td className="px-4 py-3 font-mono text-xs font-bold text-hive">{o.order_code}</td>
                   <td className="px-4 py-3">{o.client_name}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{o.client_phone}</td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground">
+                    <div>{o.client_phone}</div>
+                    {o.client_email && <div className="text-[10px]">{o.client_email}</div>}
+                  </td>
+                  <td className="px-4 py-3 text-xs">
+                    <div>{o.client_address || "—"}</div>
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                      {[o.client_city, o.client_region].filter(Boolean).join(" · ") || "Sin ciudad/región"}
+                    </div>
+                  </td>
+
                   <td className="px-4 py-3">{o.quantity}</td>
                   <td className="px-4 py-3">{formatCOP(Number(o.total ?? 0))}</td>
                   <td className="px-4 py-3">
