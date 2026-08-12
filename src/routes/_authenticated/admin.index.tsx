@@ -1137,8 +1137,14 @@ function EditOrderDialog({ order, onClose }: { order: OrderRow | null; onClose: 
             <div><Label>Teléfono</Label><Input required value={form.client_phone} onChange={(e) => setForm({ ...form, client_phone: e.target.value })} className="bg-white/5" /></div>
             <div><Label>Cantidad</Label><Input type="number" min={1} value={form.quantity} onChange={(e) => setForm({ ...form, quantity: Number(e.target.value) })} className="bg-white/5" /></div>
           </div>
-          <div><Label>Dirección</Label><Input value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className="bg-white/5" /></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>Correo electrónico</Label><Input type="email" value={form.client_email} onChange={(e) => setForm({ ...form, client_email: e.target.value })} className="bg-white/5" /></div>
+            <div><Label>Ciudad</Label><Input value={form.client_city} onChange={(e) => setForm({ ...form, client_city: e.target.value })} className="bg-white/5" /></div>
+          </div>
+          <div><Label>Departamento / Región</Label><Input value={form.client_region} onChange={(e) => setForm({ ...form, client_region: e.target.value })} className="bg-white/5" /></div>
+          <div><Label>Dirección de entrega</Label><Input value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className="bg-white/5" /></div>
           <div><Label>Observaciones</Label><Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="bg-white/5" /></div>
+
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
             <Button type="submit" disabled={busy} className="hive-btn-primary border-0">
