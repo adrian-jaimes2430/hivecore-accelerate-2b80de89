@@ -321,7 +321,7 @@ function OrderDialog({ product, impulsadorName }: { product: Product; impulsador
         ) : (
           <form onSubmit={submit} className="space-y-3">
             <div>
-              <Label>Nombre cliente</Label>
+              <Label>Nombres y apellidos completos del cliente</Label>
               <Input required value={form.client_name} onChange={(e) => setForm({ ...form, client_name: e.target.value })} className="bg-white/5" />
             </div>
             <div className="grid grid-cols-2 gap-3">
