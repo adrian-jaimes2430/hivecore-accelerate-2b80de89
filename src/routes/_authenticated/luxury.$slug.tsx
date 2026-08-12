@@ -194,6 +194,10 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
       client_name: form.client_name,
       client_phone: form.client_phone,
       client_address: form.client_address,
+      client_city: form.client_city,
+      client_region: form.client_region,
+      client_email: form.client_email,
+
       quantity: form.quantity,
       notes: fullNotes,
       total,
