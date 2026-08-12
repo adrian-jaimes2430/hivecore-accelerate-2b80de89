@@ -213,7 +213,7 @@ export function PublicCheckoutDialog({
             </div>
 
             <div>
-              <Label>Nombre completo</Label>
+              <Label>Nombres y apellidos completos</Label>
               <Input
                 required
                 minLength={2}
