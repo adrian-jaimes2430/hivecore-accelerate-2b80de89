@@ -265,9 +265,24 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
               </div>
             </div>
             <div>
-              <Label>Dirección</Label>
-              <Input value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className="bg-white/5" />
+              <Label>Correo electrónico</Label>
+              <Input type="email" required maxLength={180} value={form.client_email} onChange={(e) => setForm({ ...form, client_email: e.target.value })} className="bg-white/5" />
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Ciudad</Label>
+                <Input required minLength={2} value={form.client_city} onChange={(e) => setForm({ ...form, client_city: e.target.value })} className="bg-white/5" />
+              </div>
+              <div>
+                <Label>Departamento / Región</Label>
+                <Input required minLength={2} value={form.client_region} onChange={(e) => setForm({ ...form, client_region: e.target.value })} className="bg-white/5" />
+              </div>
+            </div>
+            <div>
+              <Label>Dirección de entrega (barrio, calle, número)</Label>
+              <Input required minLength={4} value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className="bg-white/5" />
+            </div>
+
             <div>
               <Label>Observaciones</Label>
               <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="bg-white/5" />
