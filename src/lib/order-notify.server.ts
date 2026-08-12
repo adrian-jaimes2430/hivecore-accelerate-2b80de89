@@ -22,7 +22,7 @@ export async function loadOrderAlert(orderId: string): Promise<OrderAlert | null
   const { data: order } = await supabaseAdmin
     .from("orders")
     .select(
-      "order_code, quantity, total, client_name, client_phone, client_address, source, impulsador_id, product_id, luxury_product_id, payment_method, payment_status, created_at",
+      "order_code, quantity, total, client_name, client_phone, client_address, client_city, client_region, source, impulsador_id, product_id, luxury_product_id, payment_method, payment_status, created_at",
     )
     .eq("id", orderId)
     .maybeSingle();
