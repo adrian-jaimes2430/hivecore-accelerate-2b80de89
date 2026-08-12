@@ -979,8 +979,10 @@ function OrdersTab() {
             <th className="px-4 py-3">Impulsador</th>
             <th className="px-4 py-3">Pago</th>
             <th className="px-4 py-3">Cliente</th>
-            <th className="px-4 py-3">Teléfono</th>
+            <th className="px-4 py-3">Contacto</th>
+            <th className="px-4 py-3">Envío (dirección / ciudad / región)</th>
             <th className="px-4 py-3">Cant.</th>
+
             <th className="px-4 py-3">Total</th>
             <th className="px-4 py-3">Estado</th>
             <th className="px-4 py-3">Fecha</th>
