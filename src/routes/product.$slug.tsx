@@ -247,7 +247,7 @@ function OrderDialog({ product, impulsadorName }: { product: Product; impulsador
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [code, setCode] = useState<string | null>(null);
-  const [form, setForm] = useState({ client_name: "", client_phone: "", client_address: "", quantity: 1, notes: "" });
+  const [form, setForm] = useState({ client_name: "", client_phone: "", client_email: "", client_address: "", client_city: "", client_region: "", quantity: 1, notes: "" });
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
