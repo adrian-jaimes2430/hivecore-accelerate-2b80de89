@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { validateCheckoutFields, checkoutErrorSummary, type CheckoutFieldErrors } from "@/lib/checkout-validation";
+import { FieldError, errorRing } from "@/components/checkout/FieldError";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -248,10 +250,17 @@ function OrderDialog({ product, impulsadorName }: { product: Product; impulsador
   const [busy, setBusy] = useState(false);
   const [code, setCode] = useState<string | null>(null);
   const [form, setForm] = useState({ client_name: "", client_phone: "", client_email: "", client_address: "", client_city: "", client_region: "", quantity: 1, notes: "" });
+  const [errors, setErrors] = useState<CheckoutFieldErrors>({});
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+    const found = validateCheckoutFields(form);
+    setErrors(found);
+    if (Object.keys(found).length > 0) {
+      toast.error(checkoutErrorSummary(found));
+      return;
+    }
     setBusy(true);
     const total = bundleTotal(
       {
@@ -319,15 +328,17 @@ function OrderDialog({ product, impulsadorName }: { product: Product; impulsador
             <Button onClick={() => setOpen(false)} className="hive-btn-primary border-0">Cerrar</Button>
           </div>
         ) : (
-          <form onSubmit={submit} className="space-y-3">
+          <form onSubmit={submit} noValidate className="space-y-3">
             <div>
               <Label>Nombres y apellidos completos del cliente</Label>
-              <Input required value={form.client_name} onChange={(e) => setForm({ ...form, client_name: e.target.value })} className="bg-white/5" />
+              <Input required value={form.client_name} onChange={(e) => setForm({ ...form, client_name: e.target.value })} className={`bg-white/5${errorRing(errors.client_name)}`} />
+              <FieldError message={errors.client_name} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Teléfono</Label>
-                <Input required value={form.client_phone} onChange={(e) => setForm({ ...form, client_phone: e.target.value })} className="bg-white/5" />
+                <Input required value={form.client_phone} onChange={(e) => setForm({ ...form, client_phone: e.target.value })} className={`bg-white/5${errorRing(errors.client_phone)}`} />
+              <FieldError message={errors.client_phone} />
               </div>
               <div>
                 <Label>Cantidad</Label>
@@ -350,21 +361,25 @@ function OrderDialog({ product, impulsadorName }: { product: Product; impulsador
             </div>
             <div>
               <Label>Correo electrónico</Label>
-              <Input type="email" required maxLength={180} value={form.client_email} onChange={(e) => setForm({ ...form, client_email: e.target.value })} className="bg-white/5" />
+              <Input type="email" required maxLength={180} value={form.client_email} onChange={(e) => setForm({ ...form, client_email: e.target.value })} className={`bg-white/5${errorRing(errors.client_email)}`} />
+              <FieldError message={errors.client_email} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Ciudad</Label>
-                <Input required minLength={2} value={form.client_city} onChange={(e) => setForm({ ...form, client_city: e.target.value })} className="bg-white/5" />
+                <Input required minLength={2} value={form.client_city} onChange={(e) => setForm({ ...form, client_city: e.target.value })} className={`bg-white/5${errorRing(errors.client_city)}`} />
+              <FieldError message={errors.client_city} />
               </div>
               <div>
                 <Label>Departamento / Región</Label>
-                <Input required minLength={2} value={form.client_region} onChange={(e) => setForm({ ...form, client_region: e.target.value })} className="bg-white/5" />
+                <Input required minLength={2} value={form.client_region} onChange={(e) => setForm({ ...form, client_region: e.target.value })} className={`bg-white/5${errorRing(errors.client_region)}`} />
+              <FieldError message={errors.client_region} />
               </div>
             </div>
             <div>
               <Label>Dirección de entrega (barrio, calle, número)</Label>
-              <Input required minLength={4} value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className="bg-white/5" />
+              <Input required minLength={4} value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className={`bg-white/5${errorRing(errors.client_address)}`} />
+              <FieldError message={errors.client_address} />
             </div>
 
             <div>

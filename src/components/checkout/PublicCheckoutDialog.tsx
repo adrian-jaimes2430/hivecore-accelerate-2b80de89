@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import { submitPublicOrder } from "@/lib/checkout.functions";
 import { bundleTotal, formatCOP, type BundlePricing } from "@/lib/pricing";
 import { metaTrackPaid, newEventId } from "@/components/marketing/MetaPixel";
+import { validateCheckoutFields, checkoutErrorSummary, type CheckoutFieldErrors } from "@/lib/checkout-validation";
+import { FieldError, errorRing } from "@/components/checkout/FieldError";
 
 export function PublicCheckoutDialog({
   productKind,
@@ -55,6 +57,7 @@ export function PublicCheckoutDialog({
     quantity: 1,
     notes: "",
   });
+  const [errors, setErrors] = useState<CheckoutFieldErrors>({});
 
 
   const priceModel: BundlePricing = pricing ?? { price: unitPrice };
@@ -65,6 +68,12 @@ export function PublicCheckoutDialog({
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const found = validateCheckoutFields(form);
+    setErrors(found);
+    if (Object.keys(found).length > 0) {
+      toast.error(checkoutErrorSummary(found));
+      return;
+    }
     setBusy(true);
     try {
       const res: any = await submit({
@@ -180,7 +189,7 @@ export function PublicCheckoutDialog({
             </Button>
           </div>
         ) : (
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={onSubmit} noValidate className="space-y-4">
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
@@ -220,8 +229,9 @@ export function PublicCheckoutDialog({
                 maxLength={120}
                 value={form.client_name}
                 onChange={(e) => setForm({ ...form, client_name: e.target.value })}
-                className="bg-white/5"
+                className={`bg-white/5${errorRing(errors.client_name)}`}
               />
+              <FieldError message={errors.client_name} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -232,8 +242,9 @@ export function PublicCheckoutDialog({
                   maxLength={30}
                   value={form.client_phone}
                   onChange={(e) => setForm({ ...form, client_phone: e.target.value })}
-                  className="bg-white/5"
+                  className={`bg-white/5${errorRing(errors.client_phone)}`}
                 />
+                <FieldError message={errors.client_phone} />
               </div>
               <div>
                 <Label>Cantidad</Label>
@@ -284,8 +295,9 @@ export function PublicCheckoutDialog({
                 maxLength={180}
                 value={form.client_email}
                 onChange={(e) => setForm({ ...form, client_email: e.target.value })}
-                className="bg-white/5"
+                className={`bg-white/5${errorRing(errors.client_email)}`}
               />
+              <FieldError message={errors.client_email} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -296,8 +308,9 @@ export function PublicCheckoutDialog({
                   maxLength={80}
                   value={form.client_city}
                   onChange={(e) => setForm({ ...form, client_city: e.target.value })}
-                  className="bg-white/5"
+                  className={`bg-white/5${errorRing(errors.client_city)}`}
                 />
+                <FieldError message={errors.client_city} />
               </div>
               <div>
                 <Label>Departamento / Región</Label>
@@ -307,8 +320,9 @@ export function PublicCheckoutDialog({
                   maxLength={80}
                   value={form.client_region}
                   onChange={(e) => setForm({ ...form, client_region: e.target.value })}
-                  className="bg-white/5"
+                  className={`bg-white/5${errorRing(errors.client_region)}`}
                 />
+                <FieldError message={errors.client_region} />
               </div>
             </div>
 
@@ -320,8 +334,9 @@ export function PublicCheckoutDialog({
                 maxLength={300}
                 value={form.client_address}
                 onChange={(e) => setForm({ ...form, client_address: e.target.value })}
-                className="bg-white/5"
+                className={`bg-white/5${errorRing(errors.client_address)}`}
               />
+              <FieldError message={errors.client_address} />
             </div>
 
             <div>
