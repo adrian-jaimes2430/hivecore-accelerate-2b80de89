@@ -276,10 +276,10 @@ export function PublicCheckoutDialog({
               </div>
             )}
             <div>
-              <Label>Correo electrónico {method === "online" ? "" : "(opcional)"}</Label>
+              <Label>Correo electrónico</Label>
               <Input
                 type="email"
-                required={method === "online"}
+                required
                 maxLength={180}
                 value={form.client_email}
                 onChange={(e) => setForm({ ...form, client_email: e.target.value })}
@@ -301,14 +301,16 @@ export function PublicCheckoutDialog({
               <div>
                 <Label>Departamento / Región</Label>
                 <Input
+                  required
+                  minLength={2}
                   maxLength={80}
-                  placeholder="Opcional"
                   value={form.client_region}
                   onChange={(e) => setForm({ ...form, client_region: e.target.value })}
                   className="bg-white/5"
                 />
               </div>
             </div>
+
             <div>
               <Label>Dirección de entrega (barrio, calle, número)</Label>
               <Input
