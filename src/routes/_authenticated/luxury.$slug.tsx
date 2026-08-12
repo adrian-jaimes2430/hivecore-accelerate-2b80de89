@@ -14,6 +14,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { validateCheckoutFields, checkoutErrorSummary, type CheckoutFieldErrors } from "@/lib/checkout-validation";
+import { FieldError, errorRing } from "@/components/checkout/FieldError";
 import { sendOrderNotification } from "@/lib/order-email.functions";
 import { forwardOrderToIntegrations } from "@/lib/integrations.functions";
 import type { Variation } from "@/components/admin/VariationsEditor";
@@ -179,10 +181,17 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
   const [code, setCode] = useState<string | null>(null);
   const [form, setForm] = useState({ client_name: "", client_phone: "", client_email: "", client_address: "", client_city: "", client_region: "", quantity: 1, notes: "" });
   const variantSummary = summarizeVariations(selectedVariations);
+  const [errors, setErrors] = useState<CheckoutFieldErrors>({});
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+    const found = validateCheckoutFields(form);
+    setErrors(found);
+    if (Object.keys(found).length > 0) {
+      toast.error(checkoutErrorSummary(found));
+      return;
+    }
     setBusy(true);
     const unitPrice = Number(product.suggested_retail_price) > 0 ? Number(product.suggested_retail_price) : Number(product.price);
     const total = unitPrice * form.quantity;
@@ -244,7 +253,7 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
             <Button onClick={() => setOpen(false)} className="border-0 bg-[color:var(--luxury-gold)] text-black hover:opacity-90">Cerrar</Button>
           </div>
         ) : (
-          <form onSubmit={submit} className="space-y-3">
+          <form onSubmit={submit} noValidate className="space-y-3">
             {variantSummary && (
               <p className="rounded-md border border-[color:var(--luxury-gold)]/30 bg-[color:var(--luxury-gold)]/5 px-3 py-2 text-xs text-[color:var(--luxury-gold)]">
                 Variación: {variantSummary}
@@ -252,12 +261,14 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
             )}
             <div>
               <Label>Nombres y apellidos completos del cliente</Label>
-              <Input required value={form.client_name} onChange={(e) => setForm({ ...form, client_name: e.target.value })} className="bg-white/5" />
+              <Input required value={form.client_name} onChange={(e) => setForm({ ...form, client_name: e.target.value })} className={`bg-white/5${errorRing(errors.client_name)}`} />
+              <FieldError message={errors.client_name} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Teléfono</Label>
-                <Input required value={form.client_phone} onChange={(e) => setForm({ ...form, client_phone: e.target.value })} className="bg-white/5" />
+                <Input required value={form.client_phone} onChange={(e) => setForm({ ...form, client_phone: e.target.value })} className={`bg-white/5${errorRing(errors.client_phone)}`} />
+              <FieldError message={errors.client_phone} />
               </div>
               <div>
                 <Label>Cantidad</Label>
@@ -266,21 +277,25 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
             </div>
             <div>
               <Label>Correo electrónico</Label>
-              <Input type="email" required maxLength={180} value={form.client_email} onChange={(e) => setForm({ ...form, client_email: e.target.value })} className="bg-white/5" />
+              <Input type="email" required maxLength={180} value={form.client_email} onChange={(e) => setForm({ ...form, client_email: e.target.value })} className={`bg-white/5${errorRing(errors.client_email)}`} />
+              <FieldError message={errors.client_email} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Ciudad</Label>
-                <Input required minLength={2} value={form.client_city} onChange={(e) => setForm({ ...form, client_city: e.target.value })} className="bg-white/5" />
+                <Input required minLength={2} value={form.client_city} onChange={(e) => setForm({ ...form, client_city: e.target.value })} className={`bg-white/5${errorRing(errors.client_city)}`} />
+              <FieldError message={errors.client_city} />
               </div>
               <div>
                 <Label>Departamento / Región</Label>
-                <Input required minLength={2} value={form.client_region} onChange={(e) => setForm({ ...form, client_region: e.target.value })} className="bg-white/5" />
+                <Input required minLength={2} value={form.client_region} onChange={(e) => setForm({ ...form, client_region: e.target.value })} className={`bg-white/5${errorRing(errors.client_region)}`} />
+              <FieldError message={errors.client_region} />
               </div>
             </div>
             <div>
               <Label>Dirección de entrega (barrio, calle, número)</Label>
-              <Input required minLength={4} value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className="bg-white/5" />
+              <Input required minLength={4} value={form.client_address} onChange={(e) => setForm({ ...form, client_address: e.target.value })} className={`bg-white/5${errorRing(errors.client_address)}`} />
+              <FieldError message={errors.client_address} />
             </div>
 
             <div>
