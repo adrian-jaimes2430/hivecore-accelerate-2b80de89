@@ -1081,7 +1081,7 @@ function OrdersTab() {
 function EditOrderDialog({ order, onClose }: { order: OrderRow | null; onClose: () => void }) {
   const qc = useQueryClient();
   const forwardEvent = useServerFn(forwardOrderEvent);
-  const [form, setForm] = useState({ client_name: "", client_phone: "", client_address: "", quantity: 1, notes: "" });
+  const [form, setForm] = useState({ client_name: "", client_phone: "", client_email: "", client_address: "", client_city: "", client_region: "", quantity: 1, notes: "" });
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
