@@ -72,7 +72,11 @@ export async function loadOrderAlert(orderId: string): Promise<OrderAlert | null
     seller,
     clientName: order.client_name,
     clientPhone: order.client_phone,
-    clientAddress: order.client_address ?? null,
+    clientAddress:
+      [order.client_address, (order as any).client_city, (order as any).client_region]
+        .filter((v) => typeof v === "string" && v.trim())
+        .join(" · ") || null,
+
     paymentMethod: order.payment_method === "online" ? "Pago en línea" : "Contra entrega",
     paymentStatus: order.payment_status ?? "pending",
     createdAt: order.created_at,
