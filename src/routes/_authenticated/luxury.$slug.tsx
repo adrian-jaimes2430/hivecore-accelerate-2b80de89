@@ -177,7 +177,7 @@ function LuxuryOrderDialog({ product, selectedVariations }: { product: LuxProduc
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [code, setCode] = useState<string | null>(null);
-  const [form, setForm] = useState({ client_name: "", client_phone: "", client_address: "", quantity: 1, notes: "" });
+  const [form, setForm] = useState({ client_name: "", client_phone: "", client_email: "", client_address: "", client_city: "", client_region: "", quantity: 1, notes: "" });
   const variantSummary = summarizeVariations(selectedVariations);
 
   const submit = async (e: React.FormEvent) => {
