@@ -74,10 +74,11 @@ export function PublicCheckoutDialog({
           quantity: form.quantity,
           client_name: form.client_name,
           client_phone: form.client_phone,
-          client_email: form.client_email || null,
+          client_email: form.client_email,
           client_address: form.client_address,
-          client_city: form.client_city || null,
-          client_region: form.client_region || null,
+          client_city: form.client_city,
+          client_region: form.client_region,
+
 
           notes: form.notes || null,
           variations: variations || null,
