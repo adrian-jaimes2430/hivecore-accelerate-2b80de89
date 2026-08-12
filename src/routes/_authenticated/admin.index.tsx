@@ -1089,10 +1089,14 @@ function EditOrderDialog({ order, onClose }: { order: OrderRow | null; onClose: 
       setForm({
         client_name: order.client_name,
         client_phone: order.client_phone,
+        client_email: order.client_email ?? "",
         client_address: order.client_address ?? "",
+        client_city: order.client_city ?? "",
+        client_region: order.client_region ?? "",
         quantity: order.quantity,
         notes: order.notes ?? "",
       });
+
     }
   }, [order]);
 
