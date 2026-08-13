@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProductosRouteImport } from './routes/productos'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as GraciasRouteImport } from './routes/gracias'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
@@ -20,6 +21,8 @@ import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedLuxuryIndexRouteImport } from './routes/_authenticated/luxury.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as ApiPublicCatalogFeedRouteImport } from './routes/api/public/catalog-feed'
+import { Route as ApiPublicCatalogRouteImport } from './routes/api/public/catalog'
 import { Route as AuthenticatedLuxurySlugRouteImport } from './routes/_authenticated/luxury.$slug'
 import { Route as AuthenticatedCategorySlugRouteImport } from './routes/_authenticated/category.$slug'
 import { Route as AuthenticatedAdminLuxuryRouteImport } from './routes/_authenticated/admin.luxury'
@@ -29,6 +32,11 @@ import { Route as ApiPublicWebhooksWompiRouteImport } from './routes/api/public/
 import { Route as ApiPublicNotificationsOrderRouteImport } from './routes/api/public/notifications/order'
 import { Route as ApiPublicIntegrationsAocoreOrderRouteImport } from './routes/api/public/integrations/aocore/order'
 
+const ProductosRoute = ProductosRouteImport.update({
+  id: '/productos',
+  path: '/productos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -84,6 +92,16 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ApiPublicCatalogFeedRoute = ApiPublicCatalogFeedRouteImport.update({
+  id: '/api/public/catalog-feed',
+  path: '/api/public/catalog-feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicCatalogRoute = ApiPublicCatalogRouteImport.update({
+  id: '/api/public/catalog',
+  path: '/api/public/catalog',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedLuxurySlugRoute = AuthenticatedLuxurySlugRouteImport.update({
   id: '/luxury/$slug',
   path: '/luxury/$slug',
@@ -135,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
+  '/productos': typeof ProductosRoute
   '/app': typeof AuthenticatedAppRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
@@ -144,6 +163,8 @@ export interface FileRoutesByFullPath {
   '/admin/luxury': typeof AuthenticatedAdminLuxuryRoute
   '/category/$slug': typeof AuthenticatedCategorySlugRoute
   '/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
+  '/api/public/catalog': typeof ApiPublicCatalogRoute
+  '/api/public/catalog-feed': typeof ApiPublicCatalogFeedRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/luxury/': typeof AuthenticatedLuxuryIndexRoute
   '/api/public/notifications/order': typeof ApiPublicNotificationsOrderRoute
@@ -155,6 +176,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
+  '/productos': typeof ProductosRoute
   '/app': typeof AuthenticatedAppRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
@@ -164,6 +186,8 @@ export interface FileRoutesByTo {
   '/admin/luxury': typeof AuthenticatedAdminLuxuryRoute
   '/category/$slug': typeof AuthenticatedCategorySlugRoute
   '/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
+  '/api/public/catalog': typeof ApiPublicCatalogRoute
+  '/api/public/catalog-feed': typeof ApiPublicCatalogFeedRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/luxury': typeof AuthenticatedLuxuryIndexRoute
   '/api/public/notifications/order': typeof ApiPublicNotificationsOrderRoute
@@ -177,6 +201,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
+  '/productos': typeof ProductosRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
@@ -186,6 +211,8 @@ export interface FileRoutesById {
   '/_authenticated/admin/luxury': typeof AuthenticatedAdminLuxuryRoute
   '/_authenticated/category/$slug': typeof AuthenticatedCategorySlugRoute
   '/_authenticated/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
+  '/api/public/catalog': typeof ApiPublicCatalogRoute
+  '/api/public/catalog-feed': typeof ApiPublicCatalogFeedRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/luxury/': typeof AuthenticatedLuxuryIndexRoute
   '/api/public/notifications/order': typeof ApiPublicNotificationsOrderRoute
@@ -199,6 +226,7 @@ export interface FileRouteTypes {
     | '/'
     | '/gracias'
     | '/login'
+    | '/productos'
     | '/app'
     | '/orders'
     | '/catalogo/$slug'
@@ -208,6 +236,8 @@ export interface FileRouteTypes {
     | '/admin/luxury'
     | '/category/$slug'
     | '/luxury/$slug'
+    | '/api/public/catalog'
+    | '/api/public/catalog-feed'
     | '/admin/'
     | '/luxury/'
     | '/api/public/notifications/order'
@@ -219,6 +249,7 @@ export interface FileRouteTypes {
     | '/'
     | '/gracias'
     | '/login'
+    | '/productos'
     | '/app'
     | '/orders'
     | '/catalogo/$slug'
@@ -228,6 +259,8 @@ export interface FileRouteTypes {
     | '/admin/luxury'
     | '/category/$slug'
     | '/luxury/$slug'
+    | '/api/public/catalog'
+    | '/api/public/catalog-feed'
     | '/admin'
     | '/luxury'
     | '/api/public/notifications/order'
@@ -240,6 +273,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/gracias'
     | '/login'
+    | '/productos'
     | '/_authenticated/app'
     | '/_authenticated/orders'
     | '/catalogo/$slug'
@@ -249,6 +283,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/luxury'
     | '/_authenticated/category/$slug'
     | '/_authenticated/luxury/$slug'
+    | '/api/public/catalog'
+    | '/api/public/catalog-feed'
     | '/_authenticated/admin/'
     | '/_authenticated/luxury/'
     | '/api/public/notifications/order'
@@ -262,9 +298,12 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   GraciasRoute: typeof GraciasRoute
   LoginRoute: typeof LoginRoute
+  ProductosRoute: typeof ProductosRoute
   CatalogoSlugRoute: typeof CatalogoSlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
   CatalogoIndexRoute: typeof CatalogoIndexRoute
+  ApiPublicCatalogRoute: typeof ApiPublicCatalogRoute
+  ApiPublicCatalogFeedRoute: typeof ApiPublicCatalogFeedRoute
   ApiPublicNotificationsOrderRoute: typeof ApiPublicNotificationsOrderRoute
   ApiPublicWebhooksWompiRoute: typeof ApiPublicWebhooksWompiRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -273,6 +312,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/productos': {
+      id: '/productos'
+      path: '/productos'
+      fullPath: '/productos'
+      preLoaderRoute: typeof ProductosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -349,6 +395,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/api/public/catalog-feed': {
+      id: '/api/public/catalog-feed'
+      path: '/api/public/catalog-feed'
+      fullPath: '/api/public/catalog-feed'
+      preLoaderRoute: typeof ApiPublicCatalogFeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/catalog': {
+      id: '/api/public/catalog'
+      path: '/api/public/catalog'
+      fullPath: '/api/public/catalog'
+      preLoaderRoute: typeof ApiPublicCatalogRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/luxury/$slug': {
       id: '/_authenticated/luxury/$slug'
@@ -440,9 +500,12 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   GraciasRoute: GraciasRoute,
   LoginRoute: LoginRoute,
+  ProductosRoute: ProductosRoute,
   CatalogoSlugRoute: CatalogoSlugRoute,
   ProductSlugRoute: ProductSlugRoute,
   CatalogoIndexRoute: CatalogoIndexRoute,
+  ApiPublicCatalogRoute: ApiPublicCatalogRoute,
+  ApiPublicCatalogFeedRoute: ApiPublicCatalogFeedRoute,
   ApiPublicNotificationsOrderRoute: ApiPublicNotificationsOrderRoute,
   ApiPublicWebhooksWompiRoute: ApiPublicWebhooksWompiRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
@@ -451,3 +514,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
