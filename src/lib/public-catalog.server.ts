@@ -25,6 +25,18 @@ export interface FeedItem {
 const asArray = (v: unknown): string[] =>
   Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && x.length > 0) : [];
 
+const WEB_IMAGE = /\.(png|jpe?g|webp|gif|avif)(\?.*)?$/i;
+
+/** Crawler-safe, same-origin URL so ad platforms and AI tools never hit a blocked third-party host. */
+const proxied = (url: string) =>
+  url.startsWith("http") ? `${SITE_URL}/api/public/media?u=${encodeURIComponent(url)}` : url;
+
+/** Only formats every crawler/ad platform can decode (drops RAW like .DNG, videos, docs). */
+const asImages = (v: unknown): string[] =>
+  asArray(v)
+    .filter((u) => WEB_IMAGE.test(u.split("?")[0]))
+    .map(proxied);
+
 const clean = (v: unknown, fallback: string) => {
   const text = typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "";
   return text.length > 0 ? text.slice(0, 4800) : fallback;
