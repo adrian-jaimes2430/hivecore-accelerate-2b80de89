@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProductosRouteImport } from './routes/productos'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as GraciasRouteImport } from './routes/gracias'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
@@ -31,6 +32,11 @@ import { Route as ApiPublicWebhooksWompiRouteImport } from './routes/api/public/
 import { Route as ApiPublicNotificationsOrderRouteImport } from './routes/api/public/notifications/order'
 import { Route as ApiPublicIntegrationsAocoreOrderRouteImport } from './routes/api/public/integrations/aocore/order'
 
+const ProductosRoute = ProductosRouteImport.update({
+  id: '/productos',
+  path: '/productos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -147,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
+  '/productos': typeof ProductosRoute
   '/app': typeof AuthenticatedAppRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
@@ -169,6 +176,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
+  '/productos': typeof ProductosRoute
   '/app': typeof AuthenticatedAppRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/gracias': typeof GraciasRoute
   '/login': typeof LoginRoute
+  '/productos': typeof ProductosRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
     | '/'
     | '/gracias'
     | '/login'
+    | '/productos'
     | '/app'
     | '/orders'
     | '/catalogo/$slug'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/'
     | '/gracias'
     | '/login'
+    | '/productos'
     | '/app'
     | '/orders'
     | '/catalogo/$slug'
@@ -262,6 +273,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/gracias'
     | '/login'
+    | '/productos'
     | '/_authenticated/app'
     | '/_authenticated/orders'
     | '/catalogo/$slug'
@@ -286,6 +298,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   GraciasRoute: typeof GraciasRoute
   LoginRoute: typeof LoginRoute
+  ProductosRoute: typeof ProductosRoute
   CatalogoSlugRoute: typeof CatalogoSlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
   CatalogoIndexRoute: typeof CatalogoIndexRoute
@@ -299,6 +312,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/productos': {
+      id: '/productos'
+      path: '/productos'
+      fullPath: '/productos'
+      preLoaderRoute: typeof ProductosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -480,6 +500,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   GraciasRoute: GraciasRoute,
   LoginRoute: LoginRoute,
+  ProductosRoute: ProductosRoute,
   CatalogoSlugRoute: CatalogoSlugRoute,
   ProductSlugRoute: ProductSlugRoute,
   CatalogoIndexRoute: CatalogoIndexRoute,
