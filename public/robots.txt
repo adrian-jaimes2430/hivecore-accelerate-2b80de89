@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Catálogo legible por máquinas (JSON y feed XML tipo Google/Meta)
+# https://hivecore-shop.lovable.app/api/public/catalog
+# https://hivecore-shop.lovable.app/api/public/catalog-feed
+
+Sitemap: https://hivecore-shop.lovable.app/productos
