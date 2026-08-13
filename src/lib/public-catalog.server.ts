@@ -156,14 +156,18 @@ const esc = (s: string) =>
 
 export function buildProductXmlFeed(data: Awaited<ReturnType<typeof loadPublicCatalog>>) {
   const entries = data.items
+    .filter((i) => Boolean(i.image))
     .map((i) => {
-      const extra = i.images.slice(1, 11).map((u) => `      <g:additional_image_link>${esc(u)}</g:additional_image_link>`).join("\n");
+      const extra = i.images
+        .slice(1, 11)
+        .map((u) => `      <g:additional_image_link>${esc(u)}</g:additional_image_link>`)
+        .join("\n");
       return `    <item>
       <g:id>${esc(i.sku)}</g:id>
       <g:title>${esc(i.name)}</g:title>
       <g:description>${esc(i.description)}</g:description>
       <g:link>${esc(i.url)}</g:link>
-      ${i.image ? `<g:image_link>${esc(i.image)}</g:image_link>` : ""}
+      <g:image_link>${esc(i.image!)}</g:image_link>
 ${extra}
       <g:brand>${esc(i.brand)}</g:brand>
       <g:condition>new</g:condition>
