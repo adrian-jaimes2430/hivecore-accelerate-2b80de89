@@ -25,6 +25,18 @@ export interface FeedItem {
 const asArray = (v: unknown): string[] =>
   Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && x.length > 0) : [];
 
+const WEB_IMAGE = /\.(png|jpe?g|webp|gif|avif)(\?.*)?$/i;
+
+/** Crawler-safe, same-origin URL so ad platforms and AI tools never hit a blocked third-party host. */
+const proxied = (url: string) =>
+  url.startsWith("http") ? `${SITE_URL}/api/public/media?u=${encodeURIComponent(url)}` : url;
+
+/** Only formats every crawler/ad platform can decode (drops RAW like .DNG, videos, docs). */
+const asImages = (v: unknown): string[] =>
+  asArray(v)
+    .filter((u) => WEB_IMAGE.test(u.split("?")[0]))
+    .map(proxied);
+
 const clean = (v: unknown, fallback: string) => {
   const text = typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "";
   return text.length > 0 ? text.slice(0, 4800) : fallback;
@@ -72,7 +84,7 @@ export async function loadPublicCatalog(): Promise<{
   const items: FeedItem[] = [];
 
   for (const p of products ?? []) {
-    const images = asArray(p.images);
+    const images = asImages(p.images);
     const price = Number(p.price);
     const bundles: { units: number; price: number }[] = [];
     if (p.bundle_pricing_enabled) {
@@ -102,7 +114,7 @@ export async function loadPublicCatalog(): Promise<{
   }
 
   for (const p of luxury ?? []) {
-    const images = asArray(p.images);
+    const images = asImages(p.images);
     const price = Number(p.suggested_retail_price) > 0 ? Number(p.suggested_retail_price) : Number(p.price);
     items.push({
       id: p.id,
@@ -121,7 +133,7 @@ export async function loadPublicCatalog(): Promise<{
       condition: "new",
       images,
       image: images[0] ?? null,
-      videos: asArray(p.videos),
+      videos: asArray(p.videos).map(proxied),
       updated_at: p.updated_at ?? null,
     });
   }
@@ -144,14 +156,18 @@ const esc = (s: string) =>
 
 export function buildProductXmlFeed(data: Awaited<ReturnType<typeof loadPublicCatalog>>) {
   const entries = data.items
+    .filter((i) => Boolean(i.image))
     .map((i) => {
-      const extra = i.images.slice(1, 11).map((u) => `      <g:additional_image_link>${esc(u)}</g:additional_image_link>`).join("\n");
+      const extra = i.images
+        .slice(1, 11)
+        .map((u) => `      <g:additional_image_link>${esc(u)}</g:additional_image_link>`)
+        .join("\n");
       return `    <item>
       <g:id>${esc(i.sku)}</g:id>
       <g:title>${esc(i.name)}</g:title>
       <g:description>${esc(i.description)}</g:description>
       <g:link>${esc(i.url)}</g:link>
-      ${i.image ? `<g:image_link>${esc(i.image)}</g:image_link>` : ""}
+      <g:image_link>${esc(i.image!)}</g:image_link>
 ${extra}
       <g:brand>${esc(i.brand)}</g:brand>
       <g:condition>new</g:condition>
