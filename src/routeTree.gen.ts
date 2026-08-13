@@ -20,6 +20,7 @@ import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedLuxuryIndexRouteImport } from './routes/_authenticated/luxury.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as ApiPublicCatalogFeedRouteImport } from './routes/api/public/catalog-feed'
 import { Route as ApiPublicCatalogRouteImport } from './routes/api/public/catalog'
 import { Route as AuthenticatedLuxurySlugRouteImport } from './routes/_authenticated/luxury.$slug'
 import { Route as AuthenticatedCategorySlugRouteImport } from './routes/_authenticated/category.$slug'
@@ -84,6 +85,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
   getParentRoute: () => AuthenticatedRoute,
+} as any)
+const ApiPublicCatalogFeedRoute = ApiPublicCatalogFeedRouteImport.update({
+  id: '/api/public/catalog-feed',
+  path: '/api/public/catalog-feed',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicCatalogRoute = ApiPublicCatalogRouteImport.update({
   id: '/api/public/catalog',
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/category/$slug': typeof AuthenticatedCategorySlugRoute
   '/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
   '/api/public/catalog': typeof ApiPublicCatalogRoute
+  '/api/public/catalog-feed': typeof ApiPublicCatalogFeedRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/luxury/': typeof AuthenticatedLuxuryIndexRoute
   '/api/public/notifications/order': typeof ApiPublicNotificationsOrderRoute
@@ -172,6 +179,7 @@ export interface FileRoutesByTo {
   '/category/$slug': typeof AuthenticatedCategorySlugRoute
   '/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
   '/api/public/catalog': typeof ApiPublicCatalogRoute
+  '/api/public/catalog-feed': typeof ApiPublicCatalogFeedRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/luxury': typeof AuthenticatedLuxuryIndexRoute
   '/api/public/notifications/order': typeof ApiPublicNotificationsOrderRoute
@@ -195,6 +203,7 @@ export interface FileRoutesById {
   '/_authenticated/category/$slug': typeof AuthenticatedCategorySlugRoute
   '/_authenticated/luxury/$slug': typeof AuthenticatedLuxurySlugRoute
   '/api/public/catalog': typeof ApiPublicCatalogRoute
+  '/api/public/catalog-feed': typeof ApiPublicCatalogFeedRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/luxury/': typeof AuthenticatedLuxuryIndexRoute
   '/api/public/notifications/order': typeof ApiPublicNotificationsOrderRoute
@@ -218,6 +227,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/luxury/$slug'
     | '/api/public/catalog'
+    | '/api/public/catalog-feed'
     | '/admin/'
     | '/luxury/'
     | '/api/public/notifications/order'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/luxury/$slug'
     | '/api/public/catalog'
+    | '/api/public/catalog-feed'
     | '/admin'
     | '/luxury'
     | '/api/public/notifications/order'
@@ -261,6 +272,7 @@ export interface FileRouteTypes {
     | '/_authenticated/category/$slug'
     | '/_authenticated/luxury/$slug'
     | '/api/public/catalog'
+    | '/api/public/catalog-feed'
     | '/_authenticated/admin/'
     | '/_authenticated/luxury/'
     | '/api/public/notifications/order'
@@ -278,6 +290,7 @@ export interface RootRouteChildren {
   ProductSlugRoute: typeof ProductSlugRoute
   CatalogoIndexRoute: typeof CatalogoIndexRoute
   ApiPublicCatalogRoute: typeof ApiPublicCatalogRoute
+  ApiPublicCatalogFeedRoute: typeof ApiPublicCatalogFeedRoute
   ApiPublicNotificationsOrderRoute: typeof ApiPublicNotificationsOrderRoute
   ApiPublicWebhooksWompiRoute: typeof ApiPublicWebhooksWompiRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -362,6 +375,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/api/public/catalog-feed': {
+      id: '/api/public/catalog-feed'
+      path: '/api/public/catalog-feed'
+      fullPath: '/api/public/catalog-feed'
+      preLoaderRoute: typeof ApiPublicCatalogFeedRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/catalog': {
       id: '/api/public/catalog'
@@ -464,6 +484,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductSlugRoute: ProductSlugRoute,
   CatalogoIndexRoute: CatalogoIndexRoute,
   ApiPublicCatalogRoute: ApiPublicCatalogRoute,
+  ApiPublicCatalogFeedRoute: ApiPublicCatalogFeedRoute,
   ApiPublicNotificationsOrderRoute: ApiPublicNotificationsOrderRoute,
   ApiPublicWebhooksWompiRoute: ApiPublicWebhooksWompiRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
