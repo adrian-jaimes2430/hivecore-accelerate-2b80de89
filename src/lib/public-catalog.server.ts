@@ -84,7 +84,7 @@ export async function loadPublicCatalog(): Promise<{
   const items: FeedItem[] = [];
 
   for (const p of products ?? []) {
-    const images = asArray(p.images);
+    const images = asImages(p.images);
     const price = Number(p.price);
     const bundles: { units: number; price: number }[] = [];
     if (p.bundle_pricing_enabled) {
@@ -114,7 +114,7 @@ export async function loadPublicCatalog(): Promise<{
   }
 
   for (const p of luxury ?? []) {
-    const images = asArray(p.images);
+    const images = asImages(p.images);
     const price = Number(p.suggested_retail_price) > 0 ? Number(p.suggested_retail_price) : Number(p.price);
     items.push({
       id: p.id,
@@ -133,7 +133,7 @@ export async function loadPublicCatalog(): Promise<{
       condition: "new",
       images,
       image: images[0] ?? null,
-      videos: asArray(p.videos),
+      videos: asArray(p.videos).map(proxied),
       updated_at: p.updated_at ?? null,
     });
   }
