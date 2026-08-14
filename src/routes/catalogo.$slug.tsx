@@ -10,7 +10,7 @@ import { MediaGallery, buildMedia } from "@/components/luxury/MediaGallery";
 import { VariationPicker, summarizeVariations } from "@/components/luxury/VariationPicker";
 import type { Variation } from "@/components/admin/VariationsEditor";
 import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
-import { waHref, productOrderMessage } from "@/lib/whatsapp";
+import { waHref, productOrderMessage, ANMA_WHATSAPP } from "@/lib/whatsapp";
 import { formatCOP } from "@/lib/pricing";
 import { MetaViewContent } from "@/components/marketing/MetaPixel";
 
@@ -74,7 +74,7 @@ function PublicProduct() {
   const variantSummary = summarizeVariations(selectedVariations);
 
   const waLink = waHref(
-    impulsador?.phone,
+    impulsador?.phone || ANMA_WHATSAPP,
     productOrderMessage(product.name, { price: formatCOP(price), options: variantSummary || null, url }),
   );
 

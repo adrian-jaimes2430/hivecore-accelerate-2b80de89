@@ -12,7 +12,7 @@ import { listLuxuryCatalog, getImpulsadorRef } from "@/lib/luxury-public.functio
 import { type Promo } from "@/components/luxury/PromoCarousel";
 import { PromoTicker } from "@/components/luxury/PromoTicker";
 import { Reveal } from "@/components/Reveal";
-import { waHref } from "@/lib/whatsapp";
+import { waHref, ANMA_WHATSAPP } from "@/lib/whatsapp";
 import { formatCOP } from "@/lib/pricing";
 
 const searchSchema = z.object({
@@ -327,7 +327,10 @@ function QuickPreview({ p, brand, refQs }: { p: Product; brand?: string; refQs: 
 }
 
 function FloatingCTA({ impulsador }: { impulsador: { id: string; name: string | null; phone: string | null } | null }) {
-  const href = waHref(impulsador?.phone, "Hola 😊 Vi el catálogo AnMa Luxury ✨ y quisiera conocer precios, cómo funciona y qué incluye.");
+  const href = waHref(
+    impulsador?.phone || ANMA_WHATSAPP,
+    "Hola 😊 Vi el catálogo AnMa Luxury ✨ y quisiera conocer precios, cómo funciona y qué incluye.",
+  );
   return (
     <a
       href={href}

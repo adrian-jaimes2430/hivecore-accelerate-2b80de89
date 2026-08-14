@@ -1,5 +1,8 @@
-/** Número oficial de HIVECORE / AnMa Luxury para pedidos sin impulsador asignado. */
+/** Número oficial de HIVECORE / A&O para pedidos sin impulsador asignado. */
 export const DEFAULT_WHATSAPP = "573106807521";
+
+/** Número oficial de AnMa Luxury Collection. */
+export const ANMA_WHATSAPP = "573058023023";
 
 export function waHref(phone: string | null | undefined, text: string) {
   const digits = (phone ?? "").replace(/[^\d]/g, "");
