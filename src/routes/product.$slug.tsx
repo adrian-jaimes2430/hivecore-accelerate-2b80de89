@@ -18,7 +18,7 @@ import { forwardOrderToIntegrations } from "@/lib/integrations.functions";
 import { getProductPublic } from "@/lib/product-public.functions";
 import { getImpulsadorRef } from "@/lib/luxury-public.functions";
 import { WhatsAppFab } from "@/components/marketing/WhatsAppFab";
-import { productInquiryMessage } from "@/lib/whatsapp";
+import { productInquiryMessage, ANMA_WHATSAPP } from "@/lib/whatsapp";
 import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
 import { MetaPixel, MetaViewContent } from "@/components/marketing/MetaPixel";
 import { bundleTotal, formatCOP} from "@/lib/pricing";
@@ -232,7 +232,7 @@ function ProductFunnel() {
               triggerClassName="cta-3d"
             />
           </div>
-          <WhatsAppFab phone={impulsador?.phone} message={productInquiryMessage(product.name)} />
+          <WhatsAppFab phone={impulsador?.phone ?? ANMA_WHATSAPP} message={productInquiryMessage(product.name)} />
         </>
       )}
     </div>
