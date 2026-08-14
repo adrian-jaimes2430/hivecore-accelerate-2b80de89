@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { WhatsAppFab } from "@/components/marketing/WhatsAppFab";
 import { listPublicCatalog } from "@/lib/public-catalog.functions";
 import { formatCOP } from "@/lib/pricing";
+import { ANMA_WHATSAPP } from "@/lib/whatsapp";
 
 const SITE_URL = "https://hivecore-shop.lovable.app";
 
@@ -124,6 +126,11 @@ function ProductIndex() {
           </li>
         ))}
       </ul>
+
+      <WhatsAppFab
+        phone={ANMA_WHATSAPP}
+        message="Hola 😊 Vi el catálogo HIVECORE y AnMa Luxury ✨ y quisiera conocer precios, disponibilidad y cómo hacer mi pedido."
+      />
     </main>
   );
 }
