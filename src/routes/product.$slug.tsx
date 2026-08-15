@@ -64,7 +64,11 @@ export const Route = createFileRoute("/product/$slug")({
       meta.push({ property: "og:image", content: cover });
       meta.push({ name: "twitter:image", content: cover });
     }
-    return { meta, links: [{ rel: "canonical", href: url }] };
+    const links: any[] = [{ rel: "canonical", href: url }];
+    const first = Array.isArray(p.funnel_sections) ? (p.funnel_sections as any[]).find((s) => s?.image || s?.video) : null;
+    if (first?.image) links.push({ rel: "preload", as: "image", href: first.image, fetchpriority: "high" });
+    return { meta, links };
+
   },
 });
 
