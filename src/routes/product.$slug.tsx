@@ -87,6 +87,9 @@ function ProductFunnel() {
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", slug],
     initialData: initial as Product,
+    staleTime: 5 * 60_000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
     queryFn: async () => {
       const { data, error } = await supabase.from("products").select("*").eq("slug", slug).eq("is_active", true).maybeSingle();
       if (error) throw error;
@@ -94,6 +97,7 @@ function ProductFunnel() {
       return data as Product;
     },
   });
+
 
 
   const { data: impulsador } = useQuery({
