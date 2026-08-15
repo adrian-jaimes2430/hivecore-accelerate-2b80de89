@@ -18,6 +18,8 @@ import { forwardOrderToIntegrations } from "@/lib/integrations.functions";
 import { getProductPublic } from "@/lib/product-public.functions";
 import { getImpulsadorRef } from "@/lib/luxury-public.functions";
 import { WhatsAppFab } from "@/components/marketing/WhatsAppFab";
+import { AutoVideo } from "@/components/marketing/AutoVideo";
+
 import { productInquiryMessage, ANMA_WHATSAPP } from "@/lib/whatsapp";
 import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
 import { MetaPixel, MetaViewContent } from "@/components/marketing/MetaPixel";
@@ -62,7 +64,11 @@ export const Route = createFileRoute("/product/$slug")({
       meta.push({ property: "og:image", content: cover });
       meta.push({ name: "twitter:image", content: cover });
     }
-    return { meta, links: [{ rel: "canonical", href: url }] };
+    const links: any[] = [{ rel: "canonical", href: url }];
+    const first = Array.isArray(p.funnel_sections) ? (p.funnel_sections as any[]).find((s) => s?.image || s?.video) : null;
+    if (first?.image) links.push({ rel: "preload", as: "image", href: first.image, fetchpriority: "high" });
+    return { meta, links };
+
   },
 });
 
@@ -85,6 +91,9 @@ function ProductFunnel() {
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", slug],
     initialData: initial as Product,
+    staleTime: 5 * 60_000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
     queryFn: async () => {
       const { data, error } = await supabase.from("products").select("*").eq("slug", slug).eq("is_active", true).maybeSingle();
       if (error) throw error;
@@ -92,6 +101,7 @@ function ProductFunnel() {
       return data as Product;
     },
   });
+
 
 
   const { data: impulsador } = useQuery({
@@ -146,7 +156,8 @@ function ProductFunnel() {
           {funnel.map((s, i) => {
             const mediaOnly = Boolean((s.image || s.video) && !s.content?.trim());
             const media = s.video ? (
-              <video key={`v-${i}`} src={s.video} controls playsInline preload={i < 1 ? "metadata" : "none"} className="block h-auto w-full object-contain" />
+              <AutoVideo key={`v-${i}`} src={s.video} poster={s.image} eager={i < 1} className="block h-auto w-full object-contain" />
+
             ) : s.image ? (
               <img key={`i-${i}`} src={s.image} alt={`${product.name} — sección ${i + 1}`} loading={i < 1 ? "eager" : "lazy"} decoding="async" fetchPriority={i < 1 ? "high" : "low"} className="block h-auto w-full object-contain" />
             ) : null;
