@@ -94,6 +94,10 @@ export function PublicCheckoutDialog({
           payment_method: method,
           ref: refId || null,
           origin: typeof window !== "undefined" ? window.location.search.slice(0, 200) : null,
+          fbp: readCookie("_fbp"),
+          fbc: readCookie("_fbc"),
+          event_source_url: typeof window !== "undefined" ? window.location.href.slice(0, 500) : null,
+          client_user_agent: typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 500) : null,
         },
       });
       if (!res?.ok) {
