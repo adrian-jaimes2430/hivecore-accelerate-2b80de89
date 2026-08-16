@@ -19,6 +19,13 @@ import { metaTrackPaid, newEventId } from "@/components/marketing/MetaPixel";
 import { validateCheckoutFields, checkoutErrorSummary, type CheckoutFieldErrors } from "@/lib/checkout-validation";
 import { FieldError, errorRing } from "@/components/checkout/FieldError";
 
+/** Lee una cookie del navegador (_fbp / _fbc de Meta) para la Conversions API. */
+function readCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const m = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return m?.[1] ? decodeURIComponent(m[1]) : null;
+}
+
 export function PublicCheckoutDialog({
   productKind,
   slug,
@@ -94,6 +101,10 @@ export function PublicCheckoutDialog({
           payment_method: method,
           ref: refId || null,
           origin: typeof window !== "undefined" ? window.location.search.slice(0, 200) : null,
+          fbp: readCookie("_fbp"),
+          fbc: readCookie("_fbc"),
+          event_source_url: typeof window !== "undefined" ? window.location.href.slice(0, 500) : null,
+          client_user_agent: typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 500) : null,
         },
       });
       if (!res?.ok) {

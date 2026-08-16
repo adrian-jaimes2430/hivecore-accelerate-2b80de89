@@ -38,7 +38,9 @@ export const Route = createFileRoute("/api/public/webhooks/wompi")({
 
         const { data: order } = await supabaseAdmin
           .from("orders")
-          .select("id, status, payment_status")
+          .select(
+            "id, status, payment_status, order_code, quantity, total, impulsador_id, client_name, client_email, client_phone, client_city, client_region",
+          )
           .or(`payment_reference.eq.${reference},order_code.eq.${reference}`)
           .maybeSingle();
         if (!order) return new Response("Order not found", { status: 404 });
@@ -65,6 +67,24 @@ export const Route = createFileRoute("/api/public/webhooks/wompi")({
         if (mapped.payment_status !== order.payment_status) {
           const { forwardSafely } = await import("@/lib/checkout.server");
           await forwardSafely(order.id, "order.updated");
+
+          // Venta pagada en línea desde tráfico pago → Purchase por Conversions API
+          if (mapped.payment_status === "paid" && !order.impulsador_id) {
+            const { sendMetaPurchase } = await import("@/lib/meta-capi.server");
+            await sendMetaPurchase({
+              eventId: `purchase-${order.order_code}`,
+              value: Number(order.total ?? 0),
+              quantity: Number(order.quantity ?? 1),
+              contentId: order.order_code,
+              orderCode: order.order_code,
+              email: order.client_email,
+              phone: order.client_phone,
+              fullName: order.client_name,
+              city: order.client_city,
+              region: order.client_region,
+              country: "co",
+            });
+          }
         }
 
         return Response.json({ ok: true });
