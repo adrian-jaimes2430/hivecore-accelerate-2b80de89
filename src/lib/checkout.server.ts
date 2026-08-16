@@ -149,6 +149,29 @@ export async function createPublicOrder(input: PublicOrderInput) {
 
   if (input.payment_method === "cod") {
     await forwardSafely(order.id, "order.created");
+    // Contra entrega también es una venta: se envía a Meta por Conversions API
+    // con el mismo event_id del píxel para que deduplique y calcule ROAS.
+    if (isPaidTraffic) {
+      const { sendMetaPurchase } = await import("./meta-capi.server");
+      await sendMetaPurchase({
+        eventId: `purchase-${order.order_code}`,
+        value: total,
+        quantity: input.quantity,
+        contentId: input.slug,
+        contentName: productName,
+        orderCode: order.order_code,
+        email: input.client_email,
+        phone: input.client_phone,
+        fullName: input.client_name,
+        city: input.client_city,
+        region: input.client_region,
+        country: "co",
+        fbp: input.fbp ?? null,
+        fbc: input.fbc ?? null,
+        clientUserAgent: input.client_user_agent ?? null,
+        eventSourceUrl: input.event_source_url ?? null,
+      });
+    }
     return {
       ok: true as const,
       orderId: order.id,
@@ -158,6 +181,7 @@ export async function createPublicOrder(input: PublicOrderInput) {
       checkoutUrl: null as string | null,
     };
   }
+
 
 
   const cfg = getWompiConfig();
