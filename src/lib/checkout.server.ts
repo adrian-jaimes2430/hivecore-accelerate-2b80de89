@@ -19,6 +19,11 @@ export const publicOrderSchema = z.object({
   payment_method: z.enum(["cod", "online"]),
   ref: z.string().uuid().optional().nullable(),
   origin: z.string().trim().max(200).optional().nullable(),
+  // Datos de atribución del navegador para la Conversions API de Meta
+  fbp: z.string().trim().max(200).optional().nullable(),
+  fbc: z.string().trim().max(400).optional().nullable(),
+  event_source_url: z.string().trim().max(500).optional().nullable(),
+  client_user_agent: z.string().trim().max(500).optional().nullable(),
 });
 
 export type PublicOrderInput = z.infer<typeof publicOrderSchema>;
