@@ -38,7 +38,9 @@ export const Route = createFileRoute("/api/public/webhooks/wompi")({
 
         const { data: order } = await supabaseAdmin
           .from("orders")
-          .select("id, status, payment_status")
+          .select(
+            "id, status, payment_status, order_code, quantity, total, impulsador_id, client_name, client_email, client_phone, client_city, client_region",
+          )
           .or(`payment_reference.eq.${reference},order_code.eq.${reference}`)
           .maybeSingle();
         if (!order) return new Response("Order not found", { status: 404 });
