@@ -71,12 +71,14 @@ function GraciasPage() {
   const fired = useRef(false);
 
   const paidOrder = order?.payment_status === "paid";
+  const codOrder = order?.payment_method === "cod";
 
   useEffect(() => {
-    if (!order || !paidOrder || fired.current) return;
+    if (!order || fired.current) return;
+    // Contamos como venta tanto el pago en línea aprobado como el pedido
+    // contra entrega (mismo eventID → Meta deduplica con el evento del checkout).
+    if (!paidOrder && !codOrder) return;
     fired.current = true;
-    // Purchase del pago en línea (Wompi). Mismo eventID que el flujo contra
-    // entrega para que Meta deduplique si ya se envió.
     metaTrackPaid(
       "Purchase",
       {
@@ -88,7 +90,7 @@ function GraciasPage() {
       },
       { eventID: `purchase-${order.order_code}` },
     );
-  }, [order, paidOrder]);
+  }, [order, paidOrder, codOrder]);
 
   if (!order) {
     return (
