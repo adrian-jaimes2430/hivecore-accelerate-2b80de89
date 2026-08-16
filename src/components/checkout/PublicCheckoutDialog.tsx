@@ -19,6 +19,13 @@ import { metaTrackPaid, newEventId } from "@/components/marketing/MetaPixel";
 import { validateCheckoutFields, checkoutErrorSummary, type CheckoutFieldErrors } from "@/lib/checkout-validation";
 import { FieldError, errorRing } from "@/components/checkout/FieldError";
 
+/** Lee una cookie del navegador (_fbp / _fbc de Meta) para la Conversions API. */
+function readCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const m = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return m?.[1] ? decodeURIComponent(m[1]) : null;
+}
+
 export function PublicCheckoutDialog({
   productKind,
   slug,
