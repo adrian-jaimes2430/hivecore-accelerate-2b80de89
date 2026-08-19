@@ -57,10 +57,10 @@ function LoginPage() {
   const [phone, setPhone] = useState("");
 
   useEffect(() => {
-    if (!loading && user && profile) {
+    if (!loading && user) {
       navigate({ to: "/app" });
     }
-  }, [loading, user, profile, navigate]);
+  }, [loading, user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
