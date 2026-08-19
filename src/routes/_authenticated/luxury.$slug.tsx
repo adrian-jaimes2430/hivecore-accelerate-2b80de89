@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { LevelLocked } from "@/components/LevelGate";
 import { ArrowLeft, Crown, Loader2, ExternalLink, ShoppingBag, Check } from "lucide-react";
 import { ShareBar } from "@/components/luxury/ShareBar";
 import { MediaGallery, buildMedia } from "@/components/luxury/MediaGallery";
@@ -37,6 +38,9 @@ interface LuxProduct {
 }
 
 function LuxuryProduct() {
+  const { canLuxury } = useAuth();
+  if (!canLuxury) return <LevelLocked section="AnMa Luxury Collection" />;
+
   const { slug } = Route.useParams();
   const { user } = useAuth();
   const [selectedVariations, setSelectedVariations] = useState<Record<string, string>>({});

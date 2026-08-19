@@ -5,6 +5,7 @@ import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { LevelLocked } from "@/components/LevelGate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -48,6 +49,9 @@ interface LuxProduct {
 }
 
 function LuxuryCatalog() {
+  const { canLuxury } = useAuth();
+  if (!canLuxury) return <LevelLocked section="AnMa Luxury Collection" />;
+
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/luxury/" });
   const { user } = useAuth();
