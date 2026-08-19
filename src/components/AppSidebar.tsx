@@ -76,16 +76,19 @@ export function AppSidebar() {
           <span className="rail-tip">{profile?.full_name ?? "Impulsador"}</span>
         </div>
         <button
+          type="button"
+          aria-label="Cerrar sesión"
           onClick={async () => {
             await signOut();
             navigate({ to: "/login" });
           }}
-          className="rail-item group"
+          className="rail-item group border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive"
         >
           <LogOut className="h-[20px] w-[20px]" />
           <span className="rail-tip">Cerrar sesión</span>
         </button>
       </div>
+
     </aside>
   );
 }

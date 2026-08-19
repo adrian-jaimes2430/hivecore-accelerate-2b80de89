@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HiveLogo } from "@/components/HiveLogo";
 import { Reveal } from "@/components/Reveal";
+import { ParticleField } from "@/components/marketing/ParticleField";
+
 import {
   ArrowRight,
   Sparkles,
@@ -97,7 +99,11 @@ function Landing() {
         />
 
         <div className="absolute inset-0 -z-10 bg-[color:var(--onyx-canvas)]/70" />
+        <div className="absolute inset-0 -z-10">
+          <ParticleField />
+        </div>
         <div className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-[color:var(--onyx-canvas)] to-transparent" />
+
 
         <div className="mx-auto flex min-h-[86vh] max-w-[1200px] flex-col items-center justify-center px-5 py-28 text-center">
           <span className="mercury-tag animate-rise" style={{ animationDelay: "80ms" }}>
