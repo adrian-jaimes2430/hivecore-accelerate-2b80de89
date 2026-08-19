@@ -624,6 +624,9 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          level: Database["public"]["Enums"]["impulsor_level"]
+          level_updated_at: string | null
+          level_updated_by: string | null
           phone: string | null
           status: Database["public"]["Enums"]["user_status"]
           updated_at: string
@@ -633,6 +636,9 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id: string
+          level?: Database["public"]["Enums"]["impulsor_level"]
+          level_updated_at?: string | null
+          level_updated_by?: string | null
           phone?: string | null
           status?: Database["public"]["Enums"]["user_status"]
           updated_at?: string
@@ -642,6 +648,9 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          level?: Database["public"]["Enums"]["impulsor_level"]
+          level_updated_at?: string | null
+          level_updated_by?: string | null
           phone?: string | null
           status?: Database["public"]["Enums"]["user_status"]
           updated_at?: string
@@ -735,6 +744,7 @@ export type Database = {
     }
     Enums: {
       app_role: "super_admin" | "collaborator" | "impulsador"
+      impulsor_level: "junior" | "senior" | "lider" | "staff_matriz"
       order_status:
         | "pending"
         | "confirmed"
@@ -870,6 +880,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["super_admin", "collaborator", "impulsador"],
+      impulsor_level: ["junior", "senior", "lider", "staff_matriz"],
       order_status: [
         "pending",
         "confirmed",

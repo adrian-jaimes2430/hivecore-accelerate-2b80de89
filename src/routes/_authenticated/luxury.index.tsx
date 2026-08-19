@@ -5,6 +5,7 @@ import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { LevelLocked } from "@/components/LevelGate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -27,7 +28,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/_authenticated/luxury/")({
   validateSearch: zodValidator(searchSchema),
-  component: LuxuryCatalog,
+  component: LuxuryCatalogGate,
   head: () => ({
     meta: [
       { title: "AnMa Luxury Collection — A&O Ecosystem" },
@@ -45,6 +46,12 @@ interface LuxProduct {
   price: number; suggested_retail_price: number; show_impulsador_price: boolean;
   stock_status: string; stock_quantity: number;
   attributes: Record<string, unknown>; is_featured: boolean;
+}
+
+function LuxuryCatalogGate() {
+  const { canLuxury } = useAuth();
+  if (!canLuxury) return <LevelLocked section="AnMa Luxury Collection" />;
+  return <LuxuryCatalog />;
 }
 
 function LuxuryCatalog() {

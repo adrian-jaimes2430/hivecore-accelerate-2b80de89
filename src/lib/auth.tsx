@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { canAccessLuxury, type ImpulsorLevel } from "@/lib/levels";
 
 export type AppRole = "super_admin" | "collaborator" | "impulsador";
 export type UserStatus = "pending" | "approved" | "blocked";
@@ -11,6 +12,7 @@ export interface Profile {
   phone: string | null;
   avatar_url: string | null;
   status: UserStatus;
+  level: ImpulsorLevel;
 }
 
 interface AuthCtx {
@@ -22,6 +24,8 @@ interface AuthCtx {
   hasRole: (r: AppRole) => boolean;
   isAdmin: boolean;
   isApproved: boolean;
+  level: ImpulsorLevel;
+  canLuxury: boolean;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -66,11 +70,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  const isStaff = roles.includes("super_admin") || roles.includes("collaborator");
+  const level: ImpulsorLevel = profile?.level ?? "junior";
+
   const value: AuthCtx = {
     user, session, profile, roles, loading,
     hasRole: (r) => roles.includes(r),
     isAdmin: roles.includes("super_admin"),
     isApproved: profile?.status === "approved",
+    level,
+    canLuxury: canAccessLuxury({ level, isStaff }),
     refresh: async () => { if (user) await loadProfile(user.id); },
     signOut: async () => { await supabase.auth.signOut(); },
   };

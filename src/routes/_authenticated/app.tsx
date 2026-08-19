@@ -11,6 +11,7 @@ import { Rail } from "@/components/Rail";
 
 import type { LucideIcon } from "lucide-react";
 import { formatCOP } from "@/lib/pricing";
+import { LEVEL_LABEL, levelChip } from "@/lib/levels";
 
 export const Route = createFileRoute("/_authenticated/app")({
   component: Dashboard,
@@ -47,7 +48,7 @@ type TagKey = (typeof TAGS)[number]["key"];
 const COMMISSION_RATE = 0.2;
 
 function Dashboard() {
-  const { profile, user } = useAuth();
+  const { profile, user, canLuxury, level } = useAuth();
   const [tag, setTag] = useState<TagKey>("all");
   const SITE_URL = "https://hivecore-shop.lovable.app";
   const myCatalogUrl = user ? `${SITE_URL}/catalogo?ref=${user.id}` : `${SITE_URL}/catalogo`;
@@ -98,14 +99,27 @@ function Dashboard() {
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">Tu catálogo premium del ecosistema A&O.</p>
         </div>
-        <div className="shop-panel flex items-center gap-3 px-4 py-2.5 sm:gap-4 sm:px-5 sm:py-3">
-          <div className="h-2 w-2 shrink-0 rounded-full bg-hive hive-pulse" />
-          <p className="text-xs text-muted-foreground">Estado</p>
-          <p className="text-sm font-medium text-hive">Aprobado</p>
+        <div className="shop-panel flex flex-wrap items-center gap-3 px-4 py-2.5 sm:gap-4 sm:px-5 sm:py-3">
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 shrink-0 rounded-full bg-hive hive-pulse" />
+            <p className="text-sm font-medium text-hive">Aprobado</p>
+          </div>
+          <span className="h-4 w-px bg-border/60" />
+          <div className="flex items-center gap-2">
+            <p className="text-xs text-muted-foreground">Nivel</p>
+            <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide ${levelChip(level)}`}>
+              {LEVEL_LABEL[level]}
+            </span>
+          </div>
+          <span className="h-4 w-px bg-border/60" />
+          <p className="text-xs text-muted-foreground">
+            Comisión <span className="font-semibold text-hive">20%</span> por venta
+          </p>
         </div>
       </div>
 
       {/* Luxury hero */}
+      {canLuxury && (
       <Reveal className="shop-card relative mb-8 overflow-hidden p-5 sm:mb-10 sm:p-8" from="scale">
         <div className="absolute inset-0 hive-grid-bg opacity-15" />
         <div className="relative grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
@@ -134,6 +148,7 @@ function Dashboard() {
           </div>
         </div>
       </Reveal>
+      )}
 
       {/* Tag ribbon — filtra al instante */}
       <div className="-mx-4 mb-6 sm:-mx-6">

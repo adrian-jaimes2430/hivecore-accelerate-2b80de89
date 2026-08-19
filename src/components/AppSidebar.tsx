@@ -20,12 +20,12 @@ interface Item {
 }
 
 export function AppSidebar() {
-  const { profile, isAdmin, signOut } = useAuth();
+  const { profile, isAdmin, canLuxury, signOut } = useAuth();
   const navigate = useNavigate();
 
   const items: Item[] = [
     { to: "/app", label: "Inicio", icon: LayoutDashboard },
-    { to: "/luxury", label: "AnMa Luxury", icon: Crown, accent: true },
+    ...(canLuxury ? [{ to: "/luxury", label: "AnMa Luxury", icon: Crown, accent: true }] : []),
     { to: "/orders", label: "Pedidos", icon: Package },
     { to: "/catalogo", label: "Vista pública", icon: Store, external: true },
     ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: ShieldCheck }] : []),

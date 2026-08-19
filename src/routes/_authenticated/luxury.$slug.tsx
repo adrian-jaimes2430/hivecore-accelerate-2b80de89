@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { LevelLocked } from "@/components/LevelGate";
 import { ArrowLeft, Crown, Loader2, ExternalLink, ShoppingBag, Check } from "lucide-react";
 import { ShareBar } from "@/components/luxury/ShareBar";
 import { MediaGallery, buildMedia } from "@/components/luxury/MediaGallery";
@@ -22,7 +23,7 @@ import type { Variation } from "@/components/admin/VariationsEditor";
 import { formatCOP } from "@/lib/pricing";
 
 export const Route = createFileRoute("/_authenticated/luxury/$slug")({
-  component: LuxuryProduct,
+  component: LuxuryProductGate,
 });
 
 interface LuxProduct {
@@ -34,6 +35,12 @@ interface LuxProduct {
   show_impulsador_price: boolean;
   stock_status: string; stock_quantity: number;
   attributes: Record<string, unknown>;
+}
+
+function LuxuryProductGate() {
+  const { canLuxury } = useAuth();
+  if (!canLuxury) return <LevelLocked section="AnMa Luxury Collection" />;
+  return <LuxuryProduct />;
 }
 
 function LuxuryProduct() {
