@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -15,6 +15,8 @@ export const Route = createFileRoute("/_authenticated")({
 function AuthLayout() {
   const { user, profile, loading, signOut } = useAuth();
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isMarel = pathname.startsWith("/marel");
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -39,7 +41,7 @@ function AuthLayout() {
       <main className="pb-32 md:pb-24 md:pl-[72px]">
         <Outlet />
       </main>
-      <CatalogSearch />
+      {!isMarel && <CatalogSearch />}
       <MobileTabBar />
     </div>
   );
