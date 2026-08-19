@@ -36,6 +36,7 @@ const COUNTRY_CODES = [
   { code: "+351", country: "Portugal", flag: "🇵🇹" },
 ];
 import { HiveLogo } from "@/components/HiveLogo";
+import { ParticleField } from "@/components/marketing/ParticleField";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { Loader2, ArrowLeft } from "lucide-react";
