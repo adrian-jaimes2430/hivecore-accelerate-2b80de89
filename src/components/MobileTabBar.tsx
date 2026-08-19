@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
-import { LayoutDashboard, Crown, Package, ShieldCheck, User, type LucideIcon } from "lucide-react";
+import { LayoutDashboard, Crown, Package, ShieldCheck, User, Sparkles, type LucideIcon } from "lucide-react";
 
 interface Tab {
   to: string;
@@ -18,6 +18,7 @@ export function MobileTabBar() {
     { to: "/app", label: "Inicio", icon: LayoutDashboard },
     ...(canLuxury ? [{ to: "/luxury", label: "Luxury", icon: Crown, accent: true }] : []),
     { to: "/orders", label: "Pedidos", icon: Package },
+    { to: "/marel", label: "Marel", icon: Sparkles },
     ...(isAdmin
       ? [{ to: "/admin", label: "Admin", icon: ShieldCheck }]
       : [{ to: "/app", label: profile?.full_name?.split(" ")[0] ?? "Perfil", icon: User }]),
