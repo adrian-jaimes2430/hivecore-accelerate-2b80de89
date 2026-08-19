@@ -11,12 +11,12 @@ interface Tab {
 
 /** Bottom app-style navigation for mobile (mirrors the desktop icon rail). */
 export function MobileTabBar() {
-  const { isAdmin, profile } = useAuth();
+  const { isAdmin, profile, canLuxury } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const tabs: Tab[] = [
     { to: "/app", label: "Inicio", icon: LayoutDashboard },
-    { to: "/luxury", label: "Luxury", icon: Crown, accent: true },
+    ...(canLuxury ? [{ to: "/luxury", label: "Luxury", icon: Crown, accent: true }] : []),
     { to: "/orders", label: "Pedidos", icon: Package },
     ...(isAdmin
       ? [{ to: "/admin", label: "Admin", icon: ShieldCheck }]
