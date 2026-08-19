@@ -51,6 +51,7 @@ function LoginPage() {
   const { user } = useAuth();
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [busy, setBusy] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -67,9 +68,15 @@ function LoginPage() {
     e.preventDefault();
     setBusy(true);
     const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    if (!data.session) return toast.error("No fue posible iniciar la sesión. Intenta nuevamente.");
+    if (error) {
+      setBusy(false);
+      return toast.error(error.message);
+    }
+    if (!data.session) {
+      setBusy(false);
+      return toast.error("No fue posible iniciar la sesión. Intenta nuevamente.");
+    }
+    setRedirecting(true);
     toast.success("Bienvenido a HIVECORE");
     await navigate({ to: "/app", replace: true });
   };
@@ -100,6 +107,18 @@ function LoginPage() {
       <div className="absolute inset-0">
         <ParticleField />
       </div>
+      {redirecting && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-sm" role="status" aria-live="polite">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <HiveLogo size={52} withText={false} />
+            <Loader2 className="h-6 w-6 animate-spin text-hive" />
+            <div>
+              <p className="font-display text-lg font-semibold">Abriendo tu cuenta</p>
+              <p className="mt-1 text-sm text-muted-foreground">Estamos preparando tu panel.</p>
+            </div>
+          </div>
+        </div>
+      )}
       <Link to="/" className="absolute left-6 top-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Volver
       </Link>
