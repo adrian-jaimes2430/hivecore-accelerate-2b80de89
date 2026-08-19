@@ -1,6 +1,6 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
-import { LayoutDashboard, Crown, Package, ShieldCheck, User, Sparkles, type LucideIcon } from "lucide-react";
+import { LayoutDashboard, Crown, Package, ShieldCheck, Sparkles, LogOut, type LucideIcon } from "lucide-react";
 
 interface Tab {
   to: string;
@@ -11,7 +11,8 @@ interface Tab {
 
 /** Bottom app-style navigation for mobile (mirrors the desktop icon rail). */
 export function MobileTabBar() {
-  const { isAdmin, profile, canLuxury } = useAuth();
+  const { isAdmin, canLuxury, signOut } = useAuth();
+  const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const tabs: Tab[] = [
@@ -19,11 +20,10 @@ export function MobileTabBar() {
     ...(canLuxury ? [{ to: "/luxury", label: "Luxury", icon: Crown, accent: true }] : []),
     { to: "/orders", label: "Pedidos", icon: Package },
     { to: "/marel", label: "Marel", icon: Sparkles },
-    ...(isAdmin
-      ? [{ to: "/admin", label: "Admin", icon: ShieldCheck }]
-      : [{ to: "/app", label: profile?.full_name?.split(" ")[0] ?? "Perfil", icon: User }]),
+    ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: ShieldCheck }] : []),
   ];
 
+  const total = tabs.length + 1; // + logout
   const activeIndex = Math.max(
     0,
     tabs.findIndex((t, i) => (i === 0 ? pathname === "/app" : pathname.startsWith(t.to))),
@@ -35,7 +35,7 @@ export function MobileTabBar() {
         <span
           className="tabbar-indicator"
           style={{
-            width: `calc(100% / ${tabs.length})`,
+            width: `calc(100% / ${total})`,
             transform: `translateX(${activeIndex * 100}%)`,
           }}
         />
@@ -49,7 +49,20 @@ export function MobileTabBar() {
             <span className="truncate text-[10px] font-medium tracking-tight">{t.label}</span>
           </Link>
         ))}
+        <button
+          type="button"
+          aria-label="Cerrar sesión"
+          onClick={async () => {
+            await signOut();
+            navigate({ to: "/login" });
+          }}
+          className="tabbar-item text-destructive"
+        >
+          <LogOut className="h-[19px] w-[19px]" />
+          <span className="truncate text-[10px] font-medium tracking-tight">Salir</span>
+        </button>
       </div>
     </nav>
   );
 }
+
