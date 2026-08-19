@@ -80,7 +80,7 @@ export function AppSidebar() {
           aria-label="Cerrar sesión"
           onClick={async () => {
             await signOut();
-            navigate({ to: "/login" });
+            await navigate({ to: "/login", replace: true });
           }}
           className="rail-item group border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive"
         >
