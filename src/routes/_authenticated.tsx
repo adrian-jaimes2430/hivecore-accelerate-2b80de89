@@ -2,6 +2,8 @@ import { createFileRoute, Outlet, useNavigate, Link } from "@tanstack/react-rout
 import { useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { AppSidebar } from "@/components/AppSidebar";
+import { MobileTabBar } from "@/components/MobileTabBar";
+import { CatalogSearch } from "@/components/CatalogSearch";
 
 import { Loader2, ShieldAlert, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,8 +33,14 @@ function AuthLayout() {
 
   return (
     <div className="min-h-screen">
-      <AppSidebar />
-      <main className="pl-[72px]"><Outlet /></main>
+      <div className="hidden md:block">
+        <AppSidebar />
+      </div>
+      <main className="pb-32 md:pb-24 md:pl-[72px]">
+        <Outlet />
+      </main>
+      <CatalogSearch />
+      <MobileTabBar />
     </div>
   );
 }
