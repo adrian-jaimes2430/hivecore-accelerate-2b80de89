@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 import { formatCOP } from "@/lib/pricing";
 import { Search, X, ArrowRight, Crown } from "lucide-react";
 
@@ -31,6 +32,7 @@ function firstImage(images: unknown): string | null {
 
 /** Floating bottom search pill (shop.app style) with instant keyword results. */
 export function CatalogSearch() {
+  const { canLuxury } = useAuth();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -48,7 +50,7 @@ export function CatalogSearch() {
   }, []);
 
   const { data: rows = [] } = useQuery({
-    queryKey: ["catalog-search-index"],
+    queryKey: ["catalog-search-index", canLuxury],
     enabled: open,
     staleTime: 5 * 60 * 1000,
     queryFn: async (): Promise<Row[]> => {
@@ -96,7 +98,7 @@ export function CatalogSearch() {
         brand: p.brand_id ? brandName.get(p.brand_id) ?? null : null,
       }));
 
-      return [...a, ...b];
+      return canLuxury ? [...a, ...b] : a;
     },
   });
 
