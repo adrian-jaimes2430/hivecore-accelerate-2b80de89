@@ -54,7 +54,7 @@ export function MobileTabBar() {
           aria-label="Cerrar sesión"
           onClick={async () => {
             await signOut();
-            navigate({ to: "/login" });
+            await navigate({ to: "/login", replace: true });
           }}
           className="tabbar-item text-destructive"
         >
