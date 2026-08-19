@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Package,
   Crown,
+  Sparkles,
   ShieldCheck,
   Store,
   LogOut,
@@ -27,6 +28,7 @@ export function AppSidebar() {
     { to: "/app", label: "Inicio", icon: LayoutDashboard },
     ...(canLuxury ? [{ to: "/luxury", label: "AnMa Luxury", icon: Crown, accent: true }] : []),
     { to: "/orders", label: "Pedidos", icon: Package },
+    { to: "/marel", label: "Marel IA", icon: Sparkles },
     { to: "/catalogo", label: "Vista pública", icon: Store, external: true },
     ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: ShieldCheck }] : []),
   ];

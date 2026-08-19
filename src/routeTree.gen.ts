@@ -18,6 +18,7 @@ import { Route as CatalogoIndexRouteImport } from './routes/catalogo.index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as CatalogoSlugRouteImport } from './routes/catalogo.$slug'
 import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
+import { Route as AuthenticatedMarelRouteImport } from './routes/_authenticated/marel'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedLuxuryIndexRouteImport } from './routes/_authenticated/luxury.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -75,6 +76,11 @@ const CatalogoSlugRoute = CatalogoSlugRouteImport.update({
 const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedMarelRoute = AuthenticatedMarelRouteImport.update({
+  id: '/marel',
+  path: '/marel',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/productos': typeof ProductosRoute
   '/app': typeof AuthenticatedAppRoute
+  '/marel': typeof AuthenticatedMarelRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/productos': typeof ProductosRoute
   '/app': typeof AuthenticatedAppRoute
+  '/marel': typeof AuthenticatedMarelRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -211,6 +219,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/productos': typeof ProductosRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
+  '/_authenticated/marel': typeof AuthenticatedMarelRoute
   '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -237,6 +246,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/productos'
     | '/app'
+    | '/marel'
     | '/orders'
     | '/catalogo/$slug'
     | '/product/$slug'
@@ -261,6 +271,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/productos'
     | '/app'
+    | '/marel'
     | '/orders'
     | '/catalogo/$slug'
     | '/product/$slug'
@@ -286,6 +297,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/productos'
     | '/_authenticated/app'
+    | '/_authenticated/marel'
     | '/_authenticated/orders'
     | '/catalogo/$slug'
     | '/product/$slug'
@@ -386,6 +398,13 @@ declare module '@tanstack/react-router' {
       path: '/orders'
       fullPath: '/orders'
       preLoaderRoute: typeof AuthenticatedOrdersRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/marel': {
+      id: '/_authenticated/marel'
+      path: '/marel'
+      fullPath: '/marel'
+      preLoaderRoute: typeof AuthenticatedMarelRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/app': {
@@ -491,6 +510,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
+  AuthenticatedMarelRoute: typeof AuthenticatedMarelRoute
   AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
   AuthenticatedAdminIntegrationsRoute: typeof AuthenticatedAdminIntegrationsRoute
   AuthenticatedAdminLuxuryRoute: typeof AuthenticatedAdminLuxuryRoute
@@ -502,6 +522,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAppRoute: AuthenticatedAppRoute,
+  AuthenticatedMarelRoute: AuthenticatedMarelRoute,
   AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
   AuthenticatedAdminIntegrationsRoute: AuthenticatedAdminIntegrationsRoute,
   AuthenticatedAdminLuxuryRoute: AuthenticatedAdminLuxuryRoute,
