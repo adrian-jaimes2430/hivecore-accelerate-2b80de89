@@ -48,7 +48,7 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { user, profile, loading } = useAuth();
+  const { user } = useAuth();
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [busy, setBusy] = useState(false);
   const [email, setEmail] = useState("");
@@ -58,18 +58,20 @@ function LoginPage() {
   const [phone, setPhone] = useState("");
 
   useEffect(() => {
-    if (!loading && user) {
-      navigate({ to: "/app" });
+    if (user) {
+      void navigate({ to: "/app", replace: true });
     }
-  }, [loading, user, navigate]);
+  }, [user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setBusy(false);
     if (error) return toast.error(error.message);
+    if (!data.session) return toast.error("No fue posible iniciar la sesión. Intenta nuevamente.");
     toast.success("Bienvenido a HIVECORE");
+    await navigate({ to: "/app", replace: true });
   };
 
   const handleSignup = async (e: React.FormEvent) => {
