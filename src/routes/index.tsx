@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HiveLogo } from "@/components/HiveLogo";
 import { Reveal } from "@/components/Reveal";
+import { ParticleField } from "@/components/marketing/ParticleField";
+
 import {
   ArrowRight,
   Sparkles,
