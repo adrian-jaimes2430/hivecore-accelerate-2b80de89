@@ -1,108 +1,58 @@
-# AnMa Luxury Collection — Nueva unidad premium
+# NomadHive: catálogo móvil, niveles y Marel
 
-Una expansión 100% modular y desacoplada del catálogo actual. **No se modifica nada del sistema existente** (productos, funnels, categorías actuales, uploads, admin, navegación). Todo vive en rutas y tablas nuevas.
+Entrega en 4 fases. Cada fase se aprueba y se publica antes de pasar a la siguiente.
 
----
-
-## 1. Base de datos (migración nueva, aislada)
-
-Nuevas tablas con prefijo `luxury_` para no chocar con `products` / `categories` actuales:
-
-- `luxury_categories` — name, slug, parent_id (auto-referencia para sub-categorías), sort_order, is_active
-- `luxury_brands` — name, slug, logo_url, is_active
-- `luxury_products` — sku, name, slug, short_description, description, images (jsonb), category_id, brand_id, price (costo impulsador), suggested_retail_price (precio sugerido venta), stock_status (in_stock/low_stock/out_of_stock/preorder), stock_quantity, attributes (jsonb, p.ej. material, quilates, género), is_active, is_featured
-
-`utility = suggested_retail_price - price` → se calcula en el front, no se almacena.
-
-RLS:
-- Lectura pública para `is_active` (impulsadores aprobados ven todo) usando `is_approved(auth.uid())`.
-- Escritura solo `admin` vía `has_role`.
-- GRANTs `authenticated` + `service_role` en las 3 tablas.
-
-Seed inicial de categorías:
-```
-AnMa Luxury Collection
-├─ Perfumería Premium
-├─ Relojería Premium
-├─ Joyería AAA (oro, plata, esmeraldas)
-└─ Marroquinería
-   ├─ Calzado
-   ├─ Morrales
-   ├─ Billeteras
-   ├─ Correas
-   └─ Accesorios
-```
+Niveles definidos: **1. Junior · 2. Senior · 3. Líder · 4. Staff Matriz**.
+Regla base: el impulsador gana 20% del total de cada venta.
 
 ---
 
-## 2. Rutas nuevas (no se modifica ninguna ruta existente)
+## Fase 1 — Catálogo interno optimizado para móvil
 
-```
-src/routes/_authenticated/
-  luxury.tsx                    → /luxury (catálogo principal con filtros)
-  luxury.$productSlug.tsx       → /luxury/<slug> (ficha producto)
-  admin.luxury.tsx              → /admin/luxury (gestión productos luxury — solo admin)
-```
+**Navegación**
+- El menú lateral (rail de 72px) se mantiene igual en escritorio.
+- En móvil aparece una **barra inferior tipo app**: sobrepuesta, flotante, con blur, animada, con indicador deslizante del ítem activo (estilo imagen 3): Inicio · Luxury · Pedidos · Marel · Perfil.
+- Se elimina el margen izquierdo forzado en móvil (hoy el contenido queda corrido).
 
-`src/routes/_authenticated/admin.tsx` actual queda intacto; se añade un **link** en su header hacia `/admin/luxury`.
+**Cintas horizontales por etiqueta (imagen 1)**
+- Cada bloque (Destacados, Tendencia, Top ventas, Recomendados, Nuevos, y por categoría) pasa a ser un carrusel horizontal deslizable con scroll-snap, flechas en escritorio y arrastre en móvil.
+- Mosaico de categoría en cuadrícula 2x2 con etiqueta sobre la imagen, como en la imagen 1.
+- Fila de chips de etiquetas (TOP, HOT, NUEVO, MÁS GANANCIA) que filtra al instante sin salir de la página.
+- Tarjetas con animación de entrada escalonada y hover 3D suave; se reutiliza el sistema visual actual (shop-card, tokens verdes existentes).
 
----
+**Barra inferior de búsqueda (imagen 1)**
+- Píldora flotante fija sobre la barra de navegación, con búsqueda por palabra sobre nombre, descripción, SKU, marca y categoría (productos funnel + Luxury).
+- Resultados en panel expandible con agrupación por categoría y accesos rápidos.
 
-## 3. Catálogo `/luxury`
+## Fase 2 — Sistema de niveles + permisos
 
-- Hero premium con branding A&O (oro/negro, tipografía display).
-- Sidebar/Drawer filtros (mobile-first):
-  - Categoría (árbol con sub-categorías Marroquinería)
-  - Marca (multi-select)
-  - Rango de precio (slider)
-  - Disponibilidad (in_stock / preorder)
-- Grid responsive (2 cols mobile → 4 cols desktop) con tarjetas:
-  - Imagen principal (aspect 4/5)
-  - Nombre + marca
-  - Descripción corta (2 líneas)
-  - **Precio impulsador** (S/ X)
-  - **Precio sugerido** (tachado o destacado)
-  - **Utilidad estimada** (chip dorado)
-  - Botón "Vista rápida" → abre Dialog con galería + descripción completa + CTA "Ver ficha"
-- URL search params para filtros (compartibles, `validateSearch` + zod).
-- Paginación / infinite scroll preparado para miles de productos.
-- Estado vacío y skeletons.
+- Nuevo campo de nivel por usuario en la base de datos, con valor inicial Junior para nuevos registros.
+- **Panel admin**: en la pestaña de impulsadores, selector de nivel por usuario (solo super admin), con registro de quién y cuándo lo cambió.
+- **Puertas por nivel**: Junior no ve AnMa Luxury (oculto en el rail, en la barra móvil y bloqueado por ruta con pantalla explicativa "Disponible desde nivel Senior"). Senior en adelante sí.
+- La lógica de niveles queda centralizada para poder habilitar/deshabilitar más opciones después.
+- Insignia de nivel visible en el dashboard del impulsador, con su 20% de comisión estimada.
 
----
+## Fase 3 — Marel, asistente IA interno
 
-## 4. Ficha producto `/luxury/<slug>`
+- Chat interno con **hilos guardados en la base de datos** por usuario (lista de conversaciones, nuevo chat, URL propia por hilo, historial al recargar).
+- Logo adjunto (imagen 4) como avatar de Marel.
+- Marel responde sobre: cómo funciona la plataforma, el proceso de impulso, cómo compartir funnels y links con referido, cobros y pagos, y ayuda a encontrar productos con mejor ganancia (calcula el 20% sobre el precio de cada producto y ordena por comisión).
+- Marel ve el catálogo real y el nivel del usuario: a un Junior no le recomienda productos Luxury.
+- Streaming de respuestas, indicador de escritura y formato enriquecido.
 
-- Galería de imágenes
-- Nombre, marca, descripción
-- Bloque de precios (impulsador, sugerido, utilidad)
-- Disponibilidad
-- Atributos dinámicos (material, quilates, etc.)
-- Botón "Compartir" (genera link público — fase futura, no en este sprint)
+## Fase 4 — Homepage con partículas interactivas 3D
+
+- Fondo de partículas interactivo a pantalla completa que reacciona al cursor y al scroll, con el texto y las secciones integrados dentro de la animación (referencia monopo.vn + guía de estilo indicada).
+- Paleta y tipografía actuales conservadas; **el contenido de la homepage no cambia**, solo su presentación.
+- Degradación segura: en móvil y en equipos de bajo rendimiento baja la densidad de partículas, y con "reducir movimiento" activo se muestra un fondo estático.
 
 ---
 
-## 5. Admin `/admin/luxury` (solo rol admin)
+## Notas técnicas
 
-- Tabs: Productos · Categorías · Marcas
-- CRUD productos con `MediaUploader` ya existente (reutilizado, no se modifica)
-- Selección de categoría/marca, edición de stock y precios
-
----
-
-## 6. Navegación
-
-Añadir un único item "Luxury Collection" en `AppNavbar` (con badge dorado) que enlaza a `/luxury`. No se mueve ni renombra nada existente.
-
----
-
-## Detalles técnicos
-
-- Lectura cliente: `supabase` browser client + TanStack Query (`useSuspenseQuery` desde loader con `ensureQueryData`).
-- Filtros vía `validateSearch` (zod) — sin `useState` para estado URL.
-- Diseño: tokens existentes + acento `--luxury-gold` nuevo en `src/styles.css` (solo añadir, no modificar tokens actuales).
-- Mobile-first, escalable, preparado para integración futura de inventario (campo `stock_quantity` ya presente; webhook se añadirá luego sin migración).
-
-## Lo que NO se toca
-- `products`, `categories`, `orders`, funnels, `product.$slug.tsx`, `admin.tsx`, uploaders, auth flow, roles, RLS existentes, navbar links existentes, estilos globales.
-
-¿Avanzo con la migración + implementación?
+- Barra inferior móvil: componente nuevo `MobileTabBar`, montado en el layout autenticado; el rail se oculta por debajo de `md`.
+- Carruseles: componente `Rail` reutilizable con scroll-snap nativo (sin librería de carrusel) + `Reveal` existente para animación de entrada.
+- Búsqueda: filtrado en cliente sobre los datos ya cargados por consulta; sin llamadas extra por tecla.
+- Niveles: enum + columna en `profiles`, con política de escritura restringida a super admin y helper de nivel para las puertas de UI y de datos.
+- Marel: ruta de chat en servidor con la pasarela de IA de Lovable (modelo por defecto), tablas de hilos y mensajes con RLS por usuario, y contexto de catálogo generado en el servidor.
+- Homepage 3D: capa de partículas con Three.js cargada solo en cliente, aislada de la SSR de la ruta.
