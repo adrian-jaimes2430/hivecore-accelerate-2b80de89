@@ -24,6 +24,8 @@ interface AuthCtx {
   hasRole: (r: AppRole) => boolean;
   isAdmin: boolean;
   isApproved: boolean;
+  level: ImpulsorLevel;
+  canLuxury: boolean;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
 }
