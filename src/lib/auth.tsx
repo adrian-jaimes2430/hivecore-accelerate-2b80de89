@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { canAccessLuxury, type ImpulsorLevel } from "@/lib/levels";
@@ -38,37 +38,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
+  const restored = useRef(false);
+  const signingOut = useRef(false);
 
-  const loadProfile = async (uid: string) => {
+  /**
+   * Carga perfil + roles con reintentos. Un fallo de red NUNCA borra los datos
+   * ya cargados: de lo contrario el botón Admin desaparecía en cualquier
+   * hipo de conexión.
+   */
+  const loadProfile = async (uid: string, attempt = 0): Promise<void> => {
     try {
-      const [{ data: p }, { data: r }] = await Promise.all([
+      const [{ data: p, error: pe }, { data: r, error: re }] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", uid),
       ]);
-      setProfile((p as Profile) ?? null);
+      if (pe || re) throw pe ?? re;
+      if (p) setProfile(p as Profile);
       setRoles(((r ?? []) as { role: AppRole }[]).map((x) => x.role));
     } catch (error) {
       console.error("No fue posible cargar los datos de la cuenta", error);
-      setProfile(null);
-      setRoles([]);
+      if (attempt < 3 && !signingOut.current) {
+        await new Promise((res) => setTimeout(res, 600 * (attempt + 1)));
+        return loadProfile(uid, attempt + 1);
+      }
     }
   };
 
+  const clearIdentity = () => {
+    setSession(null);
+    setUser(null);
+    setProfile(null);
+    setRoles([]);
+  };
+
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      setLoading(false);
+    const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
+      // Antes de que getSession() resuelva, un evento sin sesión (INITIAL_SESSION)
+      // no debe expulsar al usuario del panel.
+      if (!s && !restored.current && event !== "SIGNED_OUT") return;
+
       if (s?.user) {
+        restored.current = true;
+        setSession(s);
+        setUser(s.user);
+        setLoading(false);
         setTimeout(() => void loadProfile(s.user.id), 0);
-      } else {
-        setProfile(null);
-        setRoles([]);
+        return;
+      }
+
+      if (event === "SIGNED_OUT") {
+        restored.current = true;
+        clearIdentity();
+        setLoading(false);
       }
     });
 
     void supabase.auth.getSession()
       .then(({ data: { session: s } }) => {
+        restored.current = true;
         setSession(s);
         setUser(s?.user ?? null);
         setLoading(false);
@@ -76,8 +103,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       .catch((error) => {
         console.error("No fue posible restaurar la sesión", error);
-        setSession(null);
-        setUser(null);
+        restored.current = true;
+        clearIdentity();
         setLoading(false);
       });
 
@@ -95,7 +122,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     level,
     canLuxury: canAccessLuxury({ level, isStaff }),
     refresh: async () => { if (user) await loadProfile(user.id); },
-    signOut: async () => { await supabase.auth.signOut(); },
+    signOut: async () => {
+      signingOut.current = true;
+      try {
+        await supabase.auth.signOut();
+      } catch (error) {
+        console.error("Cierre de sesión con error, limpiando localmente", error);
+        try {
+          await supabase.auth.signOut({ scope: "local" });
+        } catch { /* ignorado: el estado local se limpia igual */ }
+      } finally {
+        clearIdentity();
+        setLoading(false);
+        signingOut.current = false;
+      }
+    },
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
