@@ -23,7 +23,7 @@ import type { Variation } from "@/components/admin/VariationsEditor";
 import { formatCOP } from "@/lib/pricing";
 
 export const Route = createFileRoute("/_authenticated/luxury/$slug")({
-  component: LuxuryProduct,
+  component: LuxuryProductGate,
 });
 
 interface LuxProduct {
@@ -37,10 +37,13 @@ interface LuxProduct {
   attributes: Record<string, unknown>;
 }
 
-function LuxuryProduct() {
+function LuxuryProductGate() {
   const { canLuxury } = useAuth();
   if (!canLuxury) return <LevelLocked section="AnMa Luxury Collection" />;
+  return <LuxuryProduct />;
+}
 
+function LuxuryProduct() {
   const { slug } = Route.useParams();
   const { user } = useAuth();
   const [selectedVariations, setSelectedVariations] = useState<Record<string, string>>({});

@@ -28,7 +28,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/_authenticated/luxury/")({
   validateSearch: zodValidator(searchSchema),
-  component: LuxuryCatalog,
+  component: LuxuryCatalogGate,
   head: () => ({
     meta: [
       { title: "AnMa Luxury Collection — A&O Ecosystem" },
@@ -48,10 +48,13 @@ interface LuxProduct {
   attributes: Record<string, unknown>; is_featured: boolean;
 }
 
-function LuxuryCatalog() {
+function LuxuryCatalogGate() {
   const { canLuxury } = useAuth();
   if (!canLuxury) return <LevelLocked section="AnMa Luxury Collection" />;
+  return <LuxuryCatalog />;
+}
 
+function LuxuryCatalog() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/luxury/" });
   const { user } = useAuth();
