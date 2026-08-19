@@ -5,6 +5,7 @@ import { forwardOrderEvent } from "@/lib/integrations.functions";
 import { listUserEmails } from "@/lib/admin-users.functions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { LEVELS, LEVEL_LABEL, levelChip, type ImpulsorLevel } from "@/lib/levels";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({ meta: [{ title: "Admin — HIVECORE" }] }),
 });
 
-interface ProfileRow { id: string; full_name: string | null; phone: string | null; status: string; created_at: string }
+interface ProfileRow { id: string; full_name: string | null; phone: string | null; status: string; created_at: string; level: ImpulsorLevel; level_updated_at: string | null; level_updated_by: string | null }
 interface Category { id: string; name: string; slug: string; description: string | null; color: string | null; icon: string | null; sort_order: number | null }
 interface FunnelSection { title: string; content: string; image?: string; video?: string }
 interface Product {
@@ -142,6 +143,7 @@ interface ProfileWithRole extends ProfileRow { role: RoleType }
 
 function UsersTab() {
   const qc = useQueryClient();
+  const { isAdmin } = useAuth();
   const fetchEmails = useServerFn(listUserEmails);
   const { data: emailMap = {} } = useQuery({
     queryKey: ["admin-user-emails"],
@@ -177,6 +179,13 @@ function UsersTab() {
     return true;
   };
 
+  const setLevel = async (id: string, level: ImpulsorLevel) => {
+    const { error } = await supabase.from("profiles").update({ level }).eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    await qc.invalidateQueries({ queryKey: ["admin-profiles"] });
+    toast.success(`Nivel actualizado a ${LEVEL_LABEL[level]}`);
+  };
+
   const setRole = async (userId: string, role: RoleType) => {
     const { error: delErr } = await supabase.from("user_roles").delete().eq("user_id", userId);
     if (delErr) { toast.error(delErr.message); return false; }
@@ -202,6 +211,7 @@ function UsersTab() {
             <th className="px-4 py-3">Teléfono</th>
             <th className="px-4 py-3">Estado</th>
             <th className="px-4 py-3">Rol</th>
+            <th className="px-4 py-3">Nivel</th>
             <th className="px-4 py-3">Fecha</th>
             <th className="px-4 py-3 text-right">Acciones</th>
           </tr>
@@ -228,6 +238,29 @@ function UsersTab() {
                     <SelectItem value="super_admin">Administrador</SelectItem>
                   </SelectContent>
                 </Select>
+              </td>
+              <td className="px-4 py-3">
+                {isAdmin ? (
+                  <Select value={p.level ?? "junior"} onValueChange={(v) => setLevel(p.id, v as ImpulsorLevel)}>
+                    <SelectTrigger className="h-8 w-[150px] bg-white/5 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {LEVELS.map((l) => (
+                        <SelectItem key={l.key} value={l.key}>{l.rank}. {l.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${levelChip(p.level)}`}>
+                    {LEVEL_LABEL[p.level ?? "junior"]}
+                  </span>
+                )}
+                {p.level_updated_at && (
+                  <p className="mt-1 text-[10px] text-muted-foreground">
+                    Cambiado {new Date(p.level_updated_at).toLocaleDateString()}
+                  </p>
+                )}
               </td>
               <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</td>
               <td className="px-4 py-3 text-right">
