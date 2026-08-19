@@ -70,11 +70,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  const isStaff = roles.includes("super_admin") || roles.includes("collaborator");
+  const level: ImpulsorLevel = profile?.level ?? "junior";
+
   const value: AuthCtx = {
     user, session, profile, roles, loading,
     hasRole: (r) => roles.includes(r),
     isAdmin: roles.includes("super_admin"),
     isApproved: profile?.status === "approved",
+    level,
+    canLuxury: canAccessLuxury({ level, isStaff }),
     refresh: async () => { if (user) await loadProfile(user.id); },
     signOut: async () => { await supabase.auth.signOut(); },
   };
