@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { canAccessLuxury, type ImpulsorLevel } from "@/lib/levels";
 
 export type AppRole = "super_admin" | "collaborator" | "impulsador";
 export type UserStatus = "pending" | "approved" | "blocked";
@@ -11,6 +12,7 @@ export interface Profile {
   phone: string | null;
   avatar_url: string | null;
   status: UserStatus;
+  level: ImpulsorLevel;
 }
 
 interface AuthCtx {
