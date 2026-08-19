@@ -40,18 +40,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const loadProfile = async (uid: string) => {
-    const [{ data: p }, { data: r }] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
-      supabase.from("user_roles").select("role").eq("user_id", uid),
-    ]);
-    setProfile((p as Profile) ?? null);
-    setRoles(((r ?? []) as { role: AppRole }[]).map((x) => x.role));
+    try {
+      const [{ data: p }, { data: r }] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
+        supabase.from("user_roles").select("role").eq("user_id", uid),
+      ]);
+      setProfile((p as Profile) ?? null);
+      setRoles(((r ?? []) as { role: AppRole }[]).map((x) => x.role));
+    } catch (error) {
+      console.error("No fue posible cargar los datos de la cuenta", error);
+      setProfile(null);
+      setRoles([]);
+    }
   };
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s);
       setUser(s?.user ?? null);
+      setLoading(false);
       if (s?.user) {
         setTimeout(() => void loadProfile(s.user.id), 0);
       } else {
@@ -60,12 +67,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    supabase.auth.getSession().then(async ({ data: { session: s } }) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      if (s?.user) await loadProfile(s.user.id);
-      setLoading(false);
-    });
+    void supabase.auth.getSession()
+      .then(({ data: { session: s } }) => {
+        setSession(s);
+        setUser(s?.user ?? null);
+        setLoading(false);
+        if (s?.user) void loadProfile(s.user.id);
+      })
+      .catch((error) => {
+        console.error("No fue posible restaurar la sesión", error);
+        setSession(null);
+        setUser(null);
+        setLoading(false);
+      });
 
     return () => sub.subscription.unsubscribe();
   }, []);
