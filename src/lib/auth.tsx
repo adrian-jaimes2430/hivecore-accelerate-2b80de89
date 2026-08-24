@@ -21,6 +21,8 @@ interface AuthCtx {
   profile: Profile | null;
   roles: AppRole[];
   loading: boolean;
+  /** true cuando perfil y roles ya se resolvieron (o no hay sesión). */
+  identityReady: boolean;
   hasRole: (r: AppRole) => boolean;
   isAdmin: boolean;
   isApproved: boolean;
@@ -38,6 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
+  const [identityReady, setIdentityReady] = useState(false);
   const restored = useRef(false);
   const signingOut = useRef(false);
 
@@ -55,16 +58,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (pe || re) throw pe ?? re;
       if (p) setProfile(p as Profile);
       setRoles(((r ?? []) as { role: AppRole }[]).map((x) => x.role));
+      setIdentityReady(true);
     } catch (error) {
       console.error("No fue posible cargar los datos de la cuenta", error);
       if (attempt < 3 && !signingOut.current) {
         await new Promise((res) => setTimeout(res, 600 * (attempt + 1)));
         return loadProfile(uid, attempt + 1);
       }
+      setIdentityReady(true);
     }
   };
 
   const clearIdentity = () => {
+    setIdentityReady(true);
     setSession(null);
     setUser(null);
     setProfile(null);
@@ -100,6 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(s?.user ?? null);
         setLoading(false);
         if (s?.user) void loadProfile(s.user.id);
+        else setIdentityReady(true);
       })
       .catch((error) => {
         console.error("No fue posible restaurar la sesión", error);
@@ -115,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const level: ImpulsorLevel = profile?.level ?? "junior";
 
   const value: AuthCtx = {
-    user, session, profile, roles, loading,
+    user, session, profile, roles, loading, identityReady,
     hasRole: (r) => roles.includes(r),
     isAdmin: roles.includes("super_admin"),
     isApproved: profile?.status === "approved",
