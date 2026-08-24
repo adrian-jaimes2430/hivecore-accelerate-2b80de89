@@ -42,8 +42,8 @@ const slugify = (s: string) =>
   s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
 function LuxuryAdmin() {
-  const { isAdmin, loading } = useAuth();
-  if (loading) return <div className="flex h-60 items-center justify-center"><Loader2 className="h-5 w-5 animate-spin" /></div>;
+  const { isAdmin, loading, identityReady } = useAuth();
+  if (loading || !identityReady) return <div className="flex h-60 items-center justify-center"><Loader2 className="h-5 w-5 animate-spin" /></div>;
   if (!isAdmin) return <Navigate to="/app" />;
 
   return (

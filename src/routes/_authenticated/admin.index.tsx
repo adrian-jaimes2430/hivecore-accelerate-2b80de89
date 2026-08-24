@@ -54,7 +54,7 @@ const slugify = (s: string) =>
     .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 function AdminPage() {
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, loading, identityReady } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
