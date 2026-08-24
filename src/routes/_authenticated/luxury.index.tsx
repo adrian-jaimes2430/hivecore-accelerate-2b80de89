@@ -49,7 +49,8 @@ interface LuxProduct {
 }
 
 function LuxuryCatalogGate() {
-  const { canLuxury } = useAuth();
+  const { canLuxury, loading, identityReady } = useAuth();
+  if (loading || !identityReady) return <div className="flex h-60 items-center justify-center text-sm text-muted-foreground">Cargando…</div>;
   if (!canLuxury) return <LevelLocked section="AnMa Luxury Collection" />;
   return <LuxuryCatalog />;
 }

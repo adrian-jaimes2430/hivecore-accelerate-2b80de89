@@ -58,10 +58,10 @@ function AdminPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !isAdmin) navigate({ to: "/app" });
-  }, [loading, isAdmin, navigate]);
+    if (!loading && identityReady && !isAdmin) navigate({ to: "/app" });
+  }, [loading, identityReady, isAdmin, navigate]);
 
-  if (loading || !isAdmin) {
+  if (loading || !identityReady || !isAdmin) {
     return <div className="flex h-[50vh] items-center justify-center"><Loader2 className="h-5 w-5 animate-spin text-hive" /></div>;
   }
 
