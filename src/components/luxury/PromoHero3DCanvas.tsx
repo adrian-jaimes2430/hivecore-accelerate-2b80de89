@@ -6,7 +6,7 @@ import type { Promo } from "./PromoCarousel";
  * Lienzo three.js del banner superior: tarjetas de producto flotando en 3D
  * con parallax por puntero (estilo shop.app). Solo se carga en el navegador.
  */
-export function PromoHero3DCanvas({ promos }: { promos: Promo[] }) {
+export function PromoHero3DCanvas({ promos, images = [] }: { promos: Promo[]; images?: string[] }) {
   const host = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,8 +34,13 @@ export function PromoHero3DCanvas({ promos }: { promos: Promo[] }) {
     const loader = new THREE.TextureLoader();
     loader.setCrossOrigin("anonymous");
 
-    const media = promos.filter((p) => p.media_url).slice(0, 8);
-    const sources = media.length > 0 ? media : [];
+    type Src = { media_url: string; media_type: string };
+    const fromPromos: Src[] = promos
+      .filter((p) => p.media_url)
+      .slice(0, 8)
+      .map((p) => ({ media_url: p.media_url as string, media_type: p.media_type }));
+    const fromProducts: Src[] = images.slice(0, 8).map((u) => ({ media_url: u, media_type: "image" }));
+    const sources: Src[] = [...fromPromos, ...fromProducts].slice(0, 8);
     const group = new THREE.Group();
     scene.add(group);
 
@@ -143,7 +148,7 @@ export function PromoHero3DCanvas({ promos }: { promos: Promo[] }) {
       renderer.dispose();
       renderer.domElement.remove();
     };
-  }, [promos]);
+  }, [promos, images]);
 
   return <div ref={host} className="absolute inset-0" aria-hidden="true" />;
 }

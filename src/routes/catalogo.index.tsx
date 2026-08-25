@@ -141,7 +141,13 @@ function PublicCatalog() {
 
   return (
     <div className="min-h-screen">
-      <PromoHero3D promos={promos} />
+      <PromoHero3D
+        promos={promos}
+        images={products
+          .map((p) => (Array.isArray(p.images) ? (p.images as string[])[0] : null))
+          .filter((u): u is string => typeof u === "string")
+          .slice(0, 8)}
+      />
       {/* Top bar */}
       <header className="sticky top-0 z-40 border-b border-[color:var(--luxury-gold)]/15 bg-black/60 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">

@@ -9,7 +9,7 @@ const Canvas = lazy(() => import("./PromoHero3DCanvas"));
  * Banner superior grande del catálogo Luxury: escena 3D con tarjetas
  * flotantes (three.js) y copia superpuesta. El 3D solo carga en cliente.
  */
-export function PromoHero3D({ promos }: { promos: Promo[] }) {
+export function PromoHero3D({ promos, images = [] }: { promos: Promo[]; images?: string[] }) {
   const featured = promos.find((p) => p.title) ?? promos[0] ?? null;
 
   return (
@@ -17,7 +17,7 @@ export function PromoHero3D({ promos }: { promos: Promo[] }) {
       <div className="absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_0%,rgba(201,168,76,0.22),transparent_60%)]" />
       <ClientOnly fallback={null}>
         <Suspense fallback={null}>
-          <Canvas promos={promos} />
+          <Canvas promos={promos} images={images} />
         </Suspense>
       </ClientOnly>
       <div className="promo-hero3d-veil" />
