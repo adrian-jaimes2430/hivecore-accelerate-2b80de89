@@ -81,7 +81,7 @@ export function PromoHero3DCanvas({ promos }: { promos: Promo[] }) {
 
       const mesh = new THREE.Mesh(geo, mat);
       const spread = count > 1 ? (i / (count - 1)) * 2 - 1 : 0;
-      mesh.position.set(spread * 6.2, (i % 2 === 0 ? 0.5 : -0.6) + Math.sin(i) * 0.3, -Math.abs(spread) * 2.4);
+      mesh.position.set(spread * 4.6, (i % 2 === 0 ? 0.35 : -0.45) + Math.sin(i) * 0.25, 0.6 - Math.abs(spread) * 1.6);
       mesh.rotation.y = -spread * 0.5;
       mesh.rotation.z = spread * 0.06;
       group.add(mesh);

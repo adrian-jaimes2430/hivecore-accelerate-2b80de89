@@ -159,26 +159,6 @@ function PublicCatalog() {
       </header>
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        {/* Hero */}
-        <section className="relative mb-10 overflow-hidden rounded-[28px] border border-[color:var(--luxury-gold)]/30 bg-gradient-to-br from-black via-zinc-950 to-[#1a1208] p-8 sm:p-14 luxury-shine animate-fade-up">
-          <div className="absolute inset-0 hive-grid-bg opacity-20" />
-          <div className="relative">
-            <div className="mercury-tag border-[color:var(--luxury-gold)]/40 bg-black/40 text-[10px] uppercase tracking-[0.3em] text-[color:var(--luxury-gold)]">
-              <Crown className="h-3 w-3" /> Colección Premium
-            </div>
-            <h1 className="mercury-display animate-rise mt-5 text-4xl sm:text-6xl" style={{ animationDelay: "120ms" }}>
-              <span className="luxury-gradient-text">AnMa Luxury Collection</span>
-            </h1>
-            <p className="mercury-muted animate-rise mt-4 max-w-2xl text-sm sm:text-base" style={{ animationDelay: "240ms" }}>
-              Piezas seleccionadas a mano. Perfumería, relojería, joyería AAA y marroquinería de autor. Cada producto es una declaración.
-            </p>
-          </div>
-        </section>
-
-
-
-
-
         {/* Toolbar — pill search + category chips */}
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <div className="relative min-w-[220px] flex-1">
