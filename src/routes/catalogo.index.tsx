@@ -342,20 +342,3 @@ function QuickPreview({ p, brand, refQs }: { p: Product; brand?: string; refQs: 
   );
 }
 
-function FloatingCTA({ impulsador }: { impulsador: { id: string; name: string | null; phone: string | null } | null }) {
-  const href = waHref(
-    impulsador?.phone || ANMA_WHATSAPP,
-    "Hola 😊 Vi el catálogo AnMa Luxury ✨ y quisiera conocer precios, cómo funciona y qué incluye.",
-  );
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500 px-4 py-3 text-sm font-medium text-black shadow-2xl shadow-emerald-500/30 transition-transform hover:scale-105"
-    >
-      <MessageCircle className="h-4 w-4" />
-      {impulsador?.name ? `Contactar a ${impulsador.name.split(" ")[0]}` : "Hacer mi pedido"}
-    </a>
-  );
-}
