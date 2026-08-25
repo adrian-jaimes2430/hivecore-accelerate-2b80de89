@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Crown, Filter, Sparkles, ArrowRight, Search, MessageCircle, Film } from "lucide-react";
+import { Crown, Filter, Sparkles, ArrowRight, Search, Film } from "lucide-react";
 import { listLuxuryCatalog, getImpulsadorRef } from "@/lib/luxury-public.functions";
 import { type Promo } from "@/components/luxury/PromoCarousel";
-import { PromoTicker } from "@/components/luxury/PromoTicker";
+import { PromoHero3D } from "@/components/luxury/PromoHero3D";
+import { LuxurySearchDock } from "@/components/luxury/LuxurySearchDock";
+import { MarelChatBubble } from "@/components/marel/MarelChatBubble";
 import { Reveal } from "@/components/Reveal";
-import { waHref, ANMA_WHATSAPP } from "@/lib/whatsapp";
 import { formatCOP } from "@/lib/pricing";
 
 const searchSchema = z.object({
@@ -140,7 +141,13 @@ function PublicCatalog() {
 
   return (
     <div className="min-h-screen">
-      <PromoTicker promos={promos} />
+      <PromoHero3D
+        promos={promos}
+        images={products
+          .map((p) => (Array.isArray(p.images) ? (p.images as string[])[0] : null))
+          .filter((u): u is string => typeof u === "string")
+          .slice(0, 8)}
+      />
       {/* Top bar */}
       <header className="sticky top-0 z-40 border-b border-[color:var(--luxury-gold)]/15 bg-black/60 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
@@ -158,26 +165,6 @@ function PublicCatalog() {
       </header>
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        {/* Hero */}
-        <section className="relative mb-10 overflow-hidden rounded-[28px] border border-[color:var(--luxury-gold)]/30 bg-gradient-to-br from-black via-zinc-950 to-[#1a1208] p-8 sm:p-14 luxury-shine animate-fade-up">
-          <div className="absolute inset-0 hive-grid-bg opacity-20" />
-          <div className="relative">
-            <div className="mercury-tag border-[color:var(--luxury-gold)]/40 bg-black/40 text-[10px] uppercase tracking-[0.3em] text-[color:var(--luxury-gold)]">
-              <Crown className="h-3 w-3" /> Colección Premium
-            </div>
-            <h1 className="mercury-display animate-rise mt-5 text-4xl sm:text-6xl" style={{ animationDelay: "120ms" }}>
-              <span className="luxury-gradient-text">AnMa Luxury Collection</span>
-            </h1>
-            <p className="mercury-muted animate-rise mt-4 max-w-2xl text-sm sm:text-base" style={{ animationDelay: "240ms" }}>
-              Piezas seleccionadas a mano. Perfumería, relojería, joyería AAA y marroquinería de autor. Cada producto es una declaración.
-            </p>
-          </div>
-        </section>
-
-
-
-
-
         {/* Toolbar — pill search + category chips */}
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <div className="relative min-w-[220px] flex-1">
@@ -238,8 +225,22 @@ function PublicCatalog() {
         </div>
       </div>
 
-      {/* Floating contact CTA */}
-      <FloatingCTA impulsador={impulsador ?? null} />
+      {/* Buscador flotante inferior + Marel 3D */}
+      <LuxurySearchDock
+        items={products.map((p) => ({
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          sku: (p as { sku?: string | null }).sku ?? null,
+          price: Number(p.suggested_retail_price || p.price),
+          short_description: p.short_description ?? null,
+          images: p.images,
+          brand: brands.find((b) => b.id === p.brand_id)?.name ?? null,
+          category: categories.find((c) => c.id === p.category_id)?.name ?? null,
+        }))}
+        refId={search.ref}
+      />
+      <MarelChatBubble refId={search.ref ?? null} />
 
       <Dialog open={!!quickView} onOpenChange={(o) => !o && setQuickView(null)}>
         <DialogContent className="max-w-3xl">
@@ -326,20 +327,3 @@ function QuickPreview({ p, brand, refQs }: { p: Product; brand?: string; refQs: 
   );
 }
 
-function FloatingCTA({ impulsador }: { impulsador: { id: string; name: string | null; phone: string | null } | null }) {
-  const href = waHref(
-    impulsador?.phone || ANMA_WHATSAPP,
-    "Hola 😊 Vi el catálogo AnMa Luxury ✨ y quisiera conocer precios, cómo funciona y qué incluye.",
-  );
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500 px-4 py-3 text-sm font-medium text-black shadow-2xl shadow-emerald-500/30 transition-transform hover:scale-105"
-    >
-      <MessageCircle className="h-4 w-4" />
-      {impulsador?.name ? `Contactar a ${impulsador.name.split(" ")[0]}` : "Hacer mi pedido"}
-    </a>
-  );
-}

@@ -6,7 +6,7 @@ import type { Promo } from "./PromoCarousel";
  * Lienzo three.js del banner superior: tarjetas de producto flotando en 3D
  * con parallax por puntero (estilo shop.app). Solo se carga en el navegador.
  */
-export function PromoHero3DCanvas({ promos }: { promos: Promo[] }) {
+export function PromoHero3DCanvas({ promos, images = [] }: { promos: Promo[]; images?: string[] }) {
   const host = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,8 +34,13 @@ export function PromoHero3DCanvas({ promos }: { promos: Promo[] }) {
     const loader = new THREE.TextureLoader();
     loader.setCrossOrigin("anonymous");
 
-    const media = promos.filter((p) => p.media_url).slice(0, 8);
-    const sources = media.length > 0 ? media : [];
+    type Src = { media_url: string; media_type: string };
+    const fromPromos: Src[] = promos
+      .filter((p) => p.media_url)
+      .slice(0, 8)
+      .map((p) => ({ media_url: p.media_url as string, media_type: p.media_type }));
+    const fromProducts: Src[] = images.slice(0, 8).map((u) => ({ media_url: u, media_type: "image" }));
+    const sources: Src[] = [...fromPromos, ...fromProducts].slice(0, 8);
     const group = new THREE.Group();
     scene.add(group);
 
@@ -46,7 +51,7 @@ export function PromoHero3DCanvas({ promos }: { promos: Promo[] }) {
     const count = Math.max(sources.length, 5);
     for (let i = 0; i < count; i += 1) {
       const src = sources[i % Math.max(sources.length, 1)];
-      const geo = new THREE.PlaneGeometry(2.1, 2.7, 1, 1);
+      const geo = new THREE.PlaneGeometry(2.6, 3.3, 1, 1);
       let map: THREE.Texture | null = null;
 
       if (src?.media_url) {
@@ -69,20 +74,18 @@ export function PromoHero3DCanvas({ promos }: { promos: Promo[] }) {
         }
       }
 
-      const mat = new THREE.MeshStandardMaterial({
+      const mat = new THREE.MeshBasicMaterial({
         map: map ?? null,
-        color: map ? 0xffffff : 0x141018,
-        roughness: 0.42,
-        metalness: 0.22,
+        color: map ? 0xffffff : 0x1c1622,
         transparent: true,
-        opacity: 0.98,
+        opacity: 0.96,
       });
       disposables.push(geo, mat);
 
       const mesh = new THREE.Mesh(geo, mat);
       const spread = count > 1 ? (i / (count - 1)) * 2 - 1 : 0;
-      mesh.position.set(spread * 6.2, (i % 2 === 0 ? 0.5 : -0.6) + Math.sin(i) * 0.3, -Math.abs(spread) * 2.4);
-      mesh.rotation.y = -spread * 0.5;
+      mesh.position.set(spread * 5.6, (i % 2 === 0 ? 0.45 : -0.55) + Math.sin(i) * 0.25, 0.8 - Math.abs(spread) * 1.2);
+      mesh.rotation.y = -spread * 0.6;
       mesh.rotation.z = spread * 0.06;
       group.add(mesh);
       cards.push({ mesh, seed: i * 1.7, baseY: mesh.position.y });
@@ -117,6 +120,7 @@ export function PromoHero3DCanvas({ promos }: { promos: Promo[] }) {
       pointer.x += (target.x - pointer.x) * 0.06;
       pointer.y += (target.y - pointer.y) * 0.06;
 
+      group.position.y = -0.15;
       group.rotation.y = pointer.x * 0.22;
       group.rotation.x = pointer.y * 0.1;
       group.position.x = -pointer.x * 0.6;
@@ -143,7 +147,7 @@ export function PromoHero3DCanvas({ promos }: { promos: Promo[] }) {
       renderer.dispose();
       renderer.domElement.remove();
     };
-  }, [promos]);
+  }, [promos, images]);
 
   return <div ref={host} className="absolute inset-0" aria-hidden="true" />;
 }
