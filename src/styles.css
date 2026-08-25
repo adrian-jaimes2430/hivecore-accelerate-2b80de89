@@ -900,3 +900,60 @@ html { scroll-behavior: smooth; }
   .tabbar { animation: none; }
   .tabbar-indicator { transition: none; }
 }
+
+@layer components {
+  /* Banner 3D superior del catálogo Luxury */
+  .promo-hero3d {
+    position: relative;
+    overflow: hidden;
+    height: clamp(300px, 46vw, 520px);
+    border-bottom: 1px solid color-mix(in oklab, var(--luxury-gold) 18%, transparent);
+    background: radial-gradient(120% 120% at 50% 0%, #1a1208 0%, #08080b 60%, #050507 100%);
+  }
+  .promo-hero3d-veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(5, 5, 7, 0.94) 4%, rgba(5, 5, 7, 0.45) 45%, rgba(5, 5, 7, 0.1) 100%);
+    pointer-events: none;
+  }
+
+  /* Globo 3D de Marel + panel de chat */
+  .marel-bubble-btn {
+    position: fixed;
+    right: 16px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 5.5rem);
+    z-index: 90;
+    height: 64px;
+    width: 64px;
+    border-radius: 999px;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 30% 25%, color-mix(in oklab, var(--hive) 85%, white), color-mix(in oklab, var(--hive) 60%, black));
+    box-shadow: 0 18px 42px -14px rgba(0, 0, 0, 0.85);
+    transition: transform var(--dur-fast) var(--ease-spring);
+  }
+  .marel-bubble-btn:hover { transform: scale(1.08); }
+  .marel-bubble-btn:active { transform: scale(0.95); }
+
+  .marel-panel {
+    position: fixed;
+    z-index: 91;
+    right: 12px;
+    left: 12px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 11rem);
+    display: flex;
+    flex-direction: column;
+    height: min(66vh, 560px);
+    border-radius: 26px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(11, 11, 15, 0.96);
+    backdrop-filter: blur(24px);
+    box-shadow: 0 28px 70px -22px rgba(0, 0, 0, 0.95);
+    overflow: hidden;
+  }
+  @media (min-width: 640px) {
+    .marel-panel { left: auto; width: 400px; bottom: calc(env(safe-area-inset-bottom, 0px) + 10rem); }
+  }
+}
