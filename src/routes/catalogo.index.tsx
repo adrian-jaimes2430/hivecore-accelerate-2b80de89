@@ -7,14 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Crown, Filter, Sparkles, ArrowRight, Search, MessageCircle, Film } from "lucide-react";
+import { Crown, Filter, Sparkles, ArrowRight, Search, Film } from "lucide-react";
 import { listLuxuryCatalog, getImpulsadorRef } from "@/lib/luxury-public.functions";
 import { type Promo } from "@/components/luxury/PromoCarousel";
 import { PromoHero3D } from "@/components/luxury/PromoHero3D";
 import { LuxurySearchDock } from "@/components/luxury/LuxurySearchDock";
 import { MarelChatBubble } from "@/components/marel/MarelChatBubble";
 import { Reveal } from "@/components/Reveal";
-import { waHref, ANMA_WHATSAPP } from "@/lib/whatsapp";
 import { formatCOP } from "@/lib/pricing";
 
 const searchSchema = z.object({
