@@ -246,7 +246,7 @@ function PublicCatalog() {
           id: p.id,
           name: p.name,
           slug: p.slug,
-          sku: p.sku ?? null,
+          sku: (p as { sku?: string | null }).sku ?? null,
           price: Number(p.suggested_retail_price || p.price),
           short_description: p.short_description ?? null,
           images: p.images,
