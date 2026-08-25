@@ -10,7 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Crown, Filter, Sparkles, ArrowRight, Search, MessageCircle, Film } from "lucide-react";
 import { listLuxuryCatalog, getImpulsadorRef } from "@/lib/luxury-public.functions";
 import { type Promo } from "@/components/luxury/PromoCarousel";
-import { PromoTicker } from "@/components/luxury/PromoTicker";
+import { PromoHero3D } from "@/components/luxury/PromoHero3D";
+import { LuxurySearchDock } from "@/components/luxury/LuxurySearchDock";
+import { MarelChatBubble } from "@/components/marel/MarelChatBubble";
 import { Reveal } from "@/components/Reveal";
 import { waHref, ANMA_WHATSAPP } from "@/lib/whatsapp";
 import { formatCOP } from "@/lib/pricing";
@@ -140,7 +142,7 @@ function PublicCatalog() {
 
   return (
     <div className="min-h-screen">
-      <PromoTicker promos={promos} />
+      <PromoHero3D promos={promos} />
       {/* Top bar */}
       <header className="sticky top-0 z-40 border-b border-[color:var(--luxury-gold)]/15 bg-black/60 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
@@ -238,8 +240,22 @@ function PublicCatalog() {
         </div>
       </div>
 
-      {/* Floating contact CTA */}
-      <FloatingCTA impulsador={impulsador ?? null} />
+      {/* Buscador flotante inferior + Marel 3D */}
+      <LuxurySearchDock
+        items={products.map((p) => ({
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          sku: p.sku ?? null,
+          price: Number(p.suggested_retail_price || p.price),
+          short_description: p.short_description ?? null,
+          images: p.images,
+          brand: brands.find((b) => b.id === p.brand_id)?.name ?? null,
+          category: categories.find((c) => c.id === p.category_id)?.name ?? null,
+        }))}
+        refId={search.ref}
+      />
+      <MarelChatBubble refId={search.ref ?? null} />
 
       <Dialog open={!!quickView} onOpenChange={(o) => !o && setQuickView(null)}>
         <DialogContent className="max-w-3xl">
