@@ -28,7 +28,7 @@ ON CONFLICT (id) DO NOTHING;
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM vault.secrets WHERE name = 'order_notify_secret') THEN
-    PERFORM vault.create_secret('dd9d851653938c4238a107f86b17566b39d6e33cd51191b6b5d912fe258f6b2a', 'order_notify_secret');
+    PERFORM vault.create_secret('__REDACTED_ROTAR_ESTE_SECRETO__', 'order_notify_secret');
   END IF;
 EXCEPTION WHEN OTHERS THEN
   RAISE WARNING 'no se pudo crear el secreto order_notify_secret: %', SQLERRM;
