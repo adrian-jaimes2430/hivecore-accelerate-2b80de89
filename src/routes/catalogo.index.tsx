@@ -289,7 +289,15 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
       <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="block">
         <div className="shop-media relative m-2 aspect-[4/5]">
           {cover ? (
-            <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+            <img
+              src={cover}
+              alt={p.name}
+              loading={index < 3 ? "eager" : "lazy"}
+              decoding="async"
+              fetchPriority={index < 3 ? "high" : "low"}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+
           ) : (
             <div className="absolute inset-0 flex items-center justify-center font-display text-6xl font-bold opacity-15">{p.name.charAt(0)}</div>
           )}
