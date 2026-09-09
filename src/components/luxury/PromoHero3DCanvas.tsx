@@ -2,9 +2,12 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import type { Promo } from "./PromoCarousel";
 
+type Src = { url: string; type: string };
+
 /**
- * Lienzo three.js del banner superior: tarjetas de producto flotando en 3D
- * con parallax por puntero (estilo shop.app). Solo se carga en el navegador.
+ * Banner 3D del catálogo Luxury: carrusel cilíndrico de tarjetas con
+ * rotación continua, parallax de puntero, reflejo inferior y aparición
+ * progresiva de cada textura (sin bloquear la carga del catálogo).
  */
 export function PromoHero3DCanvas({ promos, images = [] }: { promos: Promo[]; images?: string[] }) {
   const host = useRef<HTMLDivElement>(null);
@@ -14,82 +17,103 @@ export function PromoHero3DCanvas({ promos, images = [] }: { promos: Promo[]; im
     if (!el) return;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const mobile = window.innerWidth < 640;
+
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-    camera.position.set(0, 0, 9);
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
+    camera.position.set(0, 0.35, mobile ? 12.5 : 10.5);
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !mobile, powerPreference: "high-performance" });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.5 : 2));
     renderer.setClearColor(0x000000, 0);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
     el.appendChild(renderer.domElement);
-    renderer.domElement.style.width = "100%";
-    renderer.domElement.style.height = "100%";
-    renderer.domElement.style.display = "block";
+    Object.assign(renderer.domElement.style, { width: "100%", height: "100%", display: "block" });
 
-    scene.add(new THREE.AmbientLight(0xffffff, 1.1));
-    const key = new THREE.DirectionalLight(0xffe9b0, 1.4);
-    key.position.set(3, 4, 6);
+    scene.add(new THREE.AmbientLight(0xffffff, 1.15));
+    const key = new THREE.DirectionalLight(0xffe3a8, 1.5);
+    key.position.set(3, 5, 7);
     scene.add(key);
 
-    const loader = new THREE.TextureLoader();
-    loader.setCrossOrigin("anonymous");
-
-    type Src = { media_url: string; media_type: string };
-    const fromPromos: Src[] = promos
+    const promoSrc: Src[] = promos
       .filter((p) => p.media_url)
-      .slice(0, 8)
-      .map((p) => ({ media_url: p.media_url as string, media_type: p.media_type }));
-    const fromProducts: Src[] = images.slice(0, 8).map((u) => ({ media_url: u, media_type: "image" }));
-    const sources: Src[] = [...fromPromos, ...fromProducts].slice(0, 8);
-    const group = new THREE.Group();
-    scene.add(group);
+      .map((p) => ({ url: p.media_url as string, type: p.media_type }));
+    const imgSrc: Src[] = images.map((u) => ({ url: u, type: "image" }));
+    const sources = [...promoSrc, ...imgSrc].slice(0, mobile ? 7 : 11);
+
+    const ring = new THREE.Group();
+    scene.add(ring);
 
     const disposables: { dispose: () => void }[] = [];
     const videos: HTMLVideoElement[] = [];
-    const cards: { mesh: THREE.Mesh; seed: number; baseY: number }[] = [];
+    const loader = new THREE.TextureLoader();
+    loader.setCrossOrigin("anonymous");
 
-    const count = Math.max(sources.length, 5);
+    const count = Math.max(sources.length, 6);
+    const radius = mobile ? 7.4 : 8.6;
+    const cards: { mesh: THREE.Mesh; mat: THREE.MeshBasicMaterial; angle: number; seed: number; fade: number; ready: boolean }[] = [];
+
     for (let i = 0; i < count; i += 1) {
       const src = sources[i % Math.max(sources.length, 1)];
-      const geo = new THREE.PlaneGeometry(2.6, 3.3, 1, 1);
-      let map: THREE.Texture | null = null;
+      const geo = new THREE.PlaneGeometry(2.5, 3.2, 1, 1);
+      const mat = new THREE.MeshBasicMaterial({
+        color: 0x191320,
+        transparent: true,
+        opacity: 0.6,
+        side: THREE.DoubleSide,
+      });
+      disposables.push(geo, mat);
 
-      if (src?.media_url) {
-        if (src.media_type === "video") {
+      const mesh = new THREE.Mesh(geo, mat);
+      const angle = (i / count) * Math.PI * 2;
+      mesh.position.set(Math.sin(angle) * radius, (i % 3 - 1) * 0.55, Math.cos(angle) * radius - radius + 1.2);
+      mesh.rotation.y = -angle;
+      ring.add(mesh);
+      const card = { mesh, mat, angle, seed: i * 1.63, fade: 0, ready: false };
+      cards.push(card);
+
+      if (src?.url) {
+        if (src.type === "video" && !mobile) {
           const v = document.createElement("video");
-          v.src = src.media_url;
+          v.src = src.url;
           v.muted = true;
           v.loop = true;
           v.playsInline = true;
           v.crossOrigin = "anonymous";
           void v.play().catch(() => undefined);
           videos.push(v);
-          map = new THREE.VideoTexture(v);
+          const tex = new THREE.VideoTexture(v);
+          tex.colorSpace = THREE.SRGBColorSpace;
+          disposables.push(tex);
+          mat.map = tex;
+          mat.color.set(0xffffff);
+          mat.needsUpdate = true;
+          card.ready = true;
         } else {
-          map = loader.load(src.media_url);
-        }
-        if (map) {
-          map.colorSpace = THREE.SRGBColorSpace;
-          disposables.push(map);
+          loader.loadAsync(src.url).then(
+            (tex) => {
+              tex.colorSpace = THREE.SRGBColorSpace;
+              tex.generateMipmaps = true;
+              disposables.push(tex);
+              mat.map = tex;
+              mat.color.set(0xffffff);
+              mat.needsUpdate = true;
+              card.ready = true;
+            },
+            () => undefined,
+          );
         }
       }
-
-      const mat = new THREE.MeshBasicMaterial({
-        map: map ?? null,
-        color: map ? 0xffffff : 0x1c1622,
-        transparent: true,
-        opacity: 0.96,
-      });
-      disposables.push(geo, mat);
-
-      const mesh = new THREE.Mesh(geo, mat);
-      const spread = count > 1 ? (i / (count - 1)) * 2 - 1 : 0;
-      mesh.position.set(spread * 5.6, (i % 2 === 0 ? 0.45 : -0.55) + Math.sin(i) * 0.25, 0.8 - Math.abs(spread) * 1.2);
-      mesh.rotation.y = -spread * 0.6;
-      mesh.rotation.z = spread * 0.06;
-      group.add(mesh);
-      cards.push({ mesh, seed: i * 1.7, baseY: mesh.position.y });
     }
+
+    // Piso reflectante suave
+    const floorGeo = new THREE.PlaneGeometry(60, 24);
+    const floorMat = new THREE.MeshBasicMaterial({ color: 0x0a0a10, transparent: true, opacity: 0.55 });
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -3.1;
+    scene.add(floor);
+    disposables.push(floorGeo, floorMat);
 
     const pointer = { x: 0, y: 0 };
     const target = { x: 0, y: 0 };
@@ -98,39 +122,57 @@ export function PromoHero3DCanvas({ promos, images = [] }: { promos: Promo[]; im
       target.x = ((e.clientX - r.left) / r.width) * 2 - 1;
       target.y = ((e.clientY - r.top) / r.height) * 2 - 1;
     };
-    el.addEventListener("pointermove", onMove);
+    el.addEventListener("pointermove", onMove, { passive: true });
 
     const resize = () => {
       const { clientWidth: w, clientHeight: h } = el;
-      if (w === 0 || h === 0) return;
+      if (!w || !h) return;
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
-      camera.fov = w < 640 ? 60 : 45;
+      camera.fov = w < 640 ? 56 : 42;
       camera.updateProjectionMatrix();
     };
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(el);
 
+    let visible = true;
+    const io = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+    });
+    io.observe(el);
+
     let raf = 0;
+    let spin = 0;
     const clock = new THREE.Clock();
     const tick = () => {
       raf = requestAnimationFrame(tick);
-      const t = clock.getElapsedTime();
-      pointer.x += (target.x - pointer.x) * 0.06;
-      pointer.y += (target.y - pointer.y) * 0.06;
+      const dt = Math.min(clock.getDelta(), 0.05);
+      const t = clock.elapsedTime;
+      if (!visible) return;
 
-      group.position.y = -0.15;
-      group.rotation.y = pointer.x * 0.22;
-      group.rotation.x = pointer.y * 0.1;
-      group.position.x = -pointer.x * 0.6;
+      pointer.x += (target.x - pointer.x) * 0.05;
+      pointer.y += (target.y - pointer.y) * 0.05;
 
-      if (!reduce) {
-        for (const c of cards) {
-          c.mesh.position.y = c.baseY + Math.sin(t * 0.7 + c.seed) * 0.22;
-          c.mesh.rotation.x = Math.sin(t * 0.4 + c.seed) * 0.05;
+      if (!reduce) spin += dt * 0.14;
+      ring.rotation.y = spin + pointer.x * 0.3;
+      ring.rotation.x = pointer.y * 0.06;
+      camera.position.y = 0.35 - pointer.y * 0.35;
+      camera.lookAt(0, 0, 0);
+
+      for (const c of cards) {
+        if (!reduce) {
+          c.mesh.position.y = (Math.round((c.seed % 3)) - 1) * 0.55 + Math.sin(t * 0.6 + c.seed) * 0.2;
+          c.mesh.rotation.z = Math.sin(t * 0.3 + c.seed) * 0.03;
         }
+        // aparición progresiva y desvanecido por profundidad
+        const worldZ = c.mesh.getWorldPosition(new THREE.Vector3()).z;
+        const depth = THREE.MathUtils.clamp((worldZ + 14) / 18, 0.12, 1);
+        const goal = (c.ready ? 1 : 0.55) * depth;
+        c.fade += (goal - c.fade) * 0.08;
+        c.mat.opacity = c.fade;
       }
+
       renderer.render(scene, camera);
     };
     tick();
@@ -138,6 +180,7 @@ export function PromoHero3DCanvas({ promos, images = [] }: { promos: Promo[]; im
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
+      io.disconnect();
       el.removeEventListener("pointermove", onMove);
       for (const v of videos) {
         v.pause();
