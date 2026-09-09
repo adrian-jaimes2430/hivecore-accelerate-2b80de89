@@ -269,6 +269,7 @@ export type Database = {
           is_featured: boolean
           name: string
           price: number
+          secondary_category_ids: Json
           short_description: string | null
           show_impulsador_price: boolean
           sku: string | null
@@ -292,6 +293,7 @@ export type Database = {
           is_featured?: boolean
           name: string
           price?: number
+          secondary_category_ids?: Json
           short_description?: string | null
           show_impulsador_price?: boolean
           sku?: string | null
@@ -315,6 +317,7 @@ export type Database = {
           is_featured?: boolean
           name?: string
           price?: number
+          secondary_category_ids?: Json
           short_description?: string | null
           show_impulsador_price?: boolean
           sku?: string | null
