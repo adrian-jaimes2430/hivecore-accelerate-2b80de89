@@ -4,6 +4,8 @@ import { StoryVideo } from "@/components/story/StoryVideo";
 import { SmokeLayer } from "@/components/story/SmokeLayer";
 import { BeeScene } from "@/components/story/BeeScene";
 import { StoryPanel } from "@/components/story/StoryPanel";
+import { SoundWaves } from "@/components/story/SoundWaves";
+
 import { useScrollProgress } from "@/hooks/use-scroll-progress";
 
 import {
