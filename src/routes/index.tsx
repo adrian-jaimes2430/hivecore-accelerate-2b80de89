@@ -4,6 +4,8 @@ import { StoryVideo } from "@/components/story/StoryVideo";
 import { SmokeLayer } from "@/components/story/SmokeLayer";
 import { BeeScene } from "@/components/story/BeeScene";
 import { StoryPanel } from "@/components/story/StoryPanel";
+import { SoundWaves } from "@/components/story/SoundWaves";
+
 import { useScrollProgress } from "@/hooks/use-scroll-progress";
 
 import {
@@ -47,12 +49,8 @@ export const Route = createFileRoute("/")({
   }),
 });
 
-const NAV = [
-  { l: "Historia", h: "#capitulo-1" },
-  { l: "Plataforma", h: "#capitulo-2" },
-  { l: "Luxury", h: "#capitulo-3" },
-  { l: "Catálogo", h: "/catalogo" },
-];
+
+
 
 const FEATURES = [
   { icon: ShoppingBag, t: "Catálogo Premium", d: "Productos curados con storytelling y media vertical." },
@@ -73,32 +71,21 @@ function Landing() {
       <div className="story-progress" style={{ width: `${progress * 100}%` }} />
 
       {/* Capas inmersivas: video → 3D → humo */}
-      <StoryVideo />
-      <BeeScene />
-      <SmokeLayer />
+        <StoryVideo />
+        <BeeScene />
+        <SmokeLayer />
+        <SoundWaves />
 
       <div className="story-content">
         <header className="sticky top-0 z-50">
           <div className="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between px-5">
             <HiveLogo />
-            <nav className="hidden items-center gap-1 md:flex">
-              {NAV.map((n) =>
-                n.h.startsWith("#") ? (
-                  <a key={n.l} href={n.h} className="mercury-nav-link link-sweep">
-                    {n.l}
-                  </a>
-                ) : (
-                  <Link key={n.l} to={n.h} className="mercury-nav-link link-sweep">
-                    {n.l}
-                  </Link>
-                ),
-              )}
-            </nav>
             <Link to="/login" className="story-cta !px-5 !py-2 !text-[13px]">
               Acceso impulsador
             </Link>
           </div>
         </header>
+
 
         {/* Apertura */}
         <section className="story-hero">

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
@@ -50,11 +50,12 @@ export const Route = createFileRoute("/catalogo/")({
 interface Cat { id: string; name: string; slug: string; parent_id: string | null; sort_order: number }
 interface Brand { id: string; name: string; slug: string }
 interface Product {
-  id: string; name: string; slug: string; short_description: string | null;
-  images: unknown; videos: unknown; category_id: string | null; brand_id: string | null;
+  id: string; name: string; slug: string; sku?: string | null; short_description: string | null;
+  images: unknown; videos: unknown; category_id: string | null; secondary_category_ids?: unknown; brand_id: string | null;
   price: number; suggested_retail_price: number; is_featured: boolean;
   stock_status: string;
 }
+
 
 function PublicCatalog() {
   const { products, categories, brands, promos } = Route.useLoaderData() as {
@@ -82,7 +83,11 @@ function PublicCatalog() {
       const cat = categories.find((c) => c.slug === search.cat);
       if (cat) {
         const ids = new Set([cat.id, ...childrenOf(cat.id).map((c) => c.id)]);
-        list = list.filter((p) => p.category_id && ids.has(p.category_id));
+        list = list.filter((p) => {
+          if (p.category_id && ids.has(p.category_id)) return true;
+          const sec = Array.isArray(p.secondary_category_ids) ? (p.secondary_category_ids as string[]) : [];
+          return sec.some((id) => ids.has(id));
+        });
       }
     }
     if (search.brand) {
@@ -96,6 +101,22 @@ function PublicCatalog() {
     return list;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products, categories, brands, search.cat, search.brand, search.q]);
+
+  // Render progresivo: evita pintar cientos de tarjetas de golpe.
+  const [visible, setVisible] = useState(12);
+  useEffect(() => setVisible(12), [search.cat, search.brand, search.q]);
+  const sentinel = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = sentinel.current;
+    if (!el) return;
+    const io = new IntersectionObserver((entries) => {
+      if (entries[0]?.isIntersecting) setVisible((v) => v + 12);
+    }, { rootMargin: "600px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [filtered.length]);
+  const shown = filtered.slice(0, visible);
+
 
   const filtersPanel = (
     <div className="space-y-6">
@@ -215,11 +236,15 @@ function PublicCatalog() {
                 <p className="text-sm text-muted-foreground">Estamos cargando piezas premium. Vuelve en breve.</p>
               </div>
             ) : (
-              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                {filtered.map((p, i) => (
-                  <PublicCard key={p.id} p={p} brand={brands.find((b) => b.id === p.brand_id)?.name} index={i} refQs={refQs} onQuickView={() => setQuickView(p)} />
-                ))}
-              </div>
+              <>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                  {shown.map((p, i) => (
+                    <PublicCard key={p.id} p={p} brand={brands.find((b) => b.id === p.brand_id)?.name} index={i} refQs={refQs} onQuickView={() => setQuickView(p)} />
+                  ))}
+                </div>
+                <div ref={sentinel} className="h-10" />
+              </>
+
             )}
           </div>
         </div>
@@ -264,7 +289,15 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
       <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="block">
         <div className="shop-media relative m-2 aspect-[4/5]">
           {cover ? (
-            <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+            <img
+              src={cover}
+              alt={p.name}
+              loading={index < 3 ? "eager" : "lazy"}
+              decoding="async"
+              fetchPriority={index < 3 ? "high" : "low"}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+
           ) : (
             <div className="absolute inset-0 flex items-center justify-center font-display text-6xl font-bold opacity-15">{p.name.charAt(0)}</div>
           )}

@@ -12,7 +12,7 @@ import { GalleryUploader } from "@/components/admin/GalleryUploader";
 import { VariationsEditor, type Variation } from "@/components/admin/VariationsEditor";
 import { MediaUploader } from "@/components/admin/MediaUploader";
 import { toast } from "sonner";
-import { ArrowLeft, Crown, ExternalLink, Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Crown, ExternalLink, Loader2, Plus, Save, Trash2, X } from "lucide-react";
 import { formatCOP } from "@/lib/pricing";
 
 export const Route = createFileRoute("/_authenticated/admin/luxury")({
@@ -25,7 +25,7 @@ type Product = {
   id: string; sku: string | null; name: string; slug: string;
   short_description: string | null; description: string | null;
   images: unknown; videos: unknown; variations: unknown;
-  category_id: string | null; brand_id: string | null;
+  category_id: string | null; secondary_category_ids: unknown; brand_id: string | null;
   price: number; suggested_retail_price: number;
   show_impulsador_price: boolean;
   stock_status: string; stock_quantity: number;
@@ -112,6 +112,10 @@ function ProductsTab() {
       videos: editing.videos ?? [],
       variations: editing.variations ?? [],
       category_id: editing.category_id || null,
+      secondary_category_ids: (Array.isArray(editing.secondary_category_ids) ? editing.secondary_category_ids : []).filter(
+        (id) => id && id !== editing.category_id,
+      ),
+
       brand_id: editing.brand_id || null,
       price: Number(editing.price ?? 0),
       suggested_retail_price: Number(editing.suggested_retail_price ?? 0),
@@ -142,6 +146,10 @@ function ProductsTab() {
   const variations: Variation[] = Array.isArray(editing?.variations) ? (editing!.variations as Variation[]) : [];
   const editImages = Array.isArray(editing?.images) ? (editing!.images as string[]) : [];
   const editVideos = Array.isArray(editing?.videos) ? (editing!.videos as string[]) : [];
+  const secondaryIds: string[] = Array.isArray(editing?.secondary_category_ids)
+    ? (editing!.secondary_category_ids as string[])
+    : [];
+
 
   return (
     <div className="mt-6 space-y-6">
@@ -159,13 +167,14 @@ function ProductsTab() {
             <Input placeholder="SKU (auto)" value={editing.sku ?? ""} onChange={(e) => setEditing({ ...editing, sku: e.target.value })} />
             <Input placeholder="Slug (auto)" value={editing.slug ?? ""} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} />
             <Select value={editing.category_id ?? ""} onValueChange={(v) => setEditing({ ...editing, category_id: v })}>
-              <SelectTrigger><SelectValue placeholder="Categoría" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Categoría principal" /></SelectTrigger>
               <SelectContent>
                 {categories.map((c) => (
                   <SelectItem key={c.id} value={c.id}>{c.parent_id ? "↳ " : ""}{c.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
+
             <Select value={editing.brand_id ?? ""} onValueChange={(v) => setEditing({ ...editing, brand_id: v })}>
               <SelectTrigger><SelectValue placeholder="Marca" /></SelectTrigger>
               <SelectContent>
@@ -185,6 +194,43 @@ function ProductsTab() {
             <Input type="number" placeholder="Precio sugerido / final" value={editing.suggested_retail_price ?? ""} onChange={(e) => setEditing({ ...editing, suggested_retail_price: Number(e.target.value) })} />
             <Input type="number" placeholder="Stock" value={editing.stock_quantity ?? ""} onChange={(e) => setEditing({ ...editing, stock_quantity: Number(e.target.value) })} />
           </div>
+
+          {/* Categorías secundarias */}
+          <div className="space-y-2 rounded-md border border-border/40 bg-white/[0.02] p-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--luxury-gold)]">Categorías secundarias</p>
+            {secondaryIds.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {secondaryIds.map((id) => {
+                  const c = categories.find((x) => x.id === id);
+                  if (!c) return null;
+                  return (
+                    <span key={id} className="inline-flex items-center gap-1 rounded-full bg-[color:var(--luxury-gold)]/15 px-2 py-0.5 text-xs text-[color:var(--luxury-gold)]">
+                      {c.name}
+                      <button type="button" className="hover:text-destructive" onClick={() => setEditing({ ...editing, secondary_category_ids: secondaryIds.filter((x) => x !== id) })}>
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+            <Select
+              value=""
+              onValueChange={(v) => {
+                if (!v || v === editing.category_id || secondaryIds.includes(v)) return;
+                setEditing({ ...editing, secondary_category_ids: [...secondaryIds, v] });
+              }}
+            >
+              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Añadir categoría secundaria" /></SelectTrigger>
+              <SelectContent>
+                {categories
+                  .filter((c) => c.id !== editing.category_id && !secondaryIds.includes(c.id))
+                  .map((c) => (<SelectItem key={c.id} value={c.id}>{c.parent_id ? "↳ " : ""}{c.name}</SelectItem>))}
+              </SelectContent>
+            </Select>
+          </div>
+
+
 
           <Textarea placeholder="Descripción corta" value={editing.short_description ?? ""} onChange={(e) => setEditing({ ...editing, short_description: e.target.value })} />
           <Textarea placeholder="Descripción" rows={5} value={editing.description ?? ""} onChange={(e) => setEditing({ ...editing, description: e.target.value })} />

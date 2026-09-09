@@ -10,7 +10,7 @@ export const listLuxuryCatalog = createServerFn({ method: "GET" }).handler(async
   const [{ data: products }, { data: categories }, { data: brands }, { data: promos }] = await Promise.all([
     supabase
       .from("luxury_products")
-      .select("id,sku,name,slug,short_description,images,videos,variations,category_id,brand_id,price,suggested_retail_price,show_impulsador_price,stock_status,stock_quantity,is_featured,attributes")
+      .select("id,sku,name,slug,short_description,images,videos,variations,category_id,secondary_category_ids,brand_id,price,suggested_retail_price,show_impulsador_price,stock_status,stock_quantity,is_featured,attributes")
       .eq("is_active", true)
       .order("is_featured", { ascending: false })
       .order("created_at", { ascending: false })
