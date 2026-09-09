@@ -236,11 +236,15 @@ function PublicCatalog() {
                 <p className="text-sm text-muted-foreground">Estamos cargando piezas premium. Vuelve en breve.</p>
               </div>
             ) : (
-              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                {filtered.map((p, i) => (
-                  <PublicCard key={p.id} p={p} brand={brands.find((b) => b.id === p.brand_id)?.name} index={i} refQs={refQs} onQuickView={() => setQuickView(p)} />
-                ))}
-              </div>
+              <>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                  {shown.map((p, i) => (
+                    <PublicCard key={p.id} p={p} brand={brands.find((b) => b.id === p.brand_id)?.name} index={i} refQs={refQs} onQuickView={() => setQuickView(p)} />
+                  ))}
+                </div>
+                <div ref={sentinel} className="h-10" />
+              </>
+
             )}
           </div>
         </div>
