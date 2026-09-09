@@ -12,7 +12,7 @@ import { GalleryUploader } from "@/components/admin/GalleryUploader";
 import { VariationsEditor, type Variation } from "@/components/admin/VariationsEditor";
 import { MediaUploader } from "@/components/admin/MediaUploader";
 import { toast } from "sonner";
-import { ArrowLeft, Crown, ExternalLink, Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Crown, ExternalLink, Loader2, Plus, Save, Trash2, X } from "lucide-react";
 import { formatCOP } from "@/lib/pricing";
 
 export const Route = createFileRoute("/_authenticated/admin/luxury")({
@@ -146,6 +146,10 @@ function ProductsTab() {
   const variations: Variation[] = Array.isArray(editing?.variations) ? (editing!.variations as Variation[]) : [];
   const editImages = Array.isArray(editing?.images) ? (editing!.images as string[]) : [];
   const editVideos = Array.isArray(editing?.videos) ? (editing!.videos as string[]) : [];
+  const secondaryIds: string[] = Array.isArray(editing?.secondary_category_ids)
+    ? (editing!.secondary_category_ids as string[])
+    : [];
+
 
   return (
     <div className="mt-6 space-y-6">
