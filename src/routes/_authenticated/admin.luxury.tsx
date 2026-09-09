@@ -25,7 +25,7 @@ type Product = {
   id: string; sku: string | null; name: string; slug: string;
   short_description: string | null; description: string | null;
   images: unknown; videos: unknown; variations: unknown;
-  category_id: string | null; brand_id: string | null;
+  category_id: string | null; secondary_category_ids: unknown; brand_id: string | null;
   price: number; suggested_retail_price: number;
   show_impulsador_price: boolean;
   stock_status: string; stock_quantity: number;
@@ -112,6 +112,10 @@ function ProductsTab() {
       videos: editing.videos ?? [],
       variations: editing.variations ?? [],
       category_id: editing.category_id || null,
+      secondary_category_ids: (Array.isArray(editing.secondary_category_ids) ? editing.secondary_category_ids : []).filter(
+        (id) => id && id !== editing.category_id,
+      ),
+
       brand_id: editing.brand_id || null,
       price: Number(editing.price ?? 0),
       suggested_retail_price: Number(editing.suggested_retail_price ?? 0),
@@ -159,13 +163,14 @@ function ProductsTab() {
             <Input placeholder="SKU (auto)" value={editing.sku ?? ""} onChange={(e) => setEditing({ ...editing, sku: e.target.value })} />
             <Input placeholder="Slug (auto)" value={editing.slug ?? ""} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} />
             <Select value={editing.category_id ?? ""} onValueChange={(v) => setEditing({ ...editing, category_id: v })}>
-              <SelectTrigger><SelectValue placeholder="Categoría" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Categoría principal" /></SelectTrigger>
               <SelectContent>
                 {categories.map((c) => (
                   <SelectItem key={c.id} value={c.id}>{c.parent_id ? "↳ " : ""}{c.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
+
             <Select value={editing.brand_id ?? ""} onValueChange={(v) => setEditing({ ...editing, brand_id: v })}>
               <SelectTrigger><SelectValue placeholder="Marca" /></SelectTrigger>
               <SelectContent>
