@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HiveLogo } from "@/components/HiveLogo";
-import { Reveal } from "@/components/Reveal";
-import { ParticleField } from "@/components/marketing/ParticleField";
+import { StoryVideo } from "@/components/story/StoryVideo";
+import { SmokeLayer } from "@/components/story/SmokeLayer";
+import { BeeScene } from "@/components/story/BeeScene";
+import { StoryPanel } from "@/components/story/StoryPanel";
+import { useScrollProgress } from "@/hooks/use-scroll-progress";
 
 import {
   ArrowRight,
@@ -11,228 +14,265 @@ import {
   BarChart3,
   Shield,
   Zap,
+  Crown,
+  Bot,
+  Trophy,
 } from "lucide-react";
-import heroImage from "@/assets/mercury-hero.jpg";
-import heroVideo from "@/assets/hero-bg.mp4.asset.json";
-
 
 export const Route = createFileRoute("/")({
   component: Landing,
   head: () => ({
     meta: [
-      { title: "HIVECORE — Plataforma comercial premium para impulsadores" },
+      { title: "HIVECORE — Experiencia inmersiva del ecosistema A&O" },
       {
         name: "description",
         content:
-          "El núcleo comercial digital del ecosistema Company A&O. Catálogo premium, funnels de venta y gestión inteligente de pedidos.",
+          "Recorre en scroll la historia de HIVECORE: catálogo premium, funnels de alto impacto, AnMa Luxury, Marel IA y niveles de impulsador en una experiencia 3D inmersiva.",
       },
-      { property: "og:title", content: "HIVECORE — Plataforma comercial premium" },
+      { property: "og:title", content: "HIVECORE — Experiencia inmersiva del ecosistema A&O" },
       {
         property: "og:description",
         content:
-          "Catálogo premium, funnels de venta de alto impacto y gestión inteligente de pedidos para impulsadores A&O.",
+          "Historia inmersiva en 3D: catálogo premium, funnels, AnMa Luxury, Marel IA y niveles de impulsador.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "HIVECORE — Experiencia inmersiva del ecosistema A&O" },
+      {
+        name: "twitter:description",
+        content:
+          "Historia inmersiva en 3D: catálogo premium, funnels, AnMa Luxury, Marel IA y niveles de impulsador.",
+      },
     ],
   }),
 });
 
 const NAV = [
-  { l: "Plataforma", h: "#features" },
-  { l: "Ecosistema", h: "#ecosystem" },
+  { l: "Historia", h: "#capitulo-1" },
+  { l: "Plataforma", h: "#capitulo-2" },
+  { l: "Luxury", h: "#capitulo-3" },
   { l: "Catálogo", h: "/catalogo" },
 ];
 
 const FEATURES = [
-  { icon: ShoppingBag, t: "Catálogo Premium", d: "Productos curados con storytelling, beneficios e imágenes verticales listas para compartir." },
-  { icon: Sparkles, t: "Funnels de Venta", d: "Cada producto abre una landing premium tipo funnel — no fichas planas." },
+  { icon: ShoppingBag, t: "Catálogo Premium", d: "Productos curados con storytelling y media vertical." },
+  { icon: Sparkles, t: "Funnels de Venta", d: "Cada producto abre una landing tipo funnel, no una ficha plana." },
   { icon: Share2, t: "Compartir Inteligente", d: "WhatsApp, email y enlace único con tracking por impulsador." },
-  { icon: BarChart3, t: "Métricas en tiempo real", d: "Productos más vendidos, impulsadores destacados y actividad reciente." },
-  { icon: Zap, t: "Pedidos en segundos", d: "Captura los datos del cliente, genera el código único y despacha la orden al instante." },
-  { icon: Shield, t: "Acceso privado", d: "Solo impulsadores aprobados acceden. Roles granulares para colaboradores." },
+  { icon: BarChart3, t: "Métricas en vivo", d: "Más vendidos, impulsadores destacados y actividad reciente." },
+  { icon: Zap, t: "Pedidos en segundos", d: "Datos del cliente, código único y orden despachada al instante." },
+  { icon: Shield, t: "Acceso privado", d: "Solo impulsadores aprobados. Roles y niveles granulares." },
 ];
 
+const LEVELS = ["Junior", "Senior", "Master", "Elite"];
+
 function Landing() {
+  const { progress } = useScrollProgress();
+
   return (
-    <div className="mercury-page min-h-screen">
-      {/* Nav — transparent over hero, frosted on scroll */}
-      <header className="sticky top-0 z-50 bg-[color:var(--onyx-canvas)]/70 backdrop-blur-xl">
-        <div className="mx-auto flex h-[72px] max-w-[1200px] items-center justify-between px-5">
-          <HiveLogo />
-          <nav className="hidden items-center md:flex">
-            {NAV.map((n) =>
-              n.h.startsWith("#") ? (
-                <a key={n.l} href={n.h} className="mercury-nav-link link-sweep">
-                  {n.l}
-                </a>
-              ) : (
-                <Link key={n.l} to={n.h} className="mercury-nav-link link-sweep">
-                  {n.l}
-                </Link>
-              ),
-            )}
-          </nav>
-          <div className="flex items-center gap-3">
-            <Link to="/login" className="mercury-nav-link link-sweep hidden sm:inline-flex">
-              Iniciar sesión
-            </Link>
-            <Link to="/login" className="mercury-btn">
+    <div className="story-root">
+      <div className="story-progress" style={{ width: `${progress * 100}%` }} />
+
+      {/* Capas inmersivas: video → 3D → humo */}
+      <StoryVideo />
+      <BeeScene />
+      <SmokeLayer />
+
+      <div className="story-content">
+        <header className="sticky top-0 z-50">
+          <div className="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between px-5">
+            <HiveLogo />
+            <nav className="hidden items-center gap-1 md:flex">
+              {NAV.map((n) =>
+                n.h.startsWith("#") ? (
+                  <a key={n.l} href={n.h} className="mercury-nav-link link-sweep">
+                    {n.l}
+                  </a>
+                ) : (
+                  <Link key={n.l} to={n.h} className="mercury-nav-link link-sweep">
+                    {n.l}
+                  </Link>
+                ),
+              )}
+            </nav>
+            <Link to="/login" className="story-cta !px-5 !py-2 !text-[13px]">
               Acceso impulsador
             </Link>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Full-bleed photographic hero */}
-      <section className="relative isolate min-h-[86vh] w-full overflow-hidden">
-        <video
-          className="hero-drift absolute inset-0 -z-10 h-full w-full object-cover"
-          src={heroVideo.url}
-          poster={heroImage}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          aria-hidden="true"
-        />
-
-        <div className="absolute inset-0 -z-10 bg-[color:var(--onyx-canvas)]/70" />
-        <div className="absolute inset-0 -z-10">
-          <ParticleField />
-        </div>
-        <div className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-[color:var(--onyx-canvas)] to-transparent" />
-
-
-        <div className="mx-auto flex min-h-[86vh] max-w-[1200px] flex-col items-center justify-center px-5 py-28 text-center">
-          <span className="mercury-tag animate-rise" style={{ animationDelay: "80ms" }}>
-            <span className="hive-pulse h-1.5 w-1.5 rounded-full bg-[color:var(--cobalt)]" />
-            Plataforma privada · Acceso por aprobación
+        {/* Apertura */}
+        <section className="story-hero">
+          <span className="story-pill">
+            <span className="hive-pulse h-1.5 w-1.5 rounded-full bg-[color:var(--hive)]" />
+            Plataforma privada · Ecosistema A&amp;O
           </span>
-          <h1
-            className="mercury-display animate-rise mt-8 max-w-[720px] text-[42px] text-white sm:text-[65px]"
-            style={{ animationDelay: "200ms" }}
-          >
-            El núcleo comercial de los impulsadores A&amp;O
+          <h1 className="story-hero-title mt-8 max-w-[16ch]">
+            El núcleo <span>vivo</span> del comercio A&amp;O
           </h1>
-          <p
-            className="mercury-body animate-rise mt-6 max-w-[520px] text-[18px] leading-[1.35]"
-            style={{ animationDelay: "340ms" }}
-          >
-            Catálogo premium, funnels de alto impacto y gestión inteligente de
-            pedidos — en una sola plataforma para el ecosistema Company A&amp;O.
+          <p className="story-lead mt-7 max-w-[52ch]">
+            Desplázate y recorre la historia: catálogo, funnels, luxury, inteligencia y
+            niveles — todo dentro de un mismo organismo comercial.
           </p>
-          <div
-            className="animate-rise mt-10 flex flex-wrap items-center justify-center gap-4"
-            style={{ animationDelay: "470ms" }}
-          >
-            <Link to="/login" className="mercury-btn">
-              <span>Entrar a HIVECORE</span> <ArrowRight className="h-4 w-4" />
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <Link to="/login" className="story-cta">
+              Entrar a HIVECORE <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link to="/catalogo" className="mercury-ghost">
+            <Link to="/catalogo" className="story-ghost-cta">
               Ver el catálogo
             </Link>
           </div>
-        </div>
-      </section>
+          <span className="story-scroll-hint">Scroll para comenzar</span>
+        </section>
 
-      {/* Metrics — graphite cards on onyx */}
-      <section className="mercury-section px-5">
-        <div className="grid gap-3 sm:grid-cols-3">
-          {[
-            { l: "Catálogo premium", v: "120+", s: "productos con funnel completo" },
-            { l: "Impulsadores activos", v: "850+", s: "en el ecosistema A&O" },
-            { l: "Pedidos generados", v: "12.4k", s: "este trimestre" },
-          ].map((m, i) => (
-            <Reveal key={m.l} className="mercury-card" delay={i * 110} from="up">
-              <p className="mercury-muted text-[12px] tracking-[0.12px]">{m.l}</p>
-              <p className="mercury-heading mt-4 text-[42px] text-[color:var(--ivory-text)]">
-                {m.v}
-              </p>
-              <p className="mercury-muted mt-2 text-[14px]">{m.s}</p>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      {/* Features */}
-      <section id="features" className="mercury-section px-5">
-        <Reveal>
-          <p className="mercury-muted text-[12px] uppercase tracking-[0.12px]">Plataforma</p>
-          <h2 className="mercury-heading mt-3 max-w-[640px] text-[32px] text-[color:var(--ivory-text)] sm:text-[42px]">
-            Todo lo que un impulsador necesita, en una sola plataforma.
-          </h2>
-        </Reveal>
-
-        <div className="mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((f, i) => (
-            <Reveal key={f.t} className="mercury-card group" delay={(i % 3) * 100} from="up">
-              <f.icon className="h-5 w-5 text-[color:var(--ivory-text)] transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:scale-110" />
-              <h3 className="mercury-heading mt-6 text-[21px] text-[color:var(--ivory-text)]">
-                {f.t}
-              </h3>
-              <p className="mercury-body mercury-muted mt-3">{f.d}</p>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      {/* Ecosystem */}
-      <section id="ecosystem" className="mercury-section px-5">
-        <Reveal className="mercury-card grid gap-10 lg:grid-cols-2 lg:p-14" from="scale">
-          <div>
-            <p className="mercury-muted text-[12px] uppercase tracking-[0.12px]">
-              A&amp;O Ecosystem
+        {/* Capítulo 1 — el enjambre */}
+        <div id="capitulo-1">
+          <StoryPanel
+            index="01"
+            eyebrow="El enjambre"
+            title={
+              <>
+                Cientos de impulsadores,
+                <br />
+                un solo movimiento.
+              </>
+            }
+          >
+            <p className="story-lead">
+              HIVECORE conecta a cada impulsador con el catálogo completo del ecosistema
+              Company A&amp;O. La misma experiencia premium, el mismo pulso, en cualquier
+              dispositivo.
             </p>
-            <h2 className="mercury-heading mt-3 text-[32px] text-[color:var(--ivory-text)] sm:text-[42px]">
-              Tres marcas. Un mismo núcleo.
-            </h2>
-            <p className="mercury-body mercury-muted mt-6 max-w-[480px]">
-              HIVECORE unifica el ecosistema comercial de Company A&amp;O para
-              impulsadores que venden Aguaje, NomadHive y ANMA — con la misma
-              experiencia premium para todos.
+            <div className="mt-7 grid gap-3 sm:grid-cols-3">
+              {[
+                { v: "120+", s: "productos con funnel" },
+                { v: "850+", s: "impulsadores activos" },
+                { v: "12.4k", s: "pedidos generados" },
+              ].map((m) => (
+                <div key={m.s} className="story-tile">
+                  <p className="font-display text-[28px] font-bold leading-none">{m.v}</p>
+                  <p className="mt-2 text-[12px] text-white/60">{m.s}</p>
+                </div>
+              ))}
+            </div>
+          </StoryPanel>
+        </div>
+
+        {/* Capítulo 2 — la plataforma */}
+        <div id="capitulo-2">
+          <StoryPanel
+            index="02"
+            eyebrow="La plataforma"
+            align="right"
+            title="Todo lo que necesitas para vender, en un solo núcleo."
+          >
+            <div className="grid gap-3 sm:grid-cols-2">
+              {FEATURES.map((f) => (
+                <div key={f.t} className="story-tile group">
+                  <f.icon className="h-4.5 w-4.5 text-[color:var(--hive)] transition-transform duration-500 group-hover:scale-110" />
+                  <h3 className="mt-3 font-display text-[15px] font-semibold">{f.t}</h3>
+                  <p className="mt-1.5 text-[12.5px] leading-relaxed text-white/60">{f.d}</p>
+                </div>
+              ))}
+            </div>
+          </StoryPanel>
+        </div>
+
+        {/* Capítulo 3 — luxury */}
+        <div id="capitulo-3">
+          <StoryPanel
+            index="03"
+            eyebrow="AnMa Luxury Collection"
+            title="Cuando el catálogo se vuelve alta gama."
+          >
+            <p className="story-lead">
+              Perfumería, relojería, joyería AAA y marroquinería de autor. Un catálogo
+              paralelo con su propia estética, disponible al ascender de nivel.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-7 flex flex-wrap gap-2.5">
               {["A&O", "NomadHive", "ANMA"].map((b) => (
-                <span key={b} className="mercury-tag">
+                <span key={b} className="story-pill">
                   {b}
                 </span>
               ))}
             </div>
-          </div>
-          <div className="flex items-center justify-center rounded-xl bg-[color:var(--obsidian-button)] py-14">
-            <div className="hive-float">
-              <HiveLogo size={140} withText={false} />
+            <div className="mt-7">
+              <Link to="/catalogo" className="story-ghost-cta">
+                <Crown className="h-4 w-4 text-[color:var(--hive)]" /> Explorar colección
+              </Link>
             </div>
-          </div>
-        </Reveal>
-      </section>
+          </StoryPanel>
+        </div>
 
-      {/* CTA */}
-      <section className="mercury-section px-5 text-center">
-        <Reveal>
-          <h2 className="mercury-heading text-[32px] text-[color:var(--ivory-text)] sm:text-[42px]">
-            ¿Eres impulsador aprobado?
-          </h2>
-          <p className="mercury-body mercury-muted mx-auto mt-5 max-w-[520px]">
-            Ingresa a tu cuenta y accede al catálogo completo del ecosistema.
+        {/* Capítulo 4 — Marel IA */}
+        <StoryPanel
+          index="04"
+          eyebrow="Marel · Inteligencia interna"
+          align="center"
+          title="Una IA que conoce tu catálogo de memoria."
+        >
+          <p className="story-lead mx-auto max-w-[46ch]">
+            Marel acompaña al impulsador y al cliente: encuentra productos, arma el
+            argumento de venta y, cuando hace falta, entrega la conversación al
+            impulsador correcto por WhatsApp.
           </p>
-          <div className="mt-10">
-            <Link to="/login" className="mercury-btn">
-              <span>Acceder a HIVECORE</span> <ArrowRight className="h-4 w-4" />
+          <div className="mt-7 flex justify-center">
+            <span className="story-pill">
+              <Bot className="h-3.5 w-3.5 text-[color:var(--hive)]" /> Asistente 24/7
+            </span>
+          </div>
+        </StoryPanel>
+
+        {/* Capítulo 5 — niveles */}
+        <StoryPanel
+          index="05"
+          eyebrow="Progresión"
+          title="Cuatro niveles. Un mismo camino de crecimiento."
+        >
+          <p className="story-lead">
+            Cada venta deja el 20% al impulsador. Al ascender se desbloquean catálogos,
+            herramientas y visibilidad dentro del ecosistema.
+          </p>
+          <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {LEVELS.map((l, i) => (
+              <div key={l} className="story-tile text-center">
+                <Trophy
+                  className="mx-auto h-4 w-4"
+                  style={{ color: `oklch(${0.72 + i * 0.04} 0.2 ${145 - i * 22})` }}
+                />
+                <p className="mt-2.5 font-display text-[13px] font-semibold">{l}</p>
+                <p className="mt-1 text-[11px] text-white/50">Nivel {i + 1}</p>
+              </div>
+            ))}
+          </div>
+        </StoryPanel>
+
+        {/* Cierre */}
+        <StoryPanel
+          index="06"
+          eyebrow="Último capítulo"
+          align="center"
+          title="¿Eres impulsador aprobado?"
+        >
+          <p className="story-lead mx-auto max-w-[42ch]">
+            Ingresa y toma el control del catálogo completo del ecosistema.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link to="/login" className="story-cta">
+              Acceder a HIVECORE <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link to="/productos" className="story-ghost-cta">
+              Ver productos públicos
             </Link>
           </div>
-        </Reveal>
-      </section>
+        </StoryPanel>
 
-
-      <footer className="border-t border-white/5 py-10">
-        <div className="mx-auto flex max-w-[1200px] flex-col items-center justify-between gap-4 px-5 text-[12px] tracking-[0.12px] text-[color:var(--ash-text)] sm:flex-row">
-          <HiveLogo size={24} />
-          <p>© {new Date().getFullYear()} Company A&amp;O Ecosystem · Plataforma privada</p>
-        </div>
-      </footer>
+        <footer className="relative border-t border-white/10 bg-[rgba(4,6,9,0.6)] py-10 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-[1240px] flex-col items-center justify-between gap-4 px-5 text-[12px] tracking-[0.12px] text-white/50 sm:flex-row">
+            <HiveLogo size={24} />
+            <p>© {new Date().getFullYear()} Company A&amp;O Ecosystem · Plataforma privada</p>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 }
