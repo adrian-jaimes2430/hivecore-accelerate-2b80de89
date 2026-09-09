@@ -191,6 +191,43 @@ function ProductsTab() {
             <Input type="number" placeholder="Stock" value={editing.stock_quantity ?? ""} onChange={(e) => setEditing({ ...editing, stock_quantity: Number(e.target.value) })} />
           </div>
 
+          {/* Categorías secundarias */}
+          <div className="space-y-2 rounded-md border border-border/40 bg-white/[0.02] p-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--luxury-gold)]">Categorías secundarias</p>
+            {secondaryIds.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {secondaryIds.map((id) => {
+                  const c = categories.find((x) => x.id === id);
+                  if (!c) return null;
+                  return (
+                    <span key={id} className="inline-flex items-center gap-1 rounded-full bg-[color:var(--luxury-gold)]/15 px-2 py-0.5 text-xs text-[color:var(--luxury-gold)]">
+                      {c.name}
+                      <button type="button" className="hover:text-destructive" onClick={() => setEditing({ ...editing, secondary_category_ids: secondaryIds.filter((x) => x !== id) })}>
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+            <Select
+              value=""
+              onValueChange={(v) => {
+                if (!v || v === editing.category_id || secondaryIds.includes(v)) return;
+                setEditing({ ...editing, secondary_category_ids: [...secondaryIds, v] });
+              }}
+            >
+              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Añadir categoría secundaria" /></SelectTrigger>
+              <SelectContent>
+                {categories
+                  .filter((c) => c.id !== editing.category_id && !secondaryIds.includes(c.id))
+                  .map((c) => (<SelectItem key={c.id} value={c.id}>{c.parent_id ? "↳ " : ""}{c.name}</SelectItem>))}
+              </SelectContent>
+            </Select>
+          </div>
+
+
+
           <Textarea placeholder="Descripción corta" value={editing.short_description ?? ""} onChange={(e) => setEditing({ ...editing, short_description: e.target.value })} />
           <Textarea placeholder="Descripción" rows={5} value={editing.description ?? ""} onChange={(e) => setEditing({ ...editing, description: e.target.value })} />
 
