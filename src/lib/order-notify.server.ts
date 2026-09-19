@@ -166,38 +166,79 @@ export async function sendTelegramAlert(chatId: string, text: string) {
   return { ok: true as const };
 }
 
-export async function sendEmailAlert(recipients: string[], subject: string, alert: OrderAlert) {
+async function logEmailSend(
+  recipient: string,
+  status: "sent" | "suppressed" | "failed",
+  errorMessage?: string,
+) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { error } = await supabaseAdmin.from("email_send_log").insert({
+    template_name: "new-order-alert",
+    recipient_email: recipient,
+    status,
+    error_message: errorMessage?.slice(0, 1000) ?? null,
+  } as never);
+  if (error) console.error("[order-notify] email log failed", error.code, error.message);
+}
+
+export async function sendEmailAlert(recipients: string[], _subject: string, alert: OrderAlert) {
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey || recipients.length === 0) return { ok: false, error: "email_not_configured" };
 
-  const { sendLovableEmail } = await import("@lovable.dev/email-js");
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const html = alertEmailHtml(alert);
-  const text = alertEmailText(alert);
+  const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+  const { EmailAPIError } = await import("@lovable.dev/email-js");
+
+  const templateData = {
+    orderCode: alert.orderCode,
+    productName: alert.productName,
+    quantity: alert.quantity,
+    total: formatCOP(alert.total),
+    seller: alert.seller,
+    payment: `${alert.paymentMethod} (${alert.paymentStatus})`,
+    clientName: alert.clientName,
+    clientPhone: alert.clientPhone,
+    clientAddress: alert.clientAddress ?? "—",
+  };
+
   let sent = 0;
   for (const to of recipients) {
     try {
-      const token = crypto.randomUUID().replace(/-/g, "");
-      await supabaseAdmin.from("email_unsubscribe_tokens").insert({ token, email: to } as never);
-      await sendLovableEmail(
-        {
-          to,
-          from: "HIVECORE <pedidos@notify.ayoecosystem.com>",
-          sender_domain: "notify.ayoecosystem.com",
-          subject,
-          html,
-          text,
-          purpose: "transactional",
-          label: "new_order_alert",
-          unsubscribe_token: token,
-          message_id: `order-alert-${alert.orderCode}-${to}`,
-          idempotency_key: `order-alert-${alert.orderCode}-${to}`,
-        },
-        { apiKey },
-      );
-      sent++;
+      const result = await sendTemplateEmail("new-order-alert", to, {
+        templateData,
+        idempotencyKey: `order-alert-${alert.orderCode}-${to}`,
+      });
+      if (result.sent) {
+        sent++;
+        await logEmailSend(to, "sent");
+      } else {
+        await logEmailSend(to, "suppressed", result.reason);
+      }
     } catch (e) {
-      console.error("[order-notify] email failed", to, e);
+      if (e instanceof EmailAPIError && e.status === 429) {
+        const waitSeconds = e.retryAfterSeconds ?? 60;
+        await new Promise((r) => setTimeout(r, waitSeconds * 1000));
+        try {
+          const retry = await sendTemplateEmail("new-order-alert", to, {
+            templateData,
+            idempotencyKey: `order-alert-${alert.orderCode}-${to}`,
+          });
+          if (retry.sent) {
+            sent++;
+            await logEmailSend(to, "sent");
+          } else {
+            await logEmailSend(to, "suppressed", retry.reason);
+          }
+          continue;
+        } catch (retryError) {
+          const msg = retryError instanceof Error ? retryError.message : String(retryError);
+          console.error("[order-notify] email failed", to, msg);
+          await logEmailSend(to, "failed", msg);
+          continue;
+        }
+      }
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[order-notify] email failed", to, msg);
+      await logEmailSend(to, "failed", msg);
     }
   }
   return { ok: sent > 0, sent };
