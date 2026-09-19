@@ -11,7 +11,7 @@ import { VariationPicker, summarizeVariations } from "@/components/luxury/Variat
 import type { Variation } from "@/components/admin/VariationsEditor";
 import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
 import { waHref, productOrderMessage, ANMA_WHATSAPP } from "@/lib/whatsapp";
-import { formatCOP } from "@/lib/pricing";
+import { formatCOP, isQuoteOnly } from "@/lib/pricing";
 import { MetaViewContent } from "@/components/marketing/MetaPixel";
 
 const SITE_URL = "https://hivecore-accelerate.lovable.app";
@@ -71,11 +71,12 @@ function PublicProduct() {
   const attrs = (product.attributes ?? {}) as Record<string, unknown>;
   const url = typeof window !== "undefined" ? window.location.href : `${SITE_URL}/catalogo/${product.slug}`;
   const price = Number(product.suggested_retail_price || product.price);
+  const quoteOnly = isQuoteOnly(price) || product.attributes?.is_quote_only === true;
   const variantSummary = summarizeVariations(selectedVariations);
 
   const waLink = waHref(
     impulsador?.phone || ANMA_WHATSAPP,
-    productOrderMessage(product.name, { price: formatCOP(price), options: variantSummary || null, url }),
+    productOrderMessage(product.name, { price: quoteOnly ? "Precio y disponibilidad por confirmar" : formatCOP(price), options: variantSummary || null, url }),
   );
 
   return (
@@ -113,7 +114,8 @@ function PublicProduct() {
 
             <div className="shop-panel p-6">
               <p className="text-xs uppercase tracking-wider text-muted-foreground">Precio</p>
-              <p className="shop-price mt-1 text-4xl">{formatCOP(price)}</p>
+              <p className="shop-price mt-1 text-3xl sm:text-4xl">{quoteOnly ? "Consultar precio" : formatCOP(price)}</p>
+              {quoteOnly && <p className="mt-2 text-sm text-muted-foreground">Confirma disponibilidad y valor con tu asesor antes de comprar.</p>}
               <StockBadge status={product.stock_status} />
             </div>
 
@@ -130,7 +132,7 @@ function PublicProduct() {
                 value={price}
                 paid={!ref}
               />
-              {price > 0 && (
+              {!quoteOnly && (
                 <PublicCheckoutDialog
                   productKind="luxury"
                   slug={product.slug}
@@ -143,7 +145,7 @@ function PublicProduct() {
                 />
               )}
               <a href={waLink} target="_blank" rel="noopener noreferrer" className="shop-btn-outline h-12 w-full text-base">
-                <MessageCircle className="h-5 w-5" /> {impulsador?.name ? `Pedir a ${impulsador.name.split(" ")[0]} por WhatsApp` : "Hacer mi pedido por WhatsApp"}
+                <MessageCircle className="h-5 w-5" /> {quoteOnly ? "Confirmar disponibilidad y precio" : impulsador?.name ? `Pedir a ${impulsador.name.split(" ")[0]} por WhatsApp` : "Hacer mi pedido por WhatsApp"}
               </a>
               <a href={`mailto:?subject=${encodeURIComponent(product.name)}&body=${encodeURIComponent(`Me interesa: ${product.name}${variantSummary ? `\nOpciones: ${variantSummary}` : ""}\n${url}`)}`}
                 className="shop-btn-outline h-11 w-full text-sm text-muted-foreground hover:text-foreground">

@@ -20,7 +20,7 @@ import { FieldError, errorRing } from "@/components/checkout/FieldError";
 import { sendOrderNotification } from "@/lib/order-email.functions";
 import { forwardOrderToIntegrations } from "@/lib/integrations.functions";
 import type { Variation } from "@/components/admin/VariationsEditor";
-import { formatCOP } from "@/lib/pricing";
+import { formatCOP, isQuoteOnly } from "@/lib/pricing";
 
 export const Route = createFileRoute("/_authenticated/luxury/$slug")({
   component: LuxuryProductGate,
@@ -63,7 +63,9 @@ function LuxuryProduct() {
     queryKey: ["luxury-brand", product?.brand_id],
     enabled: !!product?.brand_id,
     queryFn: async () => {
-      const { data } = await supabase.from("luxury_brands").select("name").eq("id", product!.brand_id!).maybeSingle();
+      const brandId = product?.brand_id;
+      if (!brandId) return null;
+      const { data } = await supabase.from("luxury_brands").select("name").eq("id", brandId).maybeSingle();
       return data as { name: string } | null;
     },
   });
@@ -76,6 +78,8 @@ function LuxuryProduct() {
   const utility = Number(product.suggested_retail_price) - Number(product.price);
   const attrs = (product.attributes ?? {}) as Record<string, unknown>;
   const showImp = product.show_impulsador_price !== false;
+  const finalPrice = Number(product.suggested_retail_price || product.price);
+  const quoteOnly = isQuoteOnly(finalPrice) || product.attributes?.is_quote_only === true;
 
   const publicUrl = user ? `${SITE_URL}/catalogo/${product.slug}?ref=${user.id}` : `${SITE_URL}/catalogo/${product.slug}`;
 
@@ -103,7 +107,12 @@ function LuxuryProduct() {
           {product.short_description && <p className="text-muted-foreground">{product.short_description}</p>}
 
           <div className="shop-panel">
-            {showImp ? (
+            {quoteOnly ? (
+              <div>
+                <span className="shop-price text-3xl">Consultar precio</span>
+                <p className="mt-2 text-sm text-muted-foreground">Confirma disponibilidad y valor antes de tomar el pedido.</p>
+              </div>
+            ) : showImp ? (
               <>
                 <div className="flex items-baseline gap-3">
                   <span className="shop-price text-3xl">{formatCOP(Number(product.price))}</span>
@@ -135,10 +144,10 @@ function LuxuryProduct() {
 
           <div className="space-y-2">
             <StockBadge status={product.stock_status} qty={product.stock_quantity} />
-            {user && Number(product.suggested_retail_price || product.price) > 0 && (
+            {user && !quoteOnly && (
               <LuxuryOrderDialog product={product} selectedVariations={selectedVariations} />
             )}
-            {Number(product.suggested_retail_price || product.price) <= 0 && (
+            {quoteOnly && (
               <p className="text-xs text-muted-foreground">
                 Precio a consultar: escribe por WhatsApp para confirmar disponibilidad y valor antes de tomar el pedido.
               </p>

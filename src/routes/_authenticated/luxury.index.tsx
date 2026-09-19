@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
@@ -43,6 +43,7 @@ interface LuxProduct {
   id: string; sku: string | null; name: string; slug: string;
   short_description: string | null; description: string | null;
   images: unknown; videos: unknown; category_id: string | null; brand_id: string | null;
+  secondary_category_ids: unknown;
   price: number; suggested_retail_price: number; show_impulsador_price: boolean;
   stock_status: string; stock_quantity: number;
   attributes: Record<string, unknown>; is_featured: boolean;
@@ -97,18 +98,6 @@ function LuxuryCatalog() {
     queryKey: ["luxury-products", search],
     queryFn: async () => {
       let q = supabase.from("luxury_products").select("*").eq("is_active", true);
-      if (search.cat) {
-        const cat = categories.find((c) => c.slug === search.cat);
-        if (cat) {
-          const ids: string[] = [];
-          const walk = (id: string) => {
-            ids.push(id);
-            categories.filter((c) => c.parent_id === id).forEach((c) => walk(c.id));
-          };
-          walk(cat.id);
-          q = q.in("category_id", ids);
-        }
-      }
       if (search.brand) {
         const b = brands.find((x) => x.slug === search.brand);
         if (b) q = q.eq("brand_id", b.id);
@@ -132,6 +121,37 @@ function LuxuryCatalog() {
       ? (categories.find((c) => c.id === activeCat.parent_id) ?? activeCat)
       : activeCat
     : undefined;
+
+  const filteredProducts = useMemo(() => {
+    if (!search.cat) return products;
+    const category = categories.find((item) => item.slug === search.cat);
+    if (!category) return products;
+    const ids = new Set<string>();
+    const includeDescendants = (id: string) => {
+      ids.add(id);
+      categories.filter((item) => item.parent_id === id).forEach((item) => includeDescendants(item.id));
+    };
+    includeDescendants(category.id);
+    return products.filter((product) => {
+      if (product.category_id && ids.has(product.category_id)) return true;
+      const secondary = Array.isArray(product.secondary_category_ids) ? product.secondary_category_ids as string[] : [];
+      return secondary.some((id) => ids.has(id));
+    });
+  }, [categories, products, search.cat]);
+
+  const [visible, setVisible] = useState(18);
+  const sentinel = useRef<HTMLDivElement>(null);
+  useEffect(() => setVisible(18), [search.cat, search.brand, search.q, search.min, search.max, search.stock]);
+  useEffect(() => {
+    const element = sentinel.current;
+    if (!element) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry?.isIntersecting) setVisible((value) => value + 18);
+    }, { rootMargin: "500px" });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [filteredProducts.length]);
+  const shownProducts = filteredProducts.slice(0, visible);
 
   const setSearch = (patch: Record<string, unknown>) =>
     navigate({ search: ((prev: Record<string, unknown>) => ({ ...prev, ...patch })) as never });
@@ -271,7 +291,7 @@ function LuxuryCatalog() {
             <div className="mt-6">{filtersPanel}</div>
           </SheetContent>
         </Sheet>
-        <div className="text-xs text-muted-foreground">{products.length} productos</div>
+        <div className="text-xs text-muted-foreground">{filteredProducts.length} productos</div>
       </div>
 
       {/* Main categories — Shop.app circular chips */}
@@ -326,7 +346,7 @@ function LuxuryCatalog() {
         <div>
           {isLoading ? (
             <div className="flex h-60 items-center justify-center"><Loader2 className="h-5 w-5 animate-spin text-[color:var(--luxury-gold)]" /></div>
-          ) : products.length === 0 ? (
+          ) : filteredProducts.length === 0 ? (
             <div className="hive-card flex flex-col items-center justify-center gap-3 p-12 text-center">
               <Sparkles className="h-8 w-8 text-[color:var(--luxury-gold)]" />
               <p className="font-medium">Pronto en este catálogo</p>
@@ -334,11 +354,12 @@ function LuxuryCatalog() {
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
-              {products.map((p, i) => (
+              {shownProducts.map((p, i) => (
                 <ProductCard key={p.id} p={p} index={i} brand={brands.find((b) => b.id === p.brand_id)?.name} onQuickView={() => setQuickView(p)} />
               ))}
             </div>
           )}
+          <div ref={sentinel} className="h-10" />
         </div>
       </div>
 
@@ -358,11 +379,12 @@ function ProductCard({ p, brand, index = 0, onQuickView }: { p: LuxProduct; bran
   const utility = Number(p.suggested_retail_price) - Number(p.price);
   const showImp = p.show_impulsador_price !== false;
   const finalPrice = Number(p.suggested_retail_price || p.price);
+  const quoteOnly = finalPrice <= 0 || p.attributes?.is_quote_only === true;
 
   return (
     <Reveal className="shop-card group" delay={Math.min((index % 6) * 70, 420)} from="up">
       <Link to="/luxury/$slug" params={{ slug: p.slug }} className="block">
-        <div className="shop-media relative m-2 aspect-[4/5]">
+        <div className="shop-media relative m-1.5 aspect-[4/5] sm:m-2">
           {cover ? (
             <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
           ) : (
@@ -385,7 +407,11 @@ function ProductCard({ p, brand, index = 0, onQuickView }: { p: LuxProduct; bran
         {brand && <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{brand}</p>}
         <h3 className="font-semibold leading-tight">{p.name}</h3>
         {p.short_description && <p className="line-clamp-2 text-xs text-muted-foreground">{p.short_description}</p>}
-        {showImp ? (
+        {quoteOnly ? (
+          <div className="flex min-h-8 items-center">
+            <span className="font-display text-sm font-bold luxury-gradient-text sm:text-lg">Consultar precio</span>
+          </div>
+        ) : showImp ? (
           <>
             <div className="flex items-baseline gap-2">
               <span className="font-display text-lg font-bold">{formatCOP(Number(p.price))}</span>
@@ -418,6 +444,7 @@ function ProductCard({ p, brand, index = 0, onQuickView }: { p: LuxProduct; bran
 function QuickView({ p, brand }: { p: LuxProduct; brand?: string }) {
   const imgs = Array.isArray(p.images) ? (p.images as string[]) : [];
   const utility = Number(p.suggested_retail_price) - Number(p.price);
+  const quoteOnly = Number(p.suggested_retail_price || p.price) <= 0 || p.attributes?.is_quote_only === true;
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <div className="grid grid-cols-2 gap-2">
@@ -435,7 +462,12 @@ function QuickView({ p, brand }: { p: LuxProduct; brand?: string }) {
         {p.short_description && <p className="text-sm text-muted-foreground">{p.short_description}</p>}
         {p.description && <p className="text-sm">{p.description}</p>}
         <div className="rounded-lg border border-[color:var(--luxury-gold)]/30 bg-black/40 p-4">
-          {p.show_impulsador_price !== false ? (
+          {quoteOnly ? (
+            <div>
+              <span className="font-display text-2xl font-bold luxury-gradient-text">Consultar precio</span>
+              <p className="mt-2 text-xs text-muted-foreground">Confirma disponibilidad y valor antes de tomar el pedido.</p>
+            </div>
+          ) : p.show_impulsador_price !== false ? (
             <>
               <div className="flex items-baseline gap-3">
                 <span className="font-display text-2xl font-bold">{formatCOP(Number(p.price))}</span>

@@ -1,6 +1,7 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
-import { Crown, ArrowRight } from "lucide-react";
+import { Crown, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { Promo } from "./PromoCarousel";
 
 const Canvas = lazy(() => import("./PromoHero3DCanvas"));
@@ -10,40 +11,73 @@ const Canvas = lazy(() => import("./PromoHero3DCanvas"));
  * flotantes (three.js) y copia superpuesta. El 3D solo carga en cliente.
  */
 export function PromoHero3D({ promos, images = [] }: { promos: Promo[]; images?: string[] }) {
-  const featured = promos.find((p) => p.title) ?? promos[0] ?? null;
+  const slides = useMemo(() => {
+    const promoSlides = promos.filter((p) => p.media_url);
+    if (promoSlides.length > 0) return promoSlides;
+    return images.slice(0, 8).map((media_url, index) => ({
+      id: `product-${index}`,
+      title: index === 0 ? "AnMa Luxury Collection" : "Selección AnMa",
+      subtitle: "Piezas seleccionadas para momentos excepcionales",
+      media_type: "image",
+      media_url,
+      link_url: null,
+      cta_label: null,
+    }));
+  }, [images, promos]);
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const current = slides[active] ?? null;
+  const changeSlide = useCallback((index: number) => {
+    if (slides.length === 0) return;
+    setActive((index + slides.length) % slides.length);
+  }, [slides.length]);
+
+  useEffect(() => {
+    if (paused || slides.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => setActive((value) => (value + 1) % slides.length), 6500);
+    return () => window.clearInterval(timer);
+  }, [paused, slides.length]);
 
   return (
-    <section className="promo-hero3d">
-      <div className="absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_0%,rgba(201,168,76,0.22),transparent_60%)]" />
+    <section className="promo-hero3d" aria-label="Novedades AnMa Luxury" onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)}>
       <ClientOnly fallback={null}>
         <Suspense fallback={null}>
-          <Canvas promos={promos} images={images} />
+          <Canvas promos={slides} active={active} onActiveChange={changeSlide} />
         </Suspense>
       </ClientOnly>
       <div className="promo-hero3d-veil" />
 
-      <div className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-5 text-center">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--luxury-gold)]/40 bg-black/50 px-3 py-1 text-[10px] uppercase tracking-[0.28em] text-[color:var(--luxury-gold)] backdrop-blur">
-          <Crown className="h-3 w-3" /> {featured?.subtitle ?? "Colección Premium"}
-        </span>
-        <h2 className="mt-4 font-display text-3xl font-bold leading-[1.05] sm:text-5xl md:text-6xl">
-          <span className="luxury-gradient-text">{featured?.title ?? "AnMa Luxury Collection"}</span>
-        </h2>
-        <p className="mt-3 max-w-xl text-sm text-white/70 sm:text-base">
-          Perfumería, relojería, joyería AAA y marroquinería de autor. Escribe abajo lo que buscas y lo
-          encontramos por ti.
-        </p>
-        {featured?.link_url && (
+      <div className="promo-hero3d-copy">
+        <span className="promo-hero3d-kicker"><Crown className="h-3 w-3" /> Novedades</span>
+        <h2>{current?.title ?? "AnMa Luxury Collection"}</h2>
+        <p>{current?.subtitle ?? "Piezas seleccionadas para momentos excepcionales"}</p>
+        {current?.link_url && (
           <a
-            href={featured.link_url}
-            target={featured.link_url.startsWith("http") ? "_blank" : undefined}
+            href={current.link_url}
+            target={current.link_url.startsWith("http") ? "_blank" : undefined}
             rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-[color:var(--luxury-gold)] px-5 py-2.5 text-sm font-semibold text-black transition-transform hover:scale-105"
+            className="promo-hero3d-link"
           >
-            {featured.cta_label ?? "Ver colección"} <ArrowRight className="h-4 w-4" />
+            {current.cta_label ?? "Ver colección"} <ArrowRight className="h-4 w-4" />
           </a>
         )}
       </div>
+
+      {slides.length > 1 && (
+        <div className="promo-hero3d-controls">
+          <Button variant="ghost" size="icon" aria-label="Promoción anterior" onClick={() => changeSlide(active - 1)}>
+            <ChevronLeft />
+          </Button>
+          <div className="flex items-center gap-1.5" aria-label={`${active + 1} de ${slides.length}`}>
+            {slides.map((slide, index) => (
+              <Button key={slide.id} variant="ghost" size="icon" aria-label={`Ver promoción ${index + 1}`} data-active={index === active} onClick={() => changeSlide(index)} />
+            ))}
+          </div>
+          <Button variant="ghost" size="icon" aria-label="Promoción siguiente" onClick={() => changeSlide(active + 1)}>
+            <ChevronRight />
+          </Button>
+        </div>
+      )}
     </section>
   );
 }
