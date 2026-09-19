@@ -30,6 +30,8 @@ import { Route as AuthenticatedCategorySlugRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminLuxuryRouteImport } from './routes/_authenticated/admin.luxury'
 import { Route as AuthenticatedAdminIntegrationsRouteImport } from './routes/_authenticated/admin.integrations'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicWebhooksWompiRouteImport } from './routes/api/public/webhooks/wompi'
 import { Route as ApiPublicNotificationsOrderRouteImport } from './routes/api/public/notifications/order'
 import { Route as ApiPublicIntegrationsAocoreOrderRouteImport } from './routes/api/public/integrations/aocore/order'
@@ -143,6 +145,16 @@ const LovableEmailQueueProcessRoute =
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/lovable/email/auth/preview',
+  path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicWebhooksWompiRoute = ApiPublicWebhooksWompiRouteImport.update({
   id: '/api/public/webhooks/wompi',
   path: '/api/public/webhooks/wompi',
@@ -183,6 +195,8 @@ export interface FileRoutesByFullPath {
   '/luxury/': typeof AuthenticatedLuxuryIndexRoute
   '/api/public/notifications/order': typeof ApiPublicNotificationsOrderRoute
   '/api/public/webhooks/wompi': typeof ApiPublicWebhooksWompiRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/api/public/integrations/aocore/order': typeof ApiPublicIntegrationsAocoreOrderRoute
 }
@@ -208,6 +222,8 @@ export interface FileRoutesByTo {
   '/luxury': typeof AuthenticatedLuxuryIndexRoute
   '/api/public/notifications/order': typeof ApiPublicNotificationsOrderRoute
   '/api/public/webhooks/wompi': typeof ApiPublicWebhooksWompiRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/api/public/integrations/aocore/order': typeof ApiPublicIntegrationsAocoreOrderRoute
 }
@@ -235,6 +251,8 @@ export interface FileRoutesById {
   '/_authenticated/luxury/': typeof AuthenticatedLuxuryIndexRoute
   '/api/public/notifications/order': typeof ApiPublicNotificationsOrderRoute
   '/api/public/webhooks/wompi': typeof ApiPublicWebhooksWompiRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/api/public/integrations/aocore/order': typeof ApiPublicIntegrationsAocoreOrderRoute
 }
@@ -262,6 +280,8 @@ export interface FileRouteTypes {
     | '/luxury/'
     | '/api/public/notifications/order'
     | '/api/public/webhooks/wompi'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/api/public/integrations/aocore/order'
   fileRoutesByTo: FileRoutesByTo
@@ -287,6 +307,8 @@ export interface FileRouteTypes {
     | '/luxury'
     | '/api/public/notifications/order'
     | '/api/public/webhooks/wompi'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/api/public/integrations/aocore/order'
   id:
@@ -313,6 +335,8 @@ export interface FileRouteTypes {
     | '/_authenticated/luxury/'
     | '/api/public/notifications/order'
     | '/api/public/webhooks/wompi'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/api/public/integrations/aocore/order'
   fileRoutesById: FileRoutesById
@@ -331,6 +355,8 @@ export interface RootRouteChildren {
   ApiPublicMediaRoute: typeof ApiPublicMediaRoute
   ApiPublicNotificationsOrderRoute: typeof ApiPublicNotificationsOrderRoute
   ApiPublicWebhooksWompiRoute: typeof ApiPublicWebhooksWompiRoute
+  LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
+  LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   ApiPublicIntegrationsAocoreOrderRoute: typeof ApiPublicIntegrationsAocoreOrderRoute
 }
@@ -484,6 +510,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/webhooks/wompi': {
       id: '/api/public/webhooks/wompi'
       path: '/api/public/webhooks/wompi'
@@ -550,6 +590,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicMediaRoute: ApiPublicMediaRoute,
   ApiPublicNotificationsOrderRoute: ApiPublicNotificationsOrderRoute,
   ApiPublicWebhooksWompiRoute: ApiPublicWebhooksWompiRoute,
+  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
+  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   ApiPublicIntegrationsAocoreOrderRoute: ApiPublicIntegrationsAocoreOrderRoute,
 }
