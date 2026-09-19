@@ -6,6 +6,22 @@ import type { Promo } from "./PromoCarousel";
 
 const Canvas = lazy(() => import("./PromoHero3DCanvas"));
 
+const APP_HOSTS = new Set([
+  "hivecore-shop.lovable.app",
+  "hivecore-accelerate.lovable.app",
+  "hivecore-shop.ayoecosystem.com",
+]);
+
+function promoHref(link: string | null) {
+  if (!link) return null;
+  try {
+    const parsed = new URL(link, window.location.origin);
+    return APP_HOSTS.has(parsed.hostname) ? `${parsed.pathname}${parsed.search}${parsed.hash}` : parsed.href;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Banner superior grande del catálogo Luxury: escena 3D con tarjetas
  * flotantes (three.js) y copia superpuesta. El 3D solo carga en cliente.
@@ -26,9 +42,10 @@ export function PromoHero3D({ promos }: { promos: Promo[]; images?: string[] }) 
       changeSlide(index);
       return;
     }
-    if (!slide.link_url) return;
-    if (slide.link_url.startsWith("http")) window.open(slide.link_url, "_blank", "noopener,noreferrer");
-    else window.location.assign(slide.link_url);
+    const href = promoHref(slide.link_url);
+    if (!href) return;
+    if (href.startsWith("http")) window.open(href, "_blank", "noopener,noreferrer");
+    else window.location.assign(href);
   }, [active, changeSlide, slides]);
 
   useEffect(() => {
@@ -93,10 +110,10 @@ export function PromoHero3D({ promos }: { promos: Promo[]; images?: string[] }) 
         <span className="promo-hero3d-kicker"><Crown className="h-3 w-3" /> Publicitario {active + 1} de {slides.length}</span>
         <h2>{current.title ?? "AnMa Luxury Collection"}</h2>
         {current.subtitle && <p>{current.subtitle}</p>}
-        {current.link_url && (
+        {promoHref(current.link_url) && (
           <a
-            href={current.link_url}
-            target={current.link_url.startsWith("http") ? "_blank" : undefined}
+            href={promoHref(current.link_url) ?? undefined}
+            target={promoHref(current.link_url)?.startsWith("http") ? "_blank" : undefined}
             rel="noopener noreferrer"
             className="promo-hero3d-link"
           >

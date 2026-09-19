@@ -51,7 +51,7 @@ const COMMISSION_RATE = 0.2;
 function Dashboard() {
   const { profile, user, canLuxury, level } = useAuth();
   const [tag, setTag] = useState<TagKey>("all");
-  const SITE_URL = "https://hivecore-shop.lovable.app";
+  const SITE_URL = "https://hivecore-shop.ayoecosystem.com";
   const myCatalogUrl = user ? `${SITE_URL}/catalogo?ref=${user.id}` : `${SITE_URL}/catalogo`;
 
   const { data: products = [] } = useQuery({
@@ -196,11 +196,11 @@ function Dashboard() {
               {categories.map((c) => {
                 const tiles = products.filter((p) => p.category_id === c.id).slice(0, 4);
                 return (
-                  <div key={c.id} className="h-full">
+                  <div key={c.id} className={`h-full rounded-md border p-3 ${categoryToneClass(c.color)}`}>
                     <Link
                       to="/category/$slug"
                       params={{ slug: c.slug }}
-                      className={`group mb-3 inline-flex items-center gap-2 rounded-md border px-3 py-2 font-display text-lg font-semibold ${categoryToneClass(c.color)}`}
+                      className="group mb-3 inline-flex items-center gap-2 font-display text-lg font-semibold"
                     >
                       <CategoryIcon icon={c.icon} color={c.color} className="h-8 w-8" />
                       {c.name}
