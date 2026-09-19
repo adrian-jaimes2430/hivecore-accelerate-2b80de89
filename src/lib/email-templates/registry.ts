@@ -1,5 +1,8 @@
 import type { ComponentType } from 'react'
 
+import { template as newOrderAlertTemplate } from './new-order-alert'
+import { template as orderNotificationTemplate } from './order-notification'
+
 export interface TemplateEntry {
   component: ComponentType<any>
   subject: string | ((data: Record<string, any>) => string)
