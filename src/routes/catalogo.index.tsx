@@ -321,7 +321,9 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
         <h3 className="font-semibold leading-tight">{p.name}</h3>
         {p.short_description && <p className="line-clamp-2 text-xs text-muted-foreground">{p.short_description}</p>}
         <div className="flex min-h-7 items-center gap-2 pt-1">
-          <span className="font-display text-sm font-bold luxury-gradient-text sm:text-lg">{formatCOP(finalPrice)}</span>
+          <span className="font-display text-sm font-bold luxury-gradient-text sm:text-lg">
+            {quoteOnly ? "Precio por confirmar" : formatCOP(finalPrice)}
+          </span>
           {quoteOnly && <MessageCircle className="h-3.5 w-3.5 text-[color:var(--luxury-gold)]" />}
         </div>
         <div className="flex flex-col gap-2 pt-3 sm:flex-row">
