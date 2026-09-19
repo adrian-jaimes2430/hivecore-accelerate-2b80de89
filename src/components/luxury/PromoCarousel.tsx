@@ -1,6 +1,19 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 
+const APP_HOSTS = new Set(["hivecore-shop.lovable.app", "hivecore-accelerate.lovable.app", "hivecore-shop.ayoecosystem.com"]);
+
+function promoHref(link: string | null) {
+  if (!link) return null;
+  try {
+    const origin = typeof window === "undefined" ? "https://hivecore-shop.ayoecosystem.com" : window.location.origin;
+    const parsed = new URL(link, origin);
+    return APP_HOSTS.has(parsed.hostname) ? `${parsed.pathname}${parsed.search}${parsed.hash}` : parsed.href;
+  } catch {
+    return null;
+  }
+}
+
 export interface Promo {
   id: string;
   title: string | null;
@@ -24,6 +37,7 @@ export function PromoCarousel({ promos, autoMs = 6000 }: { promos: Promo[]; auto
 
   if (n === 0) return null;
   const p = promos[i];
+  const href = promoHref(p.link_url);
 
   return (
     <section
@@ -66,10 +80,10 @@ export function PromoCarousel({ promos, autoMs = 6000 }: { promos: Promo[]; auto
           {p.subtitle && (
             <p className="mt-1 max-w-xl text-sm text-zinc-200 sm:text-base">{p.subtitle}</p>
           )}
-          {p.link_url && (
+          {href && (
             <a
-              href={p.link_url}
-              target={p.link_url.startsWith("http") ? "_blank" : undefined}
+              href={href}
+              target={href.startsWith("http") ? "_blank" : undefined}
               rel="noopener noreferrer"
               className="mt-4 inline-flex items-center gap-2 rounded-full bg-[color:var(--luxury-gold)] px-4 py-2 text-sm font-semibold text-black shadow-lg shadow-amber-500/20 transition-transform hover:scale-105"
             >
