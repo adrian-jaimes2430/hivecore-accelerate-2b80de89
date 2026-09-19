@@ -66,7 +66,7 @@ export const Route = createFileRoute("/product/$slug")({
     }
     const links: any[] = [{ rel: "canonical", href: url }];
     const first = Array.isArray(p.funnel_sections) ? (p.funnel_sections as any[]).find((s) => s?.image || s?.video) : null;
-    if (first?.image) links.push({ rel: "preload", as: "image", href: first.image, fetchpriority: "high" });
+    if (first?.image) links.push({ rel: "preload", as: "image", href: first.image, fetchPriority: "high" });
     return { meta, links };
 
   },
