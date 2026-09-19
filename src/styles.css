@@ -942,19 +942,19 @@ html { scroll-behavior: smooth; }
   }
   .promo-hero3d-stage { position: absolute; inset: 0; z-index: 3; perspective: 1200px; pointer-events: none; }
   .promo-hero3d-card {
-    position: absolute; left: 50%; top: 42%; width: clamp(170px, 18vw, 235px) !important; height: clamp(220px, 24vw, 310px) !important;
-    min-width: 170px; min-height: 220px; display: block;
+    position: absolute; left: 50%; top: 44%; width: clamp(250px, 26.5vw, 340px) !important; height: clamp(310px, 30vw, 380px) !important;
+    min-width: 250px; min-height: 310px; display: block;
     overflow: hidden; border: 1px solid color-mix(in oklab, var(--luxury-gold) 32%, transparent); border-radius: 8px;
     padding: 0; background: var(--surface); box-shadow: 0 28px 70px -24px color-mix(in oklab, var(--background) 90%, transparent);
     transform-style: preserve-3d; pointer-events: auto; transition: transform 650ms cubic-bezier(.2,.8,.2,1), opacity 450ms ease, filter 450ms ease;
   }
   .promo-hero3d-card img, .promo-hero3d-card video { width: 100%; height: 100%; object-fit: cover; }
   .promo-hero3d-card-shade { position: absolute; inset: 0; background: linear-gradient(to top, color-mix(in oklab, var(--background) 48%, transparent), transparent 55%); pointer-events: none; }
-  .promo-hero3d-card[data-position="0"] { z-index: 5; transform: translate(-50%, -50%) translateZ(80px); }
-  .promo-hero3d-card[data-position="-1"] { z-index: 4; transform: translate(-124%, -48%) translateZ(-30px) rotateY(22deg) scale(.82); opacity: .8; filter: saturate(.8); }
-  .promo-hero3d-card[data-position="1"] { z-index: 4; transform: translate(24%, -48%) translateZ(-30px) rotateY(-22deg) scale(.82); opacity: .8; filter: saturate(.8); }
-  .promo-hero3d-card[data-position="-2"] { z-index: 2; transform: translate(-186%, -46%) translateZ(-100px) rotateY(30deg) scale(.66); opacity: .48; filter: saturate(.6); }
-  .promo-hero3d-card[data-position="2"] { z-index: 2; transform: translate(86%, -46%) translateZ(-100px) rotateY(-30deg) scale(.66); opacity: .48; filter: saturate(.6); }
+  .promo-hero3d-card[data-position="0"] { z-index: 5; transform: translate(-50%, -50%) translateZ(40px); }
+  .promo-hero3d-card[data-position="-1"] { z-index: 4; transform: translate(-153%, -48%) scale(.96) rotateY(10deg); opacity: .94; filter: saturate(.92); }
+  .promo-hero3d-card[data-position="1"] { z-index: 4; transform: translate(53%, -48%) scale(.96) rotateY(-10deg); opacity: .94; filter: saturate(.92); }
+  .promo-hero3d-card[data-position="-2"] { z-index: 2; transform: translate(-256%, -46%) scale(.92) rotateY(18deg); opacity: .5; filter: saturate(.6); }
+  .promo-hero3d-card[data-position="2"] { z-index: 2; transform: translate(156%, -46%) scale(.92) rotateY(-18deg); opacity: .5; filter: saturate(.6); }
   .promo-hero3d-copy {
     position: absolute; z-index: 10; left: 24px; bottom: 20px; width: min(44vw, 460px);
     text-align: left; pointer-events: none;
@@ -982,9 +982,10 @@ html { scroll-behavior: smooth; }
   .promo-hero3d-controls button[aria-label^="Ver promoción"][data-active="true"] { width: 20px; background: var(--luxury-gold); }
   @media (max-width: 639px) {
     .promo-hero3d { height: 390px; }
-    .promo-hero3d-card { top: 38%; width: 176px !important; height: 228px !important; min-width: 176px; min-height: 228px; }
-    .promo-hero3d-card[data-position="-1"] { transform: translate(-108%, -50%) translateZ(-30px) rotateY(24deg) scale(.7); }
-    .promo-hero3d-card[data-position="1"] { transform: translate(8%, -50%) translateZ(-30px) rotateY(-24deg) scale(.7); }
+    .promo-hero3d-card { top: 40%; width: 31vw !important; height: 180px !important; min-width: 96px; min-height: 130px; }
+    .promo-hero3d-card[data-position="0"] { transform: translate(-50%, -50%); }
+    .promo-hero3d-card[data-position="-1"] { transform: translate(-153%, -50%) scale(.96) rotateY(8deg); opacity: .95; filter: saturate(.92); }
+    .promo-hero3d-card[data-position="1"] { transform: translate(53%, -50%) scale(.96) rotateY(-8deg); opacity: .95; filter: saturate(.92); }
     .promo-hero3d-card[data-position="-2"], .promo-hero3d-card[data-position="2"] { display: none; }
     .promo-hero3d-copy { left: 10px; right: 10px; bottom: 10px; width: auto; padding: 10px 12px; }
     .promo-hero3d-copy h2 { font-size: 20px; }

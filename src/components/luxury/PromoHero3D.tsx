@@ -1,10 +1,7 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import { ClientOnly } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Crown, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Promo } from "./PromoCarousel";
-
-const Canvas = lazy(() => import("./PromoHero3DCanvas"));
 
 const APP_HOSTS = new Set([
   "hivecore-shop.lovable.app",
@@ -24,14 +21,15 @@ function promoHref(link: string | null) {
 }
 
 /**
- * Banner superior grande del catálogo Luxury: escena 3D con tarjetas
- * flotantes (three.js) y copia superpuesta. El 3D solo carga en cliente.
+ * Banner superior del catálogo: abanico de tarjetas de tamaño casi uniforme
+ * repartidas a todo el ancho del marco. Solo publicitarios publicados.
  */
 export function PromoHero3D({ promos }: { promos: Promo[]; images?: string[] }) {
   const slides = useMemo(() => promos.filter((promo) => promo.media_url), [promos]);
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const current = slides[active] ?? null;
+  const dragStart = useRef<{ x: number; y: number } | null>(null);
   const changeSlide = useCallback((index: number) => {
     if (slides.length === 0) return;
     setActive((index + slides.length) % slides.length);
@@ -55,28 +53,49 @@ export function PromoHero3D({ promos }: { promos: Promo[]; images?: string[] }) 
     return () => window.clearInterval(timer);
   }, [paused, slides.length]);
 
+  const visibleCards = useMemo(() => {
+    if (slides.length === 2) {
+      // Con dos publicitarios la tarjeta activa va al centro y la otra se
+      // refleja a ambos lados para que el abanico ocupe todo el ancho.
+      const otherIndex = (active + 1) % 2;
+      return [
+        { key: `${slides[otherIndex].id}-l`, slide: slides[otherIndex], index: otherIndex, offset: -1 },
+        { key: `${slides[active].id}-c`, slide: slides[active], index: active, offset: 0 },
+        { key: `${slides[otherIndex].id}-r`, slide: slides[otherIndex], index: otherIndex, offset: 1 },
+      ];
+    }
+    return slides
+      .map((slide, index) => {
+        let offset = index - active;
+        if (offset > slides.length / 2) offset -= slides.length;
+        if (offset < -slides.length / 2) offset += slides.length;
+        return { key: slide.id, slide, index, offset };
+      })
+      .filter(({ offset }) => Math.abs(offset) <= 2);
+  }, [slides, active]);
+
   if (!current) return null;
 
-  const visibleCards = slides
-    .map((slide, index) => {
-      let offset = index - active;
-      if (offset > slides.length / 2) offset -= slides.length;
-      if (offset < -slides.length / 2) offset += slides.length;
-      return { slide, index, offset };
-    })
-    .filter(({ offset }) => Math.abs(offset) <= 2);
-
   return (
-    <section className="promo-hero3d" aria-label="Novedades AnMa Luxury" onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)}>
-      <ClientOnly fallback={null}>
-        <Suspense fallback={null}>
-          <Canvas promos={slides} active={active} onActiveChange={changeSlide} onActivate={activateSlide} />
-        </Suspense>
-      </ClientOnly>
+    <section
+      className="promo-hero3d"
+      aria-label="Novedades AnMa Luxury"
+      onPointerEnter={() => setPaused(true)}
+      onPointerLeave={() => { setPaused(false); dragStart.current = null; }}
+      onPointerDown={(event) => { dragStart.current = { x: event.clientX, y: event.clientY }; }}
+      onPointerUp={(event) => {
+        const start = dragStart.current;
+        dragStart.current = null;
+        if (!start || slides.length < 2) return;
+        const dx = event.clientX - start.x;
+        const dy = event.clientY - start.y;
+        if (Math.abs(dx) >= 40 && Math.abs(dx) > Math.abs(dy)) changeSlide(active + (dx < 0 ? 1 : -1));
+      }}
+    >
       <div className="promo-hero3d-stage" aria-label="Publicitarios publicados">
-        {visibleCards.map(({ slide, index, offset }) => (
+        {visibleCards.map(({ key, slide, index, offset }) => (
           <Button
-            key={slide.id}
+            key={key}
             type="button"
             variant="ghost"
             className="promo-hero3d-card"
