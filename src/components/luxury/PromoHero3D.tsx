@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useMemo, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { Crown, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,14 +25,21 @@ export function PromoHero3D({ promos, images = [] }: { promos: Promo[]; images?:
     }));
   }, [images, promos]);
   const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
   const current = slides[active] ?? null;
   const changeSlide = useCallback((index: number) => {
     if (slides.length === 0) return;
     setActive((index + slides.length) % slides.length);
   }, [slides.length]);
 
+  useEffect(() => {
+    if (paused || slides.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => setActive((value) => (value + 1) % slides.length), 6500);
+    return () => window.clearInterval(timer);
+  }, [paused, slides.length]);
+
   return (
-    <section className="promo-hero3d" aria-label="Novedades AnMa Luxury">
+    <section className="promo-hero3d" aria-label="Novedades AnMa Luxury" onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)}>
       <ClientOnly fallback={null}>
         <Suspense fallback={null}>
           <Canvas promos={slides} active={active} onActiveChange={changeSlide} />

@@ -154,7 +154,8 @@ function ProductsTab() {
   const secondaryIds: string[] = Array.isArray(editing?.secondary_category_ids)
     ? (editing!.secondary_category_ids as string[])
     : [];
-  const quoteOnly = editing?.attributes?.is_quote_only === true || Number(editing?.suggested_retail_price || editing?.price || 0) <= 0;
+  const quoteSetting = editing?.attributes?.is_quote_only;
+  const quoteOnly = quoteSetting === true || (quoteSetting == null && Number(editing?.suggested_retail_price || editing?.price || 0) <= 0);
 
 
   return (

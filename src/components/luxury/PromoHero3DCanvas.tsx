@@ -170,7 +170,8 @@ export function PromoHero3DCanvas({ promos, active, onActiveChange }: { promos: 
         c.mesh.rotation.y += ((offset * -0.24) - c.mesh.rotation.y) * smooth;
         c.mesh.rotation.z += ((offset * -0.035) - c.mesh.rotation.z) * smooth;
         const scale = offset === 0 ? 1 : 0.82;
-        c.mesh.scale.lerp(new THREE.Vector3(scale, scale, scale), smooth);
+        const nextScale = c.mesh.scale.x + (scale - c.mesh.scale.x) * smooth;
+        c.mesh.scale.setScalar(nextScale);
         const opacity = shown ? (offset === 0 ? 1 : 0.58) : 0;
         c.mat.opacity += (((c.ready ? opacity : opacity * 0.35)) - c.mat.opacity) * smooth;
         c.mesh.visible = c.mat.opacity > 0.015;
