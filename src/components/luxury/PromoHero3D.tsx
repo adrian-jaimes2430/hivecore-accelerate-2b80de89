@@ -39,6 +39,15 @@ export function PromoHero3D({ promos }: { promos: Promo[]; images?: string[] }) 
 
   if (!current) return null;
 
+  const visibleCards = slides
+    .map((slide, index) => {
+      let offset = index - active;
+      if (offset > slides.length / 2) offset -= slides.length;
+      if (offset < -slides.length / 2) offset += slides.length;
+      return { slide, index, offset };
+    })
+    .filter(({ offset }) => Math.abs(offset) <= 2);
+
   return (
     <section className="promo-hero3d" aria-label="Novedades AnMa Luxury" onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)}>
       <ClientOnly fallback={null}>
@@ -46,6 +55,26 @@ export function PromoHero3D({ promos }: { promos: Promo[]; images?: string[] }) 
           <Canvas promos={slides} active={active} onActiveChange={changeSlide} onActivate={activateSlide} />
         </Suspense>
       </ClientOnly>
+      <div className="promo-hero3d-stage" aria-label="Publicitarios publicados">
+        {visibleCards.map(({ slide, index, offset }) => (
+          <Button
+            key={slide.id}
+            type="button"
+            variant="ghost"
+            className="promo-hero3d-card"
+            data-position={offset}
+            aria-label={index === active ? `Abrir ${slide.title ?? "publicitario"}` : `Mostrar ${slide.title ?? "publicitario"}`}
+            onClick={() => activateSlide(index)}
+          >
+            {slide.media_type === "video" ? (
+              <video src={slide.media_url} muted loop autoPlay playsInline preload={index === active ? "auto" : "metadata"} />
+            ) : (
+              <img src={slide.media_url} alt={slide.title ?? "Publicitario AnMa Luxury"} loading={index === active ? "eager" : "lazy"} decoding="async" />
+            )}
+            <span className="promo-hero3d-card-shade" />
+          </Button>
+        ))}
+      </div>
       <div className="promo-hero3d-veil" />
 
       <div className="promo-hero3d-copy">

@@ -938,6 +938,20 @@ html { scroll-behavior: smooth; }
     background: linear-gradient(to top, color-mix(in oklab, var(--background) 96%, transparent) 0%, color-mix(in oklab, var(--background) 22%, transparent) 44%, transparent 72%);
     pointer-events: none;
   }
+  .promo-hero3d-stage { position: absolute; inset: 0; z-index: 3; perspective: 1200px; pointer-events: none; }
+  .promo-hero3d-card {
+    position: absolute; left: 50%; top: 43%; width: clamp(210px, 26vw, 350px); height: clamp(260px, 34vw, 430px);
+    overflow: hidden; border: 1px solid color-mix(in oklab, var(--luxury-gold) 32%, transparent); border-radius: 8px;
+    padding: 0; background: var(--surface); box-shadow: 0 28px 70px -24px color-mix(in oklab, var(--background) 90%, transparent);
+    transform-style: preserve-3d; pointer-events: auto; transition: transform 650ms cubic-bezier(.2,.8,.2,1), opacity 450ms ease, filter 450ms ease;
+  }
+  .promo-hero3d-card img, .promo-hero3d-card video { width: 100%; height: 100%; object-fit: cover; }
+  .promo-hero3d-card-shade { position: absolute; inset: 0; background: linear-gradient(to top, color-mix(in oklab, var(--background) 48%, transparent), transparent 55%); pointer-events: none; }
+  .promo-hero3d-card[data-position="0"] { z-index: 5; transform: translate(-50%, -50%) translateZ(80px); }
+  .promo-hero3d-card[data-position="-1"] { z-index: 4; transform: translate(-118%, -48%) translateZ(-30px) rotateY(22deg) scale(.82); opacity: .8; filter: saturate(.8); }
+  .promo-hero3d-card[data-position="1"] { z-index: 4; transform: translate(18%, -48%) translateZ(-30px) rotateY(-22deg) scale(.82); opacity: .8; filter: saturate(.8); }
+  .promo-hero3d-card[data-position="-2"] { z-index: 2; transform: translate(-168%, -46%) translateZ(-100px) rotateY(30deg) scale(.66); opacity: .48; filter: saturate(.6); }
+  .promo-hero3d-card[data-position="2"] { z-index: 2; transform: translate(68%, -46%) translateZ(-100px) rotateY(-30deg) scale(.66); opacity: .48; filter: saturate(.6); }
   .promo-hero3d-copy {
     position: absolute; z-index: 10; left: 50%; bottom: 30px; width: min(88vw, 520px);
     transform: translateX(-50%); text-align: center; pointer-events: none;
@@ -965,6 +979,10 @@ html { scroll-behavior: smooth; }
   .promo-hero3d-controls button[aria-label^="Ver promoción"][data-active="true"] { width: 20px; background: var(--luxury-gold); }
   @media (max-width: 639px) {
     .promo-hero3d { height: 520px; }
+    .promo-hero3d-card { top: 39%; width: 230px; height: 300px; }
+    .promo-hero3d-card[data-position="-1"] { transform: translate(-104%, -50%) translateZ(-30px) rotateY(24deg) scale(.72); }
+    .promo-hero3d-card[data-position="1"] { transform: translate(4%, -50%) translateZ(-30px) rotateY(-24deg) scale(.72); }
+    .promo-hero3d-card[data-position="-2"], .promo-hero3d-card[data-position="2"] { display: none; }
     .promo-hero3d-copy { bottom: 18px; padding: 12px; }
     .promo-hero3d-controls { right: 50%; top: 12px; transform: translateX(50%); }
   }
