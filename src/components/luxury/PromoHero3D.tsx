@@ -15,7 +15,8 @@ const APP_HOSTS = new Set([
 function promoHref(link: string | null) {
   if (!link) return null;
   try {
-    const parsed = new URL(link, window.location.origin);
+    const origin = typeof window === "undefined" ? "https://hivecore-shop.ayoecosystem.com" : window.location.origin;
+    const parsed = new URL(link, origin);
     return APP_HOSTS.has(parsed.hostname) ? `${parsed.pathname}${parsed.search}${parsed.hash}` : parsed.href;
   } catch {
     return null;
