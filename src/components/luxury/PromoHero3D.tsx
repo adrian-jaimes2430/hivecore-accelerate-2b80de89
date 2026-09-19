@@ -67,7 +67,19 @@ export function PromoHero3D({ promos }: { promos: Promo[]; images?: string[] }) 
             onClick={() => activateSlide(index)}
           >
             {slide.media_type === "video" ? (
-              <video src={slide.media_url} muted loop autoPlay playsInline preload={index === active ? "auto" : "metadata"} />
+              <video
+                src={slide.media_url}
+                muted
+                loop
+                autoPlay
+                playsInline
+                preload={index === active ? "auto" : "metadata"}
+                onLoadedData={(event) => {
+                  const video = event.currentTarget;
+                  if (video.currentTime < 0.2) video.currentTime = 0.5;
+                  void video.play().catch(() => undefined);
+                }}
+              />
             ) : (
               <img src={slide.media_url} alt={slide.title ?? "Publicitario AnMa Luxury"} loading={index === active ? "eager" : "lazy"} decoding="async" />
             )}
