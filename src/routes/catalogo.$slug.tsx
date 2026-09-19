@@ -114,7 +114,7 @@ function PublicProduct() {
 
             <div className="shop-panel p-6">
               <p className="text-xs uppercase tracking-wider text-muted-foreground">Precio</p>
-              <p className="shop-price mt-1 text-3xl sm:text-4xl">{quoteOnly ? "Consultar precio" : formatCOP(price)}</p>
+              <p className="shop-price mt-1 text-3xl sm:text-4xl">{quoteOnly ? "Precio por confirmar" : formatCOP(price)}</p>
               {quoteOnly && <p className="mt-2 text-sm text-muted-foreground">Confirma disponibilidad y valor con tu asesor antes de comprar.</p>}
               <StockBadge status={product.stock_status} />
             </div>

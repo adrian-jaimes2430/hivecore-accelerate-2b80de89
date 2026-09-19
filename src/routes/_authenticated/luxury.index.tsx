@@ -409,7 +409,7 @@ function ProductCard({ p, brand, index = 0, onQuickView }: { p: LuxProduct; bran
         {p.short_description && <p className="line-clamp-2 text-xs text-muted-foreground">{p.short_description}</p>}
         {quoteOnly ? (
           <div className="flex min-h-8 items-center">
-            <span className="font-display text-sm font-bold luxury-gradient-text sm:text-lg">Consultar precio</span>
+            <span className="font-display text-sm font-bold luxury-gradient-text sm:text-lg">Precio por confirmar</span>
           </div>
         ) : showImp ? (
           <>
@@ -464,7 +464,7 @@ function QuickView({ p, brand }: { p: LuxProduct; brand?: string }) {
         <div className="rounded-lg border border-[color:var(--luxury-gold)]/30 bg-black/40 p-4">
           {quoteOnly ? (
             <div>
-              <span className="font-display text-2xl font-bold luxury-gradient-text">Consultar precio</span>
+              <span className="font-display text-2xl font-bold luxury-gradient-text">Precio por confirmar</span>
               <p className="mt-2 text-xs text-muted-foreground">Confirma disponibilidad y valor antes de tomar el pedido.</p>
             </div>
           ) : p.show_impulsador_price !== false ? (
