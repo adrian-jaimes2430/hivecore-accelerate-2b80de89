@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { GalleryUploader } from "@/components/admin/GalleryUploader";
 import { VariationsEditor, type Variation } from "@/components/admin/VariationsEditor";
 import { MediaUploader } from "@/components/admin/MediaUploader";
-import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { ArrowLeft, Crown, ExternalLink, Loader2, Plus, Save, Trash2, X } from "lucide-react";
 import { formatCOP } from "@/lib/pricing";
