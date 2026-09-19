@@ -70,7 +70,7 @@ export function PromoHero3D({ promos, images = [] }: { promos: Promo[]; images?:
           </Button>
           <div className="flex items-center gap-1.5" aria-label={`${active + 1} de ${slides.length}`}>
             {slides.map((slide, index) => (
-              <button key={slide.id} type="button" aria-label={`Ver promoción ${index + 1}`} data-active={index === active} onClick={() => changeSlide(index)} />
+              <Button key={slide.id} variant="ghost" size="icon" aria-label={`Ver promoción ${index + 1}`} data-active={index === active} onClick={() => changeSlide(index)} />
             ))}
           </div>
           <Button variant="ghost" size="icon" aria-label="Promoción siguiente" onClick={() => changeSlide(active + 1)}>

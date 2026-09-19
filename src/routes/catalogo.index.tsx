@@ -53,7 +53,7 @@ interface Product {
   id: string; name: string; slug: string; sku?: string | null; short_description: string | null;
   images: unknown; videos: unknown; category_id: string | null; secondary_category_ids?: unknown; brand_id: string | null;
   price: number; suggested_retail_price: number; is_featured: boolean;
-  stock_status: string;
+  stock_status: string; attributes?: Record<string, unknown>;
 }
 
 
@@ -285,7 +285,7 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
   const vids = Array.isArray(p.videos) ? (p.videos as string[]) : [];
   const cover = imgs[0];
   const finalPrice = Number(p.suggested_retail_price || p.price);
-  const quoteOnly = finalPrice <= 0;
+  const quoteOnly = finalPrice <= 0 || p.attributes?.is_quote_only === true;
   return (
     <Reveal className="shop-card group" delay={Math.min((index % 6) * 70, 420)} from="up">
       <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="block">
@@ -354,7 +354,7 @@ function QuickPreview({ p, brand, refQs }: { p: Product; brand?: string; refQs: 
         {p.short_description && <p className="text-sm text-muted-foreground">{p.short_description}</p>}
         <div className="rounded-lg border border-[color:var(--luxury-gold)]/30 bg-black/40 p-4">
           <span className="font-display text-2xl font-bold luxury-gradient-text">{formatCOP(Number(p.suggested_retail_price || p.price))}</span>
-          {Number(p.suggested_retail_price || p.price) <= 0 && <p className="mt-2 text-xs text-muted-foreground">Confirma disponibilidad y valor antes de hacer el pedido.</p>}
+          {(Number(p.suggested_retail_price || p.price) <= 0 || p.attributes?.is_quote_only === true) && <p className="mt-2 text-xs text-muted-foreground">Confirma disponibilidad y valor antes de hacer el pedido.</p>}
         </div>
         <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="inline-flex items-center gap-1 rounded-md bg-[color:var(--luxury-gold)]/15 px-3 py-2 text-sm text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/25">
           Ver ficha y reservar <ArrowRight className="h-3 w-3" />

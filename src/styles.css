@@ -937,7 +937,7 @@ html { scroll-behavior: smooth; }
     border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent); border-radius: 999px;
     background: color-mix(in oklab, var(--background) 76%, transparent); padding: 4px 7px; backdrop-filter: blur(16px);
   }
-  .promo-hero3d-controls button[aria-label^="Ver promoción"] { height: 6px; width: 6px; border-radius: 999px; background: color-mix(in oklab, var(--foreground) 32%, transparent); transition: width var(--dur-base) ease, background var(--dur-base) ease; }
+  .promo-hero3d-controls button[aria-label^="Ver promoción"] { height: 18px; width: 18px; min-width: 18px; padding: 6px; border-radius: 999px; background: color-mix(in oklab, var(--foreground) 32%, transparent); background-clip: content-box; transition: width var(--dur-base) ease, background var(--dur-base) ease; }
   .promo-hero3d-controls button[aria-label^="Ver promoción"][data-active="true"] { width: 20px; background: var(--luxury-gold); }
   @media (max-width: 639px) {
     .promo-hero3d-copy { bottom: 82px; }
