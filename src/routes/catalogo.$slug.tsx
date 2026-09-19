@@ -130,17 +130,18 @@ function PublicProduct() {
                 value={price}
                 paid={!ref}
               />
-              <PublicCheckoutDialog
-                productKind="luxury"
-                slug={product.slug}
-                productName={product.name}
-                unitPrice={price}
-                
-                ctaLabel="Comprar ahora"
-                ref={ref ?? null}
-                variations={variantSummary || null}
-                triggerClassName="shop-btn-accent h-12 w-full text-base"
-              />
+              {price > 0 && (
+                <PublicCheckoutDialog
+                  productKind="luxury"
+                  slug={product.slug}
+                  productName={product.name}
+                  unitPrice={price}
+                  ctaLabel="Comprar ahora"
+                  ref={ref ?? null}
+                  variations={variantSummary || null}
+                  triggerClassName="shop-btn-accent h-12 w-full text-base"
+                />
+              )}
               <a href={waLink} target="_blank" rel="noopener noreferrer" className="shop-btn-outline h-12 w-full text-base">
                 <MessageCircle className="h-5 w-5" /> {impulsador?.name ? `Pedir a ${impulsador.name.split(" ")[0]} por WhatsApp` : "Hacer mi pedido por WhatsApp"}
               </a>

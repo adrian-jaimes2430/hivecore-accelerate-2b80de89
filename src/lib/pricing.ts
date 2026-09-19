@@ -50,6 +50,12 @@ const round = (n: number) => Math.round(n * 100) / 100;
 /** Formato de moneda colombiana: "$ 289.900 COP" (evita confusión con soles). */
 export function formatCOP(value: number | string | null | undefined): string {
   const n = num(value);
+  if (n <= 0) return "Precio a consultar";
   const whole = Math.round(n);
   return `$ ${whole.toLocaleString("es-CO")} COP`;
+}
+
+/** true cuando el producto no tiene precio publicado y se cotiza por WhatsApp. */
+export function isQuoteOnly(value: number | string | null | undefined): boolean {
+  return num(value) <= 0;
 }
