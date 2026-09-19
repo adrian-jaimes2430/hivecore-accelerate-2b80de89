@@ -940,7 +940,8 @@ html { scroll-behavior: smooth; }
   }
   .promo-hero3d-stage { position: absolute; inset: 0; z-index: 3; perspective: 1200px; pointer-events: none; }
   .promo-hero3d-card {
-    position: absolute; left: 50%; top: 43%; width: clamp(210px, 26vw, 350px); height: clamp(260px, 34vw, 430px);
+    position: absolute; left: 50%; top: 43%; width: clamp(210px, 26vw, 350px) !important; height: clamp(260px, 34vw, 430px) !important;
+    min-width: 210px; min-height: 260px; display: block;
     overflow: hidden; border: 1px solid color-mix(in oklab, var(--luxury-gold) 32%, transparent); border-radius: 8px;
     padding: 0; background: var(--surface); box-shadow: 0 28px 70px -24px color-mix(in oklab, var(--background) 90%, transparent);
     transform-style: preserve-3d; pointer-events: auto; transition: transform 650ms cubic-bezier(.2,.8,.2,1), opacity 450ms ease, filter 450ms ease;
@@ -979,7 +980,7 @@ html { scroll-behavior: smooth; }
   .promo-hero3d-controls button[aria-label^="Ver promoción"][data-active="true"] { width: 20px; background: var(--luxury-gold); }
   @media (max-width: 639px) {
     .promo-hero3d { height: 520px; }
-    .promo-hero3d-card { top: 39%; width: 230px; height: 300px; }
+    .promo-hero3d-card { top: 39%; width: 230px !important; height: 300px !important; }
     .promo-hero3d-card[data-position="-1"] { transform: translate(-104%, -50%) translateZ(-30px) rotateY(24deg) scale(.72); }
     .promo-hero3d-card[data-position="1"] { transform: translate(4%, -50%) translateZ(-30px) rotateY(-24deg) scale(.72); }
     .promo-hero3d-card[data-position="-2"], .promo-hero3d-card[data-position="2"] { display: none; }
