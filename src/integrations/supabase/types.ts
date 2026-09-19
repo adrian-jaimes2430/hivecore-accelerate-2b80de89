@@ -490,6 +490,10 @@ export type Database = {
           external_ref: string | null
           external_synced_at: string | null
           id: string
+          impulsador_deleted_email: string | null
+          impulsador_deleted_id: string | null
+          impulsador_deleted_name: string | null
+          impulsador_deleted_phone: string | null
           impulsador_id: string | null
           luxury_product_id: string | null
           notes: string | null
@@ -519,6 +523,10 @@ export type Database = {
           external_ref?: string | null
           external_synced_at?: string | null
           id?: string
+          impulsador_deleted_email?: string | null
+          impulsador_deleted_id?: string | null
+          impulsador_deleted_name?: string | null
+          impulsador_deleted_phone?: string | null
           impulsador_id?: string | null
           luxury_product_id?: string | null
           notes?: string | null
@@ -548,6 +556,10 @@ export type Database = {
           external_ref?: string | null
           external_synced_at?: string | null
           id?: string
+          impulsador_deleted_email?: string | null
+          impulsador_deleted_id?: string | null
+          impulsador_deleted_name?: string | null
+          impulsador_deleted_phone?: string | null
           impulsador_id?: string | null
           luxury_product_id?: string | null
           notes?: string | null

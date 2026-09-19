@@ -12,6 +12,7 @@ import { Rail } from "@/components/Rail";
 import type { LucideIcon } from "lucide-react";
 import { formatCOP } from "@/lib/pricing";
 import { LEVEL_LABEL, levelChip } from "@/lib/levels";
+import { CategoryIcon, categoryToneClass } from "@/components/CategoryVisual";
 
 export const Route = createFileRoute("/_authenticated/app")({
   component: Dashboard,
@@ -32,7 +33,7 @@ interface Product {
   is_recommended: boolean;
   category_id: string | null;
 }
-interface Category { id: string; slug: string; name: string; color: string | null; description: string | null }
+interface Category { id: string; slug: string; name: string; color: string | null; icon: string | null; description: string | null }
 
 const TAGS = [
   { key: "all", label: "Todos" },
@@ -199,8 +200,9 @@ function Dashboard() {
                     <Link
                       to="/category/$slug"
                       params={{ slug: c.slug }}
-                      className="group mb-3 inline-flex items-center gap-1.5 font-display text-lg font-semibold tracking-[-0.02em]"
+                      className={`group mb-3 inline-flex items-center gap-2 rounded-md border px-3 py-2 font-display text-lg font-semibold ${categoryToneClass(c.color)}`}
                     >
+                      <CategoryIcon icon={c.icon} color={c.color} className="h-8 w-8" />
                       {c.name}
                       <ArrowRight className="h-4 w-4 text-hive transition-transform group-hover:translate-x-0.5" />
                     </Link>

@@ -3,12 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { formatCOP } from "@/lib/pricing";
+import { CategoryIcon, categoryToneClass } from "@/components/CategoryVisual";
 
 export const Route = createFileRoute("/_authenticated/category/$slug")({
   component: CategoryPage,
 });
 
-interface Cat { id: string; name: string; description: string | null; color: string | null }
+interface Cat { id: string; name: string; description: string | null; color: string | null; icon: string | null }
 interface Product { id: string; slug: string; name: string; price: number; short_description: string | null; images: unknown }
 
 function CategoryPage() {
@@ -24,7 +25,8 @@ function CategoryPage() {
     queryKey: ["category-products", category?.id],
     enabled: !!category?.id,
     queryFn: async () => {
-      const id = category!.id;
+      const id = category?.id;
+      if (!id) return [];
       const { data } = await supabase
         .from("products")
         .select("*")
@@ -39,8 +41,11 @@ function CategoryPage() {
       <Link to="/app" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Dashboard
       </Link>
-      <div className="mt-6">
-        <h1 className="font-display text-4xl font-bold sm:text-5xl hive-gradient-text">{category?.name ?? slug}</h1>
+      <div className={`mt-6 rounded-md border p-5 ${categoryToneClass(category?.color)}`}>
+        <div className="flex items-center gap-4">
+          <CategoryIcon icon={category?.icon} color={category?.color} className="h-12 w-12" />
+          <h1 className="font-display text-4xl font-bold sm:text-5xl">{category?.name ?? slug}</h1>
+        </div>
         <p className="mt-2 text-muted-foreground">{category?.description}</p>
       </div>
 

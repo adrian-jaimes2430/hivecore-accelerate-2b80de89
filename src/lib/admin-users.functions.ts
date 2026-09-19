@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { z } from "zod";
 
 /**
  * Returns the registration email of every user, keyed by user id.
@@ -32,4 +33,51 @@ export const listUserEmails = createServerFn({ method: "GET" })
       if (page > 25) break;
     }
     return { emails };
+  });
+
+export const deleteImpulsador = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ userId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    if (data.userId === context.userId) throw new Error("No puedes eliminar tu propia cuenta");
+
+    const { data: callerRoles, error: callerError } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId);
+    if (callerError) throw new Error(callerError.message);
+    if (!(callerRoles ?? []).some((row) => row.role === "super_admin")) throw new Error("No autorizado");
+
+    const { data: targetRoles, error: targetRoleError } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.userId);
+    if (targetRoleError) throw new Error(targetRoleError.message);
+    if (!(targetRoles ?? []).some((row) => row.role === "impulsador")) {
+      throw new Error("Solo se pueden eliminar cuentas con rol Impulsador");
+    }
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [{ data: profile, error: profileError }, { data: authData, error: authError }] = await Promise.all([
+      supabaseAdmin.from("profiles").select("full_name,phone").eq("id", data.userId).maybeSingle(),
+      supabaseAdmin.auth.admin.getUserById(data.userId),
+    ]);
+    if (profileError) throw new Error(profileError.message);
+    if (authError) throw new Error(authError.message);
+
+    const { error: preserveError } = await supabaseAdmin
+      .from("orders")
+      .update({
+        impulsador_deleted_id: data.userId,
+        impulsador_deleted_name: profile?.full_name ?? null,
+        impulsador_deleted_email: authData.user.email ?? null,
+        impulsador_deleted_phone: profile?.phone ?? null,
+        impulsador_id: null,
+      })
+      .eq("impulsador_id", data.userId);
+    if (preserveError) throw new Error(`No fue posible conservar las ventas: ${preserveError.message}`);
+
+    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
+    if (deleteError) throw new Error(deleteError.message);
+    return { ok: true };
   });
