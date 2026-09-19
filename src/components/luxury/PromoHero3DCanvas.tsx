@@ -2,15 +2,17 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import type { Promo } from "./PromoCarousel";
 
-type Src = { url: string; type: string };
-
 /**
- * Banner 3D del catálogo Luxury: carrusel cilíndrico de tarjetas con
- * rotación continua, parallax de puntero, reflejo inferior y aparición
- * progresiva de cada textura (sin bloquear la carga del catálogo).
+ * Abanico 3D frontal. La tarjeta activa permanece grande y visible; las
+ * laterales conservan profundidad y responden al puntero o al arrastre.
  */
-export function PromoHero3DCanvas({ promos, images = [] }: { promos: Promo[]; images?: string[] }) {
+export function PromoHero3DCanvas({ promos, active, onActiveChange }: { promos: Promo[]; active: number; onActiveChange: (index: number) => void }) {
   const host = useRef<HTMLDivElement>(null);
+  const activeRef = useRef(active);
+  const onChangeRef = useRef(onActiveChange);
+
+  useEffect(() => { activeRef.current = active; }, [active]);
+  useEffect(() => { onChangeRef.current = onActiveChange; }, [onActiveChange]);
 
   useEffect(() => {
     const el = host.current;
@@ -21,7 +23,7 @@ export function PromoHero3DCanvas({ promos, images = [] }: { promos: Promo[]; im
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
-    camera.position.set(0, 0.35, mobile ? 12.5 : 10.5);
+    camera.position.set(0, 0.1, mobile ? 10.8 : 9.6);
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !mobile, powerPreference: "high-performance" });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.5 : 2));
@@ -30,52 +32,43 @@ export function PromoHero3DCanvas({ promos, images = [] }: { promos: Promo[]; im
     el.appendChild(renderer.domElement);
     Object.assign(renderer.domElement.style, { width: "100%", height: "100%", display: "block" });
 
-    scene.add(new THREE.AmbientLight(0xffffff, 1.15));
-    const key = new THREE.DirectionalLight(0xffe3a8, 1.5);
+    scene.add(new THREE.AmbientLight(0xffffff, 1.35));
+    const key = new THREE.DirectionalLight(0xffe3a8, 1.8);
     key.position.set(3, 5, 7);
     scene.add(key);
 
-    const promoSrc: Src[] = promos
-      .filter((p) => p.media_url)
-      .map((p) => ({ url: p.media_url as string, type: p.media_type }));
-    const imgSrc: Src[] = images.map((u) => ({ url: u, type: "image" }));
-    const sources = [...promoSrc, ...imgSrc].slice(0, mobile ? 7 : 11);
+    const sources = promos.filter((p) => p.media_url).slice(0, mobile ? 6 : 9);
 
-    const ring = new THREE.Group();
-    scene.add(ring);
+    const fan = new THREE.Group();
+    scene.add(fan);
 
     const disposables: { dispose: () => void }[] = [];
     const videos: HTMLVideoElement[] = [];
     const loader = new THREE.TextureLoader();
     loader.setCrossOrigin("anonymous");
 
-    const count = Math.max(sources.length, 6);
-    const radius = mobile ? 7.4 : 8.6;
-    const cards: { mesh: THREE.Mesh; mat: THREE.MeshBasicMaterial; angle: number; seed: number; fade: number; ready: boolean }[] = [];
+    const cards: { mesh: THREE.Mesh; mat: THREE.MeshBasicMaterial; index: number; ready: boolean }[] = [];
 
-    for (let i = 0; i < count; i += 1) {
-      const src = sources[i % Math.max(sources.length, 1)];
-      const geo = new THREE.PlaneGeometry(2.5, 3.2, 1, 1);
+    for (let i = 0; i < sources.length; i += 1) {
+      const src = sources[i];
+      const geo = new THREE.PlaneGeometry(mobile ? 3.8 : 4.5, mobile ? 4.8 : 5.5, 1, 1);
       const mat = new THREE.MeshBasicMaterial({
-        color: 0x191320,
+        color: 0x171319,
         transparent: true,
-        opacity: 0.6,
+        opacity: 0,
         side: THREE.DoubleSide,
       });
       disposables.push(geo, mat);
 
       const mesh = new THREE.Mesh(geo, mat);
-      const angle = (i / count) * Math.PI * 2;
-      mesh.position.set(Math.sin(angle) * radius, (i % 3 - 1) * 0.55, Math.cos(angle) * radius - radius + 1.2);
-      mesh.rotation.y = -angle;
-      ring.add(mesh);
-      const card = { mesh, mat, angle, seed: i * 1.63, fade: 0, ready: false };
+      fan.add(mesh);
+      const card = { mesh, mat, index: i, ready: false };
       cards.push(card);
 
       if (src?.url) {
-        if (src.type === "video" && !mobile) {
+        if (src.media_type === "video" && !mobile) {
           const v = document.createElement("video");
-          v.src = src.url;
+          v.src = src.media_url;
           v.muted = true;
           v.loop = true;
           v.playsInline = true;
@@ -90,7 +83,7 @@ export function PromoHero3DCanvas({ promos, images = [] }: { promos: Promo[]; im
           mat.needsUpdate = true;
           card.ready = true;
         } else {
-          loader.loadAsync(src.url).then(
+          loader.loadAsync(src.media_url).then(
             (tex) => {
               tex.colorSpace = THREE.SRGBColorSpace;
               tex.generateMipmaps = true;
@@ -106,15 +99,6 @@ export function PromoHero3DCanvas({ promos, images = [] }: { promos: Promo[]; im
       }
     }
 
-    // Piso reflectante suave
-    const floorGeo = new THREE.PlaneGeometry(60, 24);
-    const floorMat = new THREE.MeshBasicMaterial({ color: 0x0a0a10, transparent: true, opacity: 0.55 });
-    const floor = new THREE.Mesh(floorGeo, floorMat);
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -3.1;
-    scene.add(floor);
-    disposables.push(floorGeo, floorMat);
-
     const pointer = { x: 0, y: 0 };
     const target = { x: 0, y: 0 };
     const onMove = (e: PointerEvent) => {
@@ -123,6 +107,19 @@ export function PromoHero3DCanvas({ promos, images = [] }: { promos: Promo[]; im
       target.y = ((e.clientY - r.top) / r.height) * 2 - 1;
     };
     el.addEventListener("pointermove", onMove, { passive: true });
+
+    let downX: number | null = null;
+    const onDown = (event: PointerEvent) => { downX = event.clientX; };
+    const onUp = (event: PointerEvent) => {
+      if (downX == null || sources.length < 2) return;
+      const distance = event.clientX - downX;
+      downX = null;
+      if (Math.abs(distance) < 38) return;
+      const next = distance < 0 ? activeRef.current + 1 : activeRef.current - 1;
+      onChangeRef.current((next + sources.length) % sources.length);
+    };
+    el.addEventListener("pointerdown", onDown);
+    el.addEventListener("pointerup", onUp);
 
     const resize = () => {
       const { clientWidth: w, clientHeight: h } = el;
@@ -143,34 +140,40 @@ export function PromoHero3DCanvas({ promos, images = [] }: { promos: Promo[]; im
     io.observe(el);
 
     let raf = 0;
-    let spin = 0;
-    const clock = new THREE.Clock();
+    let previous = performance.now();
     const tick = () => {
       raf = requestAnimationFrame(tick);
-      const dt = Math.min(clock.getDelta(), 0.05);
-      const t = clock.elapsedTime;
+      const now = performance.now();
+      const dt = Math.min((now - previous) / 1000, 0.05);
+      previous = now;
       if (!visible) return;
 
-      pointer.x += (target.x - pointer.x) * 0.05;
-      pointer.y += (target.y - pointer.y) * 0.05;
-
-      if (!reduce) spin += dt * 0.14;
-      ring.rotation.y = spin + pointer.x * 0.3;
-      ring.rotation.x = pointer.y * 0.06;
-      camera.position.y = 0.35 - pointer.y * 0.35;
+      const smooth = 1 - Math.exp(-7 * dt);
+      pointer.x += (target.x - pointer.x) * smooth;
+      pointer.y += (target.y - pointer.y) * smooth;
+      fan.rotation.y += ((reduce ? 0 : pointer.x * 0.045) - fan.rotation.y) * smooth;
+      fan.rotation.x += ((reduce ? 0 : pointer.y * 0.025) - fan.rotation.x) * smooth;
+      camera.position.y += ((-pointer.y * 0.12) - camera.position.y) * smooth;
       camera.lookAt(0, 0, 0);
 
       for (const c of cards) {
-        if (!reduce) {
-          c.mesh.position.y = (Math.round((c.seed % 3)) - 1) * 0.55 + Math.sin(t * 0.6 + c.seed) * 0.2;
-          c.mesh.rotation.z = Math.sin(t * 0.3 + c.seed) * 0.03;
-        }
-        // aparición progresiva y desvanecido por profundidad
-        const worldZ = c.mesh.getWorldPosition(new THREE.Vector3()).z;
-        const depth = THREE.MathUtils.clamp((worldZ + 14) / 18, 0.12, 1);
-        const goal = (c.ready ? 1 : 0.55) * depth;
-        c.fade += (goal - c.fade) * 0.08;
-        c.mat.opacity = c.fade;
+        let offset = c.index - activeRef.current;
+        if (offset > sources.length / 2) offset -= sources.length;
+        if (offset < -sources.length / 2) offset += sources.length;
+        const shown = Math.abs(offset) <= (mobile ? 1 : 2);
+        const targetX = offset * (mobile ? 2.65 : 3.35);
+        const targetZ = -Math.abs(offset) * 1.45;
+        const targetY = -Math.abs(offset) * 0.18;
+        c.mesh.position.x += (targetX - c.mesh.position.x) * smooth;
+        c.mesh.position.y += (targetY - c.mesh.position.y) * smooth;
+        c.mesh.position.z += (targetZ - c.mesh.position.z) * smooth;
+        c.mesh.rotation.y += ((offset * -0.24) - c.mesh.rotation.y) * smooth;
+        c.mesh.rotation.z += ((offset * -0.035) - c.mesh.rotation.z) * smooth;
+        const scale = offset === 0 ? 1 : 0.82;
+        c.mesh.scale.lerp(new THREE.Vector3(scale, scale, scale), smooth);
+        const opacity = shown ? (offset === 0 ? 1 : 0.58) : 0;
+        c.mat.opacity += (((c.ready ? opacity : opacity * 0.35)) - c.mat.opacity) * smooth;
+        c.mesh.visible = c.mat.opacity > 0.015;
       }
 
       renderer.render(scene, camera);
@@ -182,6 +185,8 @@ export function PromoHero3DCanvas({ promos, images = [] }: { promos: Promo[]; im
       ro.disconnect();
       io.disconnect();
       el.removeEventListener("pointermove", onMove);
+      el.removeEventListener("pointerdown", onDown);
+      el.removeEventListener("pointerup", onUp);
       for (const v of videos) {
         v.pause();
         v.src = "";
@@ -190,9 +195,9 @@ export function PromoHero3DCanvas({ promos, images = [] }: { promos: Promo[]; im
       renderer.dispose();
       renderer.domElement.remove();
     };
-  }, [promos, images]);
+  }, [promos]);
 
-  return <div ref={host} className="absolute inset-0" aria-hidden="true" />;
+  return <div ref={host} className="absolute inset-0 cursor-grab active:cursor-grabbing" aria-hidden="true" />;
 }
 
 export default PromoHero3DCanvas;

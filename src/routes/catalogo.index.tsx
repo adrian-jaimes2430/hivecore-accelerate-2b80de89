@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Crown, Filter, Sparkles, ArrowRight, Search, Film } from "lucide-react";
+import { Crown, Filter, Sparkles, ArrowRight, Search, Film, MessageCircle } from "lucide-react";
 import { listLuxuryCatalog, getImpulsadorRef } from "@/lib/luxury-public.functions";
 import { type Promo } from "@/components/luxury/PromoCarousel";
 import { PromoHero3D } from "@/components/luxury/PromoHero3D";
@@ -237,7 +237,7 @@ function PublicCatalog() {
               </div>
             ) : (
               <>
-                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
                   {shown.map((p, i) => (
                     <PublicCard key={p.id} p={p} brand={brands.find((b) => b.id === p.brand_id)?.name} index={i} refQs={refQs} onQuickView={() => setQuickView(p)} />
                   ))}
@@ -284,10 +284,12 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
   const imgs = Array.isArray(p.images) ? (p.images as string[]) : [];
   const vids = Array.isArray(p.videos) ? (p.videos as string[]) : [];
   const cover = imgs[0];
+  const finalPrice = Number(p.suggested_retail_price || p.price);
+  const quoteOnly = finalPrice <= 0;
   return (
     <Reveal className="shop-card group" delay={Math.min((index % 6) * 70, 420)} from="up">
       <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="block">
-        <div className="shop-media relative m-2 aspect-[4/5]">
+        <div className="shop-media relative m-1.5 aspect-[4/5] sm:m-2">
           {cover ? (
             <img
               src={cover}
@@ -318,13 +320,14 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
         {brand && <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{brand}</p>}
         <h3 className="font-semibold leading-tight">{p.name}</h3>
         {p.short_description && <p className="line-clamp-2 text-xs text-muted-foreground">{p.short_description}</p>}
-        <div className="flex items-baseline gap-2 pt-1">
-          <span className="font-display text-lg font-bold luxury-gradient-text">{formatCOP(Number(p.suggested_retail_price || p.price))}</span>
+        <div className="flex min-h-7 items-center gap-2 pt-1">
+          <span className="font-display text-sm font-bold luxury-gradient-text sm:text-lg">{formatCOP(finalPrice)}</span>
+          {quoteOnly && <MessageCircle className="h-3.5 w-3.5 text-[color:var(--luxury-gold)]" />}
         </div>
-        <div className="flex items-center gap-2 pt-3">
-          <button onClick={onQuickView} className="shop-btn-quiet flex-1">Vista rápida</button>
-          <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="shop-btn">
-            Ver <ArrowRight className="h-3.5 w-3.5" />
+        <div className="flex flex-col gap-2 pt-3 sm:flex-row">
+          <Button variant="ghost" onClick={onQuickView} className="shop-btn-quiet h-9 flex-1 px-2 text-xs">Vista rápida</Button>
+          <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="shop-btn h-9 flex-1 px-2 text-xs">
+            Ver <ArrowRight className="hidden h-3.5 w-3.5 sm:block" />
           </Link>
         </div>
       </div>
@@ -351,6 +354,7 @@ function QuickPreview({ p, brand, refQs }: { p: Product; brand?: string; refQs: 
         {p.short_description && <p className="text-sm text-muted-foreground">{p.short_description}</p>}
         <div className="rounded-lg border border-[color:var(--luxury-gold)]/30 bg-black/40 p-4">
           <span className="font-display text-2xl font-bold luxury-gradient-text">{formatCOP(Number(p.suggested_retail_price || p.price))}</span>
+          {Number(p.suggested_retail_price || p.price) <= 0 && <p className="mt-2 text-xs text-muted-foreground">Confirma disponibilidad y valor antes de hacer el pedido.</p>}
         </div>
         <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="inline-flex items-center gap-1 rounded-md bg-[color:var(--luxury-gold)]/15 px-3 py-2 text-sm text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/25">
           Ver ficha y reservar <ArrowRight className="h-3 w-3" />

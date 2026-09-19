@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { GalleryUploader } from "@/components/admin/GalleryUploader";
 import { VariationsEditor, type Variation } from "@/components/admin/VariationsEditor";
 import { MediaUploader } from "@/components/admin/MediaUploader";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { ArrowLeft, Crown, ExternalLink, Loader2, Plus, Save, Trash2, X } from "lucide-react";
 import { formatCOP } from "@/lib/pricing";
@@ -102,6 +103,10 @@ function ProductsTab() {
   const save = async () => {
     if (!editing) return;
     if (!editing.name || !editing.name.trim()) return toast.error("El nombre es obligatorio");
+    const quoteOnly = editing.attributes?.is_quote_only === true;
+    if (!quoteOnly && Number(editing.suggested_retail_price || editing.price || 0) <= 0) {
+      return toast.error("Define un precio final o activa la opción de precio por confirmar");
+    }
     const payload = {
       sku: editing.sku || null,
       name: editing.name,
@@ -117,14 +122,14 @@ function ProductsTab() {
       ),
 
       brand_id: editing.brand_id || null,
-      price: Number(editing.price ?? 0),
-      suggested_retail_price: Number(editing.suggested_retail_price ?? 0),
+      price: quoteOnly ? 0 : Number(editing.price ?? 0),
+      suggested_retail_price: quoteOnly ? 0 : Number(editing.suggested_retail_price ?? 0),
       show_impulsador_price: editing.show_impulsador_price ?? true,
       stock_status: editing.stock_status ?? "in_stock",
       stock_quantity: Number(editing.stock_quantity ?? 0),
       is_active: editing.is_active ?? true,
       is_featured: editing.is_featured ?? false,
-      attributes: editing.attributes ?? {},
+      attributes: { ...(editing.attributes ?? {}), is_quote_only: quoteOnly },
     };
     const { error } = editing.id
       ? await supabase.from("luxury_products").update(payload as never).eq("id", editing.id)
@@ -149,12 +154,13 @@ function ProductsTab() {
   const secondaryIds: string[] = Array.isArray(editing?.secondary_category_ids)
     ? (editing!.secondary_category_ids as string[])
     : [];
+  const quoteOnly = editing?.attributes?.is_quote_only === true || Number(editing?.suggested_retail_price || editing?.price || 0) <= 0;
 
 
   return (
     <div className="mt-6 space-y-6">
       <div className="flex justify-end">
-        <Button onClick={() => setEditing({ images: [], videos: [], variations: [], stock_status: "in_stock", is_active: true, show_impulsador_price: true })} className="hive-btn-primary">
+        <Button onClick={() => setEditing({ images: [], videos: [], variations: [], stock_status: "in_stock", is_active: true, show_impulsador_price: true, attributes: { is_quote_only: false } })} className="hive-btn-primary">
           <Plus className="mr-1 h-4 w-4" /> Nuevo producto
         </Button>
       </div>
@@ -190,9 +196,26 @@ function ProductsTab() {
                 <SelectItem value="preorder">Pre-orden</SelectItem>
               </SelectContent>
             </Select>
-            <Input type="number" placeholder="Precio impulsador" value={editing.price ?? ""} onChange={(e) => setEditing({ ...editing, price: Number(e.target.value) })} />
-            <Input type="number" placeholder="Precio sugerido / final" value={editing.suggested_retail_price ?? ""} onChange={(e) => setEditing({ ...editing, suggested_retail_price: Number(e.target.value) })} />
+            {!quoteOnly && <Input type="number" min="0" placeholder="Precio impulsador" value={editing.price ?? ""} onChange={(e) => setEditing({ ...editing, price: Number(e.target.value) })} />}
+            {!quoteOnly && <Input type="number" min="0" placeholder="Precio sugerido / final" value={editing.suggested_retail_price ?? ""} onChange={(e) => setEditing({ ...editing, suggested_retail_price: Number(e.target.value) })} />}
             <Input type="number" placeholder="Stock" value={editing.stock_quantity ?? ""} onChange={(e) => setEditing({ ...editing, stock_quantity: Number(e.target.value) })} />
+          </div>
+
+          <div className="shop-panel flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold">Precio y disponibilidad por confirmar</p>
+              <p className="mt-1 text-xs text-muted-foreground">El cliente verá “Consultar precio” y solo podrá contactar por WhatsApp.</p>
+            </div>
+            <Switch
+              checked={quoteOnly}
+              onCheckedChange={(checked) => setEditing({
+                ...editing,
+                price: checked ? 0 : editing.price,
+                suggested_retail_price: checked ? 0 : editing.suggested_retail_price,
+                attributes: { ...(editing.attributes ?? {}), is_quote_only: checked },
+              })}
+              aria-label="Precio y disponibilidad por confirmar"
+            />
           </div>
 
           {/* Categorías secundarias */}
@@ -298,7 +321,7 @@ function ProductsTab() {
                 <div>
                   <p className="font-medium">{p.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {p.sku && <>{p.sku} · </>}{formatCOP(Number(p.price))} · {p.stock_status}
+                    {p.sku && <>{p.sku} · </>}{p.attributes?.is_quote_only === true || Number(p.suggested_retail_price || p.price) <= 0 ? "Precio por confirmar" : formatCOP(Number(p.price))} · {p.stock_status}
                     {vidCount > 0 && <> · 🎬 {vidCount}</>}
                     {p.is_featured && <> · ⭐</>}
                     {!p.is_active && <> · inactivo</>}
