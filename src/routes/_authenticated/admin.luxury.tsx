@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { GalleryUploader } from "@/components/admin/GalleryUploader";
 import { VariationsEditor, type Variation } from "@/components/admin/VariationsEditor";
 import { MediaUploader } from "@/components/admin/MediaUploader";
-import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { ArrowLeft, Crown, ExternalLink, Loader2, Plus, Save, Trash2, X } from "lucide-react";
 import { formatCOP } from "@/lib/pricing";
@@ -156,6 +155,14 @@ function ProductsTab() {
     : [];
   const quoteSetting = editing?.attributes?.is_quote_only;
   const quoteOnly = quoteSetting === true || (quoteSetting == null && Number(editing?.suggested_retail_price || editing?.price || 0) <= 0);
+  const rootCategories = categories.filter((category) => !category.parent_id);
+  const childrenOf = (parentId: string) => categories.filter((category) => category.parent_id === parentId);
+  const categoryPath = (categoryId: string) => {
+    const category = categories.find((item) => item.id === categoryId);
+    if (!category) return "Categoría no disponible";
+    const parent = category.parent_id ? categories.find((item) => item.id === category.parent_id) : null;
+    return parent ? `${parent.name} / ${category.name}` : category.name;
+  };
 
 
   return (
@@ -169,19 +176,47 @@ function ProductsTab() {
       {editing && (
         <div className="hive-card space-y-5 p-5">
           <h3 className="font-display text-lg font-semibold">{editing.id ? "Editar" : "Nuevo"} producto</h3>
+
+          <div className={`rounded-md border p-4 ${quoteOnly ? "border-[color:var(--luxury-gold)]/60 bg-[color:var(--luxury-gold)]/10" : "border-border/60 bg-white/[0.02]"}`}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold">¿Este producto publica precio?</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {quoteOnly
+                    ? "No. En ambos catálogos aparecerá “Precio por confirmar por disponibilidad”."
+                    : "Sí. Se publicarán los valores definidos abajo."}
+                </p>
+              </div>
+              <div className="grid shrink-0 grid-cols-2 gap-1 rounded-md border border-border/60 bg-background/70 p-1">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={!quoteOnly ? "default" : "ghost"}
+                  onClick={() => setEditing({ ...editing, attributes: { ...(editing.attributes ?? {}), is_quote_only: false } })}
+                >
+                  Publicar precio
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={quoteOnly ? "default" : "ghost"}
+                  onClick={() => setEditing({
+                    ...editing,
+                    price: 0,
+                    suggested_retail_price: 0,
+                    attributes: { ...(editing.attributes ?? {}), is_quote_only: true },
+                  })}
+                >
+                  Por confirmar
+                </Button>
+              </div>
+            </div>
+          </div>
+
           <div className="grid gap-3 sm:grid-cols-2">
             <Input placeholder="Nombre" value={editing.name ?? ""} onChange={(e) => setEditing({ ...editing, name: e.target.value })} />
             <Input placeholder="SKU (auto)" value={editing.sku ?? ""} onChange={(e) => setEditing({ ...editing, sku: e.target.value })} />
             <Input placeholder="Slug (auto)" value={editing.slug ?? ""} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} />
-            <Select value={editing.category_id ?? ""} onValueChange={(v) => setEditing({ ...editing, category_id: v })}>
-              <SelectTrigger><SelectValue placeholder="Categoría principal" /></SelectTrigger>
-              <SelectContent>
-                {categories.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.parent_id ? "↳ " : ""}{c.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
             <Select value={editing.brand_id ?? ""} onValueChange={(v) => setEditing({ ...editing, brand_id: v })}>
               <SelectTrigger><SelectValue placeholder="Marca" /></SelectTrigger>
               <SelectContent>
@@ -202,26 +237,55 @@ function ProductsTab() {
             <Input type="number" placeholder="Stock" value={editing.stock_quantity ?? ""} onChange={(e) => setEditing({ ...editing, stock_quantity: Number(e.target.value) })} />
           </div>
 
-          <div className="shop-panel flex items-center justify-between gap-4">
+          <div className="space-y-3 rounded-md border border-border/60 bg-white/[0.02] p-4">
             <div>
-              <p className="text-sm font-semibold">Precio y disponibilidad por confirmar</p>
-              <p className="mt-1 text-xs text-muted-foreground">El cliente verá “Consultar precio” y solo podrá contactar por WhatsApp.</p>
+              <p className="text-sm font-semibold">Categoría principal</p>
+              <p className="mt-1 text-xs text-muted-foreground">Primero identifica la sección y luego elige su categoría.</p>
             </div>
-            <Switch
-              checked={quoteOnly}
-              onCheckedChange={(checked) => setEditing({
-                ...editing,
-                price: checked ? 0 : editing.price,
-                suggested_retail_price: checked ? 0 : editing.suggested_retail_price,
-                attributes: { ...(editing.attributes ?? {}), is_quote_only: checked },
+            <div className="grid gap-3 md:grid-cols-3">
+              {rootCategories.map((root) => {
+                const children = childrenOf(root.id);
+                return (
+                  <div key={root.id} className="rounded-md border border-border/50 bg-background/50 p-3">
+                    <p className="mb-2 text-xs font-bold uppercase text-[color:var(--luxury-gold)]">{root.name}</p>
+                    <div className="grid gap-1.5">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={editing.category_id === root.id ? "default" : "outline"}
+                        className="justify-start"
+                        onClick={() => setEditing({ ...editing, category_id: root.id, secondary_category_ids: secondaryIds.filter((id) => id !== root.id) })}
+                      >
+                        Toda la sección
+                      </Button>
+                      {children.map((category) => (
+                        <Button
+                          key={category.id}
+                          type="button"
+                          size="sm"
+                          variant={editing.category_id === category.id ? "default" : "ghost"}
+                          className="justify-start"
+                          onClick={() => setEditing({ ...editing, category_id: category.id, secondary_category_ids: secondaryIds.filter((id) => id !== category.id) })}
+                        >
+                          {category.name}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                );
               })}
-              aria-label="Precio y disponibilidad por confirmar"
-            />
+            </div>
+            {editing.category_id && (
+              <p className="rounded-md bg-[color:var(--luxury-gold)]/10 px-3 py-2 text-xs text-[color:var(--luxury-gold)]">
+                Seleccionada: <strong>{categoryPath(editing.category_id)}</strong>
+              </p>
+            )}
           </div>
 
           {/* Categorías secundarias */}
           <div className="space-y-2 rounded-md border border-border/40 bg-white/[0.02] p-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--luxury-gold)]">Categorías secundarias</p>
+            <p className="text-xs text-muted-foreground">Opcional. Se muestran agrupadas por Hombres, Mujeres y Línea Blanca.</p>
             {secondaryIds.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {secondaryIds.map((id) => {
@@ -229,7 +293,7 @@ function ProductsTab() {
                   if (!c) return null;
                   return (
                     <span key={id} className="inline-flex items-center gap-1 rounded-full bg-[color:var(--luxury-gold)]/15 px-2 py-0.5 text-xs text-[color:var(--luxury-gold)]">
-                      {c.name}
+                      {categoryPath(c.id)}
                       <button type="button" className="hover:text-destructive" onClick={() => setEditing({ ...editing, secondary_category_ids: secondaryIds.filter((x) => x !== id) })}>
                         <X className="h-3 w-3" />
                       </button>
@@ -246,10 +310,16 @@ function ProductsTab() {
               }}
             >
               <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Añadir categoría secundaria" /></SelectTrigger>
-              <SelectContent>
-                {categories
-                  .filter((c) => c.id !== editing.category_id && !secondaryIds.includes(c.id))
-                  .map((c) => (<SelectItem key={c.id} value={c.id}>{c.parent_id ? "↳ " : ""}{c.name}</SelectItem>))}
+              <SelectContent className="max-h-80">
+                {rootCategories.flatMap((root) => {
+                  const available = [root, ...childrenOf(root.id)].filter((category) => category.id !== editing.category_id && !secondaryIds.includes(category.id));
+                  if (available.length === 0) return [];
+                  return available.map((category) => (
+                    <SelectItem key={category.id} value={category.id} className={category.id === root.id ? "mt-1 font-semibold text-[color:var(--luxury-gold)]" : "pl-5"}>
+                      {category.id === root.id ? root.name : `${root.name} / ${category.name}`}
+                    </SelectItem>
+                  ));
+                })}
               </SelectContent>
             </Select>
           </div>

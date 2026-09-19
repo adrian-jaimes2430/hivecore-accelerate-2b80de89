@@ -109,7 +109,7 @@ function LuxuryProduct() {
           <div className="shop-panel">
             {quoteOnly ? (
               <div>
-                <span className="shop-price text-3xl">Consultar precio</span>
+                <span className="shop-price text-3xl">Precio por confirmar</span>
                 <p className="mt-2 text-sm text-muted-foreground">Confirma disponibilidad y valor antes de tomar el pedido.</p>
               </div>
             ) : showImp ? (

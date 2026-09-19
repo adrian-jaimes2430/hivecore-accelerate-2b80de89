@@ -321,7 +321,9 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
         <h3 className="font-semibold leading-tight">{p.name}</h3>
         {p.short_description && <p className="line-clamp-2 text-xs text-muted-foreground">{p.short_description}</p>}
         <div className="flex min-h-7 items-center gap-2 pt-1">
-          <span className="font-display text-sm font-bold luxury-gradient-text sm:text-lg">{formatCOP(finalPrice)}</span>
+          <span className="font-display text-sm font-bold luxury-gradient-text sm:text-lg">
+            {quoteOnly ? "Precio por confirmar" : formatCOP(finalPrice)}
+          </span>
           {quoteOnly && <MessageCircle className="h-3.5 w-3.5 text-[color:var(--luxury-gold)]" />}
         </div>
         <div className="flex flex-col gap-2 pt-3 sm:flex-row">
@@ -353,7 +355,11 @@ function QuickPreview({ p, brand, refQs }: { p: Product; brand?: string; refQs: 
         </DialogHeader>
         {p.short_description && <p className="text-sm text-muted-foreground">{p.short_description}</p>}
         <div className="rounded-lg border border-[color:var(--luxury-gold)]/30 bg-black/40 p-4">
-          <span className="font-display text-2xl font-bold luxury-gradient-text">{formatCOP(Number(p.suggested_retail_price || p.price))}</span>
+          <span className="font-display text-2xl font-bold luxury-gradient-text">
+            {Number(p.suggested_retail_price || p.price) <= 0 || p.attributes?.is_quote_only === true
+              ? "Precio por confirmar"
+              : formatCOP(Number(p.suggested_retail_price || p.price))}
+          </span>
           {(Number(p.suggested_retail_price || p.price) <= 0 || p.attributes?.is_quote_only === true) && <p className="mt-2 text-xs text-muted-foreground">Confirma disponibilidad y valor antes de hacer el pedido.</p>}
         </div>
         <Link to="/catalogo/$slug" params={{ slug: p.slug }} search={refQs ? { ref: refQs.slice(5) } : {}} className="inline-flex items-center gap-1 rounded-md bg-[color:var(--luxury-gold)]/15 px-3 py-2 text-sm text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/25">
