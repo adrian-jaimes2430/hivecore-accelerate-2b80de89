@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { forwardOrderEvent } from "@/lib/integrations.functions";
-import { listUserEmails } from "@/lib/admin-users.functions";
+import { deleteImpulsador, listUserEmails } from "@/lib/admin-users.functions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LEVELS, LEVEL_LABEL, levelChip, type ImpulsorLevel } from "@/lib/levels";
@@ -14,11 +14,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { MediaUploader } from "@/components/admin/MediaUploader";
 import { formatCOP } from "@/lib/pricing";
+import { CategoryIcon, categoryToneClass } from "@/components/CategoryVisual";
 import {
   ShieldCheck, Users, ShoppingBag, BarChart3, Check, Ban, Loader2,
   Plus, Pencil, Trash2, Package, Tag, Sparkles, GripVertical, ClipboardList, X,
@@ -145,6 +147,10 @@ function UsersTab() {
   const qc = useQueryClient();
   const { isAdmin } = useAuth();
   const fetchEmails = useServerFn(listUserEmails);
+  const removeImpulsador = useServerFn(deleteImpulsador);
+  const [deleting, setDeleting] = useState<ProfileWithRole | null>(null);
+  const [deleteText, setDeleteText] = useState("");
+  const [deleteBusy, setDeleteBusy] = useState(false);
   const { data: emailMap = {} } = useQuery({
     queryKey: ["admin-user-emails"],
     queryFn: async () => (await fetchEmails({})).emails as Record<string, string>,
@@ -199,6 +205,27 @@ function UsersTab() {
     const okRole = await setRole(userId, role);
     const okStatus = await setStatus(userId, "approved");
     if (okRole && okStatus) toast.success(`Aprobado como ${roleLabel(role)}`);
+  };
+
+  const permanentlyDelete = async () => {
+    if (!deleting || deleteText.trim().toUpperCase() !== "ELIMINAR") return;
+    setDeleteBusy(true);
+    try {
+      await removeImpulsador({ data: { userId: deleting.id } });
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["admin-profiles"] }),
+        qc.invalidateQueries({ queryKey: ["admin-user-emails"] }),
+        qc.invalidateQueries({ queryKey: ["admin-orders"] }),
+        qc.invalidateQueries({ queryKey: ["admin-stats"] }),
+      ]);
+      toast.success("Impulsador eliminado; sus ventas se conservaron");
+      setDeleting(null);
+      setDeleteText("");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No fue posible eliminar la cuenta");
+    } finally {
+      setDeleteBusy(false);
+    }
   };
 
   return (
@@ -285,12 +312,34 @@ function UsersTab() {
                       <Check className="mr-1 h-3 w-3" /> Reactivar
                     </Button>
                   )}
+                  {isAdmin && p.role === "impulsador" && (
+                    <Button size="sm" variant="ghost" onClick={() => { setDeleting(p); setDeleteText(""); }} className="h-8 text-destructive hover:bg-destructive/15 hover:text-destructive">
+                      <Trash2 className="mr-1 h-3 w-3" /> Eliminar
+                    </Button>
+                  )}
                 </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <AlertDialog open={Boolean(deleting)} onOpenChange={(open) => { if (!open && !deleteBusy) setDeleting(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminar definitivamente a {deleting?.full_name ?? "este impulsador"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              Se eliminarán su acceso, perfil y conversaciones. Sus pedidos y ventas históricas permanecerán en los reportes. Escribe ELIMINAR para confirmar.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <Input value={deleteText} onChange={(event) => setDeleteText(event.target.value)} placeholder="ELIMINAR" autoComplete="off" />
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteBusy}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={(event) => { event.preventDefault(); void permanentlyDelete(); }} disabled={deleteBusy || deleteText.trim().toUpperCase() !== "ELIMINAR"} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleteBusy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Eliminar definitivamente
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -411,9 +460,12 @@ function CategoriesTab() {
         {cats.map((c) => (
           <div key={c.id} className="hive-card p-4">
             <div className="flex items-start justify-between">
-              <div>
+              <div className="flex items-center gap-3">
+                <CategoryIcon icon={c.icon} color={c.color} />
+                <div>
                 <p className="font-display text-lg font-bold">{c.name}</p>
                 <p className="text-xs text-muted-foreground">/{c.slug}</p>
+                </div>
               </div>
               <div className="flex gap-1">
                 <Button size="icon" variant="ghost" onClick={() => { setEdit(c); setOpen(true); }} className="h-7 w-7">
@@ -494,6 +546,13 @@ function CategoryDialog({ open, onOpenChange, category }: { open: boolean; onOpe
               </Select>
             </div>
             <div><Label>Orden</Label><Input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: Number(e.target.value) })} className="bg-white/5" /></div>
+          </div>
+          <div className={`flex items-center gap-3 rounded-md border p-3 ${categoryToneClass(form.color)}`}>
+            <CategoryIcon icon={form.icon} color={form.color} />
+            <div>
+              <p className="text-xs font-semibold uppercase text-muted-foreground">Vista previa</p>
+              <p className="font-display font-semibold">{form.name || "Nombre de categoría"}</p>
+            </div>
           </div>
           <DialogFooter>
             <Button type="submit" disabled={busy} className="hive-btn-primary border-0">

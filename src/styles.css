@@ -75,6 +75,16 @@
   /* Accents */
   --ao-red: oklch(0.62 0.24 25);
   --anma-orange: oklch(0.74 0.18 55);
+  --category-green: oklch(0.78 0.22 145);
+  --category-orange: oklch(0.76 0.17 55);
+  --category-red: oklch(0.66 0.22 25);
+  --category-yellow: oklch(0.86 0.18 95);
+  --category-blue: oklch(0.68 0.16 245);
+  --category-purple: oklch(0.68 0.18 305);
+  --category-pink: oklch(0.74 0.17 355);
+  --category-cyan: oklch(0.78 0.13 205);
+  --category-white: oklch(0.94 0.01 260);
+  --category-gray: oklch(0.66 0.02 260);
 
   --secondary: oklch(0.22 0.01 260);
   --secondary-foreground: oklch(0.97 0.005 250);
@@ -106,6 +116,18 @@
 }
 
 @layer components {
+  .category-icon { display: inline-flex; height: 2.25rem; width: 2.25rem; flex: none; align-items: center; justify-content: center; border-radius: 0.5rem; border: 1px solid color-mix(in oklab, currentColor 32%, transparent); background: color-mix(in oklab, currentColor 13%, transparent); color: var(--category-color); }
+  .category-icon svg { height: 1.1rem; width: 1.1rem; }
+  .category-tone-green { --category-color: var(--category-green); color: var(--category-green); border-color: color-mix(in oklab, var(--category-green) 28%, transparent); background-color: color-mix(in oklab, var(--category-green) 8%, transparent); }
+  .category-tone-orange { --category-color: var(--category-orange); color: var(--category-orange); border-color: color-mix(in oklab, var(--category-orange) 28%, transparent); background-color: color-mix(in oklab, var(--category-orange) 8%, transparent); }
+  .category-tone-red { --category-color: var(--category-red); color: var(--category-red); border-color: color-mix(in oklab, var(--category-red) 28%, transparent); background-color: color-mix(in oklab, var(--category-red) 8%, transparent); }
+  .category-tone-yellow { --category-color: var(--category-yellow); color: var(--category-yellow); border-color: color-mix(in oklab, var(--category-yellow) 28%, transparent); background-color: color-mix(in oklab, var(--category-yellow) 8%, transparent); }
+  .category-tone-blue { --category-color: var(--category-blue); color: var(--category-blue); border-color: color-mix(in oklab, var(--category-blue) 28%, transparent); background-color: color-mix(in oklab, var(--category-blue) 8%, transparent); }
+  .category-tone-purple { --category-color: var(--category-purple); color: var(--category-purple); border-color: color-mix(in oklab, var(--category-purple) 28%, transparent); background-color: color-mix(in oklab, var(--category-purple) 8%, transparent); }
+  .category-tone-pink { --category-color: var(--category-pink); color: var(--category-pink); border-color: color-mix(in oklab, var(--category-pink) 28%, transparent); background-color: color-mix(in oklab, var(--category-pink) 8%, transparent); }
+  .category-tone-cyan { --category-color: var(--category-cyan); color: var(--category-cyan); border-color: color-mix(in oklab, var(--category-cyan) 28%, transparent); background-color: color-mix(in oklab, var(--category-cyan) 8%, transparent); }
+  .category-tone-white { --category-color: var(--category-white); color: var(--category-white); border-color: color-mix(in oklab, var(--category-white) 28%, transparent); background-color: color-mix(in oklab, var(--category-white) 8%, transparent); }
+  .category-tone-gray { --category-color: var(--category-gray); color: var(--category-gray); border-color: color-mix(in oklab, var(--category-gray) 28%, transparent); background-color: color-mix(in oklab, var(--category-gray) 8%, transparent); }
   .hive-glass {
     background: linear-gradient(180deg, oklch(1 0 0 / 0.04), oklch(1 0 0 / 0.01));
     backdrop-filter: blur(20px) saturate(160%);
@@ -906,7 +928,7 @@ html { scroll-behavior: smooth; }
   .promo-hero3d {
     position: relative;
     overflow: hidden;
-    height: clamp(390px, 52vw, 610px);
+    height: clamp(430px, 48vw, 620px);
     border-bottom: 1px solid color-mix(in oklab, var(--luxury-gold) 18%, transparent);
     background: radial-gradient(90% 80% at 50% 36%, color-mix(in oklab, var(--luxury-gold) 16%, transparent), transparent 68%), var(--background);
   }
@@ -917,8 +939,10 @@ html { scroll-behavior: smooth; }
     pointer-events: none;
   }
   .promo-hero3d-copy {
-    position: absolute; z-index: 10; left: 50%; bottom: 62px; width: min(88vw, 560px);
+    position: absolute; z-index: 10; left: 50%; bottom: 30px; width: min(88vw, 520px);
     transform: translateX(-50%); text-align: center; pointer-events: none;
+    padding: 14px 18px; border: 1px solid color-mix(in oklab, var(--luxury-gold) 24%, transparent); border-radius: 8px;
+    background: color-mix(in oklab, var(--background) 84%, transparent); backdrop-filter: blur(18px);
   }
   .promo-hero3d-kicker {
     display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px;
@@ -926,22 +950,23 @@ html { scroll-behavior: smooth; }
     background: color-mix(in oklab, var(--background) 72%, transparent); color: var(--luxury-gold);
     font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; backdrop-filter: blur(12px);
   }
-  .promo-hero3d-copy h2 { margin-top: 10px; font-family: var(--font-display); font-size: clamp(25px, 4vw, 44px); font-weight: 700; line-height: 1.05; }
+  .promo-hero3d-copy h2 { margin-top: 8px; font-family: var(--font-display); font-size: clamp(22px, 3vw, 38px); font-weight: 700; line-height: 1.05; }
   .promo-hero3d-copy p { margin: 8px auto 0; max-width: 460px; color: var(--muted-foreground); font-size: 13px; }
   .promo-hero3d-link {
     pointer-events: auto; display: inline-flex; align-items: center; gap: 7px; margin-top: 12px; padding: 8px 14px;
     border-radius: 999px; background: var(--luxury-gold); color: var(--background); font-size: 12px; font-weight: 700;
   }
   .promo-hero3d-controls {
-    position: absolute; z-index: 12; right: 16px; bottom: 16px; display: flex; align-items: center; gap: 7px;
+    position: absolute; z-index: 12; right: 16px; top: 16px; display: flex; align-items: center; gap: 7px;
     border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent); border-radius: 999px;
     background: color-mix(in oklab, var(--background) 76%, transparent); padding: 4px 7px; backdrop-filter: blur(16px);
   }
   .promo-hero3d-controls button[aria-label^="Ver promoción"] { height: 18px; width: 18px; min-width: 18px; padding: 6px; border-radius: 999px; background: color-mix(in oklab, var(--foreground) 32%, transparent); background-clip: content-box; transition: width var(--dur-base) ease, background var(--dur-base) ease; }
   .promo-hero3d-controls button[aria-label^="Ver promoción"][data-active="true"] { width: 20px; background: var(--luxury-gold); }
   @media (max-width: 639px) {
-    .promo-hero3d-copy { bottom: 82px; }
-    .promo-hero3d-controls { right: 50%; transform: translateX(50%); }
+    .promo-hero3d { height: 520px; }
+    .promo-hero3d-copy { bottom: 18px; padding: 12px; }
+    .promo-hero3d-controls { right: 50%; top: 12px; transform: translateX(50%); }
   }
 
   /* Globo 3D de Marel + panel de chat */

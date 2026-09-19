@@ -6,13 +6,15 @@ import type { Promo } from "./PromoCarousel";
  * Abanico 3D frontal. La tarjeta activa permanece grande y visible; las
  * laterales conservan profundidad y responden al puntero o al arrastre.
  */
-export function PromoHero3DCanvas({ promos, active, onActiveChange }: { promos: Promo[]; active: number; onActiveChange: (index: number) => void }) {
+export function PromoHero3DCanvas({ promos, active, onActiveChange, onActivate }: { promos: Promo[]; active: number; onActiveChange: (index: number) => void; onActivate: (index: number) => void }) {
   const host = useRef<HTMLDivElement>(null);
   const activeRef = useRef(active);
   const onChangeRef = useRef(onActiveChange);
+  const onActivateRef = useRef(onActivate);
 
   useEffect(() => { activeRef.current = active; }, [active]);
   useEffect(() => { onChangeRef.current = onActiveChange; }, [onActiveChange]);
+  useEffect(() => { onActivateRef.current = onActivate; }, [onActivate]);
 
   useEffect(() => {
     const el = host.current;
@@ -108,15 +110,34 @@ export function PromoHero3DCanvas({ promos, active, onActiveChange }: { promos: 
     };
     el.addEventListener("pointermove", onMove, { passive: true });
 
-    let downX: number | null = null;
-    const onDown = (event: PointerEvent) => { downX = event.clientX; };
+    const raycaster = new THREE.Raycaster();
+    const clickPointer = new THREE.Vector2();
+    let down: { x: number; y: number } | null = null;
+    const cardAt = (event: PointerEvent) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      clickPointer.set(
+        ((event.clientX - rect.left) / rect.width) * 2 - 1,
+        -((event.clientY - rect.top) / rect.height) * 2 + 1,
+      );
+      raycaster.setFromCamera(clickPointer, camera);
+      const hit = raycaster.intersectObjects(cards.filter((card) => card.mesh.visible).map((card) => card.mesh))[0];
+      return cards.find((card) => card.mesh === hit?.object);
+    };
+    const onDown = (event: PointerEvent) => { down = { x: event.clientX, y: event.clientY }; };
     const onUp = (event: PointerEvent) => {
-      if (downX == null || sources.length < 2) return;
-      const distance = event.clientX - downX;
-      downX = null;
-      if (Math.abs(distance) < 38) return;
-      const next = distance < 0 ? activeRef.current + 1 : activeRef.current - 1;
-      onChangeRef.current((next + sources.length) % sources.length);
+      if (!down) return;
+      const distanceX = event.clientX - down.x;
+      const distanceY = event.clientY - down.y;
+      down = null;
+      if (Math.hypot(distanceX, distanceY) < 12) {
+        const card = cardAt(event);
+        if (card) onActivateRef.current(card.index);
+        return;
+      }
+      if (sources.length > 1 && Math.abs(distanceX) >= 38) {
+        const next = distanceX < 0 ? activeRef.current + 1 : activeRef.current - 1;
+        onChangeRef.current((next + sources.length) % sources.length);
+      }
     };
     el.addEventListener("pointerdown", onDown);
     el.addEventListener("pointerup", onUp);
@@ -161,18 +182,18 @@ export function PromoHero3DCanvas({ promos, active, onActiveChange }: { promos: 
         if (offset > sources.length / 2) offset -= sources.length;
         if (offset < -sources.length / 2) offset += sources.length;
         const shown = Math.abs(offset) <= (mobile ? 1 : 2);
-        const targetX = offset * (mobile ? 2.65 : 3.35);
-        const targetZ = -Math.abs(offset) * 1.45;
-        const targetY = -Math.abs(offset) * 0.18;
+        const targetX = offset * (mobile ? 2.35 : 3.05);
+        const targetZ = -Math.abs(offset) * 1.15;
+        const targetY = Math.abs(offset) * 0.08;
         c.mesh.position.x += (targetX - c.mesh.position.x) * smooth;
         c.mesh.position.y += (targetY - c.mesh.position.y) * smooth;
         c.mesh.position.z += (targetZ - c.mesh.position.z) * smooth;
-        c.mesh.rotation.y += ((offset * -0.24) - c.mesh.rotation.y) * smooth;
-        c.mesh.rotation.z += ((offset * -0.035) - c.mesh.rotation.z) * smooth;
-        const scale = offset === 0 ? 1 : 0.82;
+        c.mesh.rotation.y += ((offset * -0.18) - c.mesh.rotation.y) * smooth;
+        c.mesh.rotation.z += ((offset * -0.02) - c.mesh.rotation.z) * smooth;
+        const scale = offset === 0 ? 1 : 0.78;
         const nextScale = c.mesh.scale.x + (scale - c.mesh.scale.x) * smooth;
         c.mesh.scale.setScalar(nextScale);
-        const opacity = shown ? (offset === 0 ? 1 : 0.58) : 0;
+        const opacity = shown ? (offset === 0 ? 1 : 0.72) : 0;
         c.mat.opacity += (((c.ready ? opacity : opacity * 0.35)) - c.mat.opacity) * smooth;
         c.mesh.visible = c.mat.opacity > 0.015;
       }
@@ -198,7 +219,7 @@ export function PromoHero3DCanvas({ promos, active, onActiveChange }: { promos: 
     };
   }, [promos]);
 
-  return <div ref={host} className="absolute inset-0 cursor-grab active:cursor-grabbing" aria-hidden="true" />;
+  return <div ref={host} className="absolute inset-0 cursor-pointer active:cursor-grabbing" aria-hidden="true" />;
 }
 
 export default PromoHero3DCanvas;
