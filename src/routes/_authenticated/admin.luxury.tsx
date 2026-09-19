@@ -292,14 +292,15 @@ function ProductsTab() {
 
           <div className="flex flex-wrap justify-end gap-2">
             {editing.id && editing.slug && (
-              <a
-                href={`/luxury/${editing.slug}`}
+              <Link
+                to="/luxury/$slug"
+                params={{ slug: editing.slug }}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 rounded-md border border-border/60 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
               >
                 <ExternalLink className="h-3 w-3" /> Ver ficha
-              </a>
+              </Link>
             )}
             <Button variant="ghost" onClick={() => setEditing(null)}>Cancelar</Button>
             <Button onClick={save} className="hive-btn-primary"><Save className="mr-1 h-4 w-4" /> Guardar</Button>
@@ -330,14 +331,15 @@ function ProductsTab() {
                 </div>
               </div>
               <div className="flex flex-wrap gap-1">
-                <a
-                  href={`/luxury/${p.slug}`}
+                <Link
+                  to="/luxury/$slug"
+                  params={{ slug: p.slug }}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
                 >
                   <ExternalLink className="h-3 w-3" /> Ver
-                </a>
+                </Link>
                 <Button size="sm" variant="ghost" onClick={() => setEditing(p)}>Editar</Button>
                 <Button size="sm" variant="ghost" onClick={() => remove(p.id)}><Trash2 className="h-4 w-4 text-red-400" /></Button>
               </div>

@@ -23,7 +23,7 @@ const searchSchema = z.object({
   ref: fallback(z.string().optional(), undefined).optional(),
 });
 
-const SITE_URL = "https://hivecore-accelerate.lovable.app";
+const SITE_URL = "https://hivecore-shop.ayoecosystem.com";
 
 export const Route = createFileRoute("/catalogo/")({
   validateSearch: zodValidator(searchSchema),

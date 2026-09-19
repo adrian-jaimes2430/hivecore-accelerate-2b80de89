@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { forwardOrderEvent } from "@/lib/integrations.functions";
@@ -75,12 +75,12 @@ function AdminPage() {
           <h1 className="font-display text-3xl font-bold">Panel administrativo</h1>
         </div>
         <div className="flex items-center gap-2">
-          <a href="/admin/integrations" className="inline-flex items-center gap-2 rounded-md border border-hive/40 bg-hive/10 px-4 py-2 text-sm text-hive hover:bg-hive/20">
+          <Link to="/admin/integrations" className="inline-flex items-center gap-2 rounded-md border border-hive/40 bg-hive/10 px-4 py-2 text-sm text-hive hover:bg-hive/20">
             <Package className="h-4 w-4" /> Integraciones
-          </a>
-          <a href="/admin/luxury" className="inline-flex items-center gap-2 rounded-md border border-[color:var(--luxury-gold)]/40 bg-[color:var(--luxury-gold)]/10 px-4 py-2 text-sm text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/20">
+          </Link>
+          <Link to="/admin/luxury" className="inline-flex items-center gap-2 rounded-md border border-[color:var(--luxury-gold)]/40 bg-[color:var(--luxury-gold)]/10 px-4 py-2 text-sm text-[color:var(--luxury-gold)] hover:bg-[color:var(--luxury-gold)]/20">
             <Sparkles className="h-4 w-4" /> AnMa Luxury
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -458,7 +458,7 @@ function CategoriesTab() {
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {cats.map((c) => (
-          <div key={c.id} className="hive-card p-4">
+          <div key={c.id} className={`rounded-md border p-4 ${categoryToneClass(c.color)}`}>
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <CategoryIcon icon={c.icon} color={c.color} />
