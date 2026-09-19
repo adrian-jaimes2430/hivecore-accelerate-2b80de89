@@ -997,6 +997,8 @@ interface OrderRow {
   luxury_product_id: string | null;
   impulsador_id: string | null;
   impulsador_name?: string | null;
+  impulsador_deleted_name?: string | null;
+  impulsador_deleted_email?: string | null;
   source?: string | null;
   payment_method?: string | null;
   payment_status?: string | null;
@@ -1092,6 +1094,11 @@ function OrdersTab() {
               <td className="px-4 py-3 text-xs">
                 {o.impulsador_name ? (
                   o.impulsador_name
+                ) : o.impulsador_deleted_name ? (
+                  <>
+                    <div>{o.impulsador_deleted_name}</div>
+                    <div className="text-[10px] text-muted-foreground">Cuenta eliminada</div>
+                  </>
                 ) : (
                   <span className="rounded bg-blue-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-blue-300">
                     Tráfico pago · Meta Ads

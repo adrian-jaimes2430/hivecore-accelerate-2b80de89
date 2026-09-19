@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { formatCOP } from "@/lib/pricing";
 import { Search, X, ArrowRight, Crown } from "lucide-react";
+import { CategoryIcon, categoryToneClass } from "@/components/CategoryVisual";
 
 interface Row {
   id: string;
@@ -17,6 +18,8 @@ interface Row {
   kind: "funnel" | "luxury";
   category: string | null;
   brand: string | null;
+  categoryColor: string | null;
+  categoryIcon: string | null;
 }
 
 function firstImage(images: unknown): string | null {
@@ -63,12 +66,13 @@ export function CatalogSearch() {
           .from("luxury_products")
           .select("id,name,slug,suggested_retail_price,sku,short_description,images,category_id,brand_id")
           .eq("is_active", true),
-        supabase.from("categories").select("id,name"),
+        supabase.from("categories").select("id,name,color,icon"),
         supabase.from("luxury_categories").select("id,name"),
         supabase.from("luxury_brands").select("id,name"),
       ]);
 
       const catName = new Map((cats.data ?? []).map((c) => [c.id, c.name]));
+      const catVisual = new Map((cats.data ?? []).map((c) => [c.id, { color: c.color, icon: c.icon }]));
       const luxCatName = new Map((luxCats.data ?? []).map((c) => [c.id, c.name]));
       const brandName = new Map((brands.data ?? []).map((b) => [b.id, b.name]));
 
@@ -83,6 +87,8 @@ export function CatalogSearch() {
         kind: "funnel",
         category: p.category_id ? catName.get(p.category_id) ?? null : null,
         brand: null,
+        categoryColor: p.category_id ? catVisual.get(p.category_id)?.color ?? null : null,
+        categoryIcon: p.category_id ? catVisual.get(p.category_id)?.icon ?? null : null,
       }));
 
       const b: Row[] = (lux.data ?? []).map((p) => ({
@@ -96,6 +102,8 @@ export function CatalogSearch() {
         kind: "luxury",
         category: p.category_id ? luxCatName.get(p.category_id) ?? null : null,
         brand: p.brand_id ? brandName.get(p.brand_id) ?? null : null,
+        categoryColor: null,
+        categoryIcon: null,
       }));
 
       return canLuxury ? [...a, ...b] : a;
@@ -150,7 +158,10 @@ export function CatalogSearch() {
             <div className="max-h-[52vh] space-y-4 overflow-y-auto pr-1">
               {grouped.map(([group, items]) => (
                 <div key={group}>
-                  <p className="mb-2 text-xs font-semibold tracking-tight text-hive">{group}</p>
+                  <p className={`mb-2 flex items-center gap-2 rounded-md border px-2 py-1.5 text-xs font-semibold ${categoryToneClass(items[0]?.categoryColor)}`}>
+                    <CategoryIcon icon={items[0]?.categoryIcon} color={items[0]?.categoryColor} className="h-7 w-7" />
+                    {group}
+                  </p>
                   <ul className="space-y-1.5">
                     {items.map((r) => {
                       const img = firstImage(r.images);

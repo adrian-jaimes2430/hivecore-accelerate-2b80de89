@@ -25,7 +25,8 @@ function CategoryPage() {
     queryKey: ["category-products", category?.id],
     enabled: !!category?.id,
     queryFn: async () => {
-      const id = category!.id;
+      const id = category?.id;
+      if (!id) return [];
       const { data } = await supabase
         .from("products")
         .select("*")
