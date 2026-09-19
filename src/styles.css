@@ -928,9 +928,11 @@ html { scroll-behavior: smooth; }
   .promo-hero3d {
     position: relative;
     overflow: hidden;
-    height: clamp(430px, 48vw, 620px);
-    border-bottom: 1px solid color-mix(in oklab, var(--luxury-gold) 18%, transparent);
+    height: clamp(340px, 34vw, 430px);
+    border: 1px solid color-mix(in oklab, var(--luxury-gold) 24%, transparent);
+    border-radius: 8px;
     background: radial-gradient(90% 80% at 50% 36%, color-mix(in oklab, var(--luxury-gold) 16%, transparent), transparent 68%), var(--background);
+    box-shadow: 0 24px 70px -42px color-mix(in oklab, var(--luxury-gold) 30%, transparent);
   }
   .promo-hero3d-veil {
     position: absolute;
@@ -940,8 +942,8 @@ html { scroll-behavior: smooth; }
   }
   .promo-hero3d-stage { position: absolute; inset: 0; z-index: 3; perspective: 1200px; pointer-events: none; }
   .promo-hero3d-card {
-    position: absolute; left: 50%; top: 43%; width: clamp(210px, 26vw, 350px) !important; height: clamp(260px, 34vw, 430px) !important;
-    min-width: 210px; min-height: 260px; display: block;
+    position: absolute; left: 50%; top: 42%; width: clamp(170px, 18vw, 235px) !important; height: clamp(220px, 24vw, 310px) !important;
+    min-width: 170px; min-height: 220px; display: block;
     overflow: hidden; border: 1px solid color-mix(in oklab, var(--luxury-gold) 32%, transparent); border-radius: 8px;
     padding: 0; background: var(--surface); box-shadow: 0 28px 70px -24px color-mix(in oklab, var(--background) 90%, transparent);
     transform-style: preserve-3d; pointer-events: auto; transition: transform 650ms cubic-bezier(.2,.8,.2,1), opacity 450ms ease, filter 450ms ease;
@@ -949,15 +951,15 @@ html { scroll-behavior: smooth; }
   .promo-hero3d-card img, .promo-hero3d-card video { width: 100%; height: 100%; object-fit: cover; }
   .promo-hero3d-card-shade { position: absolute; inset: 0; background: linear-gradient(to top, color-mix(in oklab, var(--background) 48%, transparent), transparent 55%); pointer-events: none; }
   .promo-hero3d-card[data-position="0"] { z-index: 5; transform: translate(-50%, -50%) translateZ(80px); }
-  .promo-hero3d-card[data-position="-1"] { z-index: 4; transform: translate(-118%, -48%) translateZ(-30px) rotateY(22deg) scale(.82); opacity: .8; filter: saturate(.8); }
-  .promo-hero3d-card[data-position="1"] { z-index: 4; transform: translate(18%, -48%) translateZ(-30px) rotateY(-22deg) scale(.82); opacity: .8; filter: saturate(.8); }
-  .promo-hero3d-card[data-position="-2"] { z-index: 2; transform: translate(-168%, -46%) translateZ(-100px) rotateY(30deg) scale(.66); opacity: .48; filter: saturate(.6); }
-  .promo-hero3d-card[data-position="2"] { z-index: 2; transform: translate(68%, -46%) translateZ(-100px) rotateY(-30deg) scale(.66); opacity: .48; filter: saturate(.6); }
+  .promo-hero3d-card[data-position="-1"] { z-index: 4; transform: translate(-124%, -48%) translateZ(-30px) rotateY(22deg) scale(.82); opacity: .8; filter: saturate(.8); }
+  .promo-hero3d-card[data-position="1"] { z-index: 4; transform: translate(24%, -48%) translateZ(-30px) rotateY(-22deg) scale(.82); opacity: .8; filter: saturate(.8); }
+  .promo-hero3d-card[data-position="-2"] { z-index: 2; transform: translate(-186%, -46%) translateZ(-100px) rotateY(30deg) scale(.66); opacity: .48; filter: saturate(.6); }
+  .promo-hero3d-card[data-position="2"] { z-index: 2; transform: translate(86%, -46%) translateZ(-100px) rotateY(-30deg) scale(.66); opacity: .48; filter: saturate(.6); }
   .promo-hero3d-copy {
-    position: absolute; z-index: 10; left: 50%; bottom: 30px; width: min(88vw, 520px);
-    transform: translateX(-50%); text-align: center; pointer-events: none;
-    padding: 14px 18px; border: 1px solid color-mix(in oklab, var(--luxury-gold) 24%, transparent); border-radius: 8px;
-    background: color-mix(in oklab, var(--background) 84%, transparent); backdrop-filter: blur(18px);
+    position: absolute; z-index: 10; left: 24px; bottom: 20px; width: min(44vw, 460px);
+    text-align: left; pointer-events: none;
+    padding: 14px 16px; border: 1px solid color-mix(in oklab, var(--luxury-gold) 24%, transparent); border-radius: 8px;
+    background: color-mix(in oklab, var(--background) 78%, transparent); backdrop-filter: blur(18px);
   }
   .promo-hero3d-kicker {
     display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px;
@@ -965,8 +967,8 @@ html { scroll-behavior: smooth; }
     background: color-mix(in oklab, var(--background) 72%, transparent); color: var(--luxury-gold);
     font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; backdrop-filter: blur(12px);
   }
-  .promo-hero3d-copy h2 { margin-top: 8px; font-family: var(--font-display); font-size: clamp(22px, 3vw, 38px); font-weight: 700; line-height: 1.05; }
-  .promo-hero3d-copy p { margin: 8px auto 0; max-width: 460px; color: var(--muted-foreground); font-size: 13px; }
+  .promo-hero3d-copy h2 { margin-top: 8px; font-family: var(--font-display); font-size: clamp(20px, 2.4vw, 32px); font-weight: 700; line-height: 1.05; }
+  .promo-hero3d-copy p { margin-top: 6px; max-width: 420px; color: var(--muted-foreground); font-size: 12px; }
   .promo-hero3d-link {
     pointer-events: auto; display: inline-flex; align-items: center; gap: 7px; margin-top: 12px; padding: 8px 14px;
     border-radius: 999px; background: var(--luxury-gold); color: var(--background); font-size: 12px; font-weight: 700;
@@ -979,13 +981,16 @@ html { scroll-behavior: smooth; }
   .promo-hero3d-controls button[aria-label^="Ver promoción"] { height: 18px; width: 18px; min-width: 18px; padding: 6px; border-radius: 999px; background: color-mix(in oklab, var(--foreground) 32%, transparent); background-clip: content-box; transition: width var(--dur-base) ease, background var(--dur-base) ease; }
   .promo-hero3d-controls button[aria-label^="Ver promoción"][data-active="true"] { width: 20px; background: var(--luxury-gold); }
   @media (max-width: 639px) {
-    .promo-hero3d { height: 520px; }
-    .promo-hero3d-card { top: 39%; width: 230px !important; height: 300px !important; }
-    .promo-hero3d-card[data-position="-1"] { transform: translate(-104%, -50%) translateZ(-30px) rotateY(24deg) scale(.72); }
-    .promo-hero3d-card[data-position="1"] { transform: translate(4%, -50%) translateZ(-30px) rotateY(-24deg) scale(.72); }
+    .promo-hero3d { height: 390px; }
+    .promo-hero3d-card { top: 38%; width: 176px !important; height: 228px !important; min-width: 176px; min-height: 228px; }
+    .promo-hero3d-card[data-position="-1"] { transform: translate(-108%, -50%) translateZ(-30px) rotateY(24deg) scale(.7); }
+    .promo-hero3d-card[data-position="1"] { transform: translate(8%, -50%) translateZ(-30px) rotateY(-24deg) scale(.7); }
     .promo-hero3d-card[data-position="-2"], .promo-hero3d-card[data-position="2"] { display: none; }
-    .promo-hero3d-copy { bottom: 18px; padding: 12px; }
-    .promo-hero3d-controls { right: 50%; top: 12px; transform: translateX(50%); }
+    .promo-hero3d-copy { left: 10px; right: 10px; bottom: 10px; width: auto; padding: 10px 12px; }
+    .promo-hero3d-copy h2 { font-size: 20px; }
+    .promo-hero3d-copy p { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+    .promo-hero3d-link { margin-top: 8px; padding: 7px 12px; }
+    .promo-hero3d-controls { right: 10px; top: 10px; }
   }
 
   /* Globo 3D de Marel + panel de chat */
