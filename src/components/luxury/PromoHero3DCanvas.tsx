@@ -65,7 +65,7 @@ export function PromoHero3DCanvas({ promos, active, onActiveChange }: { promos: 
       const card = { mesh, mat, index: i, ready: false };
       cards.push(card);
 
-      if (src?.url) {
+      if (src?.media_url) {
         if (src.media_type === "video" && !mobile) {
           const v = document.createElement("video");
           v.src = src.media_url;

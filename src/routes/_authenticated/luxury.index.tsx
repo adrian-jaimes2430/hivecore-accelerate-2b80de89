@@ -126,7 +126,12 @@ function LuxuryCatalog() {
     if (!search.cat) return products;
     const category = categories.find((item) => item.slug === search.cat);
     if (!category) return products;
-    const ids = new Set([category.id, ...childrenOf(category.id).map((item) => item.id)]);
+    const ids = new Set<string>();
+    const includeDescendants = (id: string) => {
+      ids.add(id);
+      categories.filter((item) => item.parent_id === id).forEach((item) => includeDescendants(item.id));
+    };
+    includeDescendants(category.id);
     return products.filter((product) => {
       if (product.category_id && ids.has(product.category_id)) return true;
       const secondary = Array.isArray(product.secondary_category_ids) ? product.secondary_category_ids as string[] : [];

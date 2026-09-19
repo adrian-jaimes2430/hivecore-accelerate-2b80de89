@@ -148,11 +148,11 @@ function ProductsTab() {
     qc.invalidateQueries({ queryKey: ["lux-admin-products"] });
   };
 
-  const variations: Variation[] = Array.isArray(editing?.variations) ? (editing!.variations as Variation[]) : [];
-  const editImages = Array.isArray(editing?.images) ? (editing!.images as string[]) : [];
-  const editVideos = Array.isArray(editing?.videos) ? (editing!.videos as string[]) : [];
+  const variations: Variation[] = Array.isArray(editing?.variations) ? (editing.variations as Variation[]) : [];
+  const editImages = Array.isArray(editing?.images) ? (editing.images as string[]) : [];
+  const editVideos = Array.isArray(editing?.videos) ? (editing.videos as string[]) : [];
   const secondaryIds: string[] = Array.isArray(editing?.secondary_category_ids)
-    ? (editing!.secondary_category_ids as string[])
+    ? (editing.secondary_category_ids as string[])
     : [];
   const quoteSetting = editing?.attributes?.is_quote_only;
   const quoteOnly = quoteSetting === true || (quoteSetting == null && Number(editing?.suggested_retail_price || editing?.price || 0) <= 0);

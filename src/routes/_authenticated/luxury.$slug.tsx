@@ -63,7 +63,9 @@ function LuxuryProduct() {
     queryKey: ["luxury-brand", product?.brand_id],
     enabled: !!product?.brand_id,
     queryFn: async () => {
-      const { data } = await supabase.from("luxury_brands").select("name").eq("id", product!.brand_id!).maybeSingle();
+      const brandId = product?.brand_id;
+      if (!brandId) return null;
+      const { data } = await supabase.from("luxury_brands").select("name").eq("id", brandId).maybeSingle();
       return data as { name: string } | null;
     },
   });
