@@ -5,17 +5,17 @@ import {
   LayoutDashboard,
   Package,
   Crown,
-  Sparkles,
   ShieldCheck,
   Store,
   LogOut,
   type LucideIcon,
 } from "lucide-react";
+import { MarelNavIcon } from "./marel/MarelAvatar";
 
 interface Item {
   to: string;
   label: string;
-  icon: LucideIcon;
+  icon: LucideIcon | typeof MarelNavIcon;
   accent?: boolean;
   external?: boolean;
 }
@@ -28,7 +28,7 @@ export function AppSidebar() {
     { to: "/app", label: "Inicio", icon: LayoutDashboard },
     ...(canLuxury ? [{ to: "/luxury", label: "AnMa Luxury", icon: Crown, accent: true }] : []),
     { to: "/orders", label: "Pedidos", icon: Package },
-    { to: "/marel", label: "Marel IA", icon: Sparkles },
+    { to: "/marel", label: "Marel IA", icon: MarelNavIcon },
     { to: "/catalogo", label: "Vista pública", icon: Store, external: true },
     ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: ShieldCheck }] : []),
   ];

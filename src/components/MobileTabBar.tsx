@@ -1,11 +1,12 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
-import { LayoutDashboard, Crown, Package, ShieldCheck, Sparkles, LogOut, type LucideIcon } from "lucide-react";
+import { LayoutDashboard, Crown, Package, ShieldCheck, LogOut, type LucideIcon } from "lucide-react";
+import { MarelNavIcon } from "./marel/MarelAvatar";
 
 interface Tab {
   to: string;
   label: string;
-  icon: LucideIcon;
+  icon: LucideIcon | typeof MarelNavIcon;
   accent?: boolean;
 }
 
@@ -19,7 +20,7 @@ export function MobileTabBar() {
     { to: "/app", label: "Inicio", icon: LayoutDashboard },
     ...(canLuxury ? [{ to: "/luxury", label: "Luxury", icon: Crown, accent: true }] : []),
     { to: "/orders", label: "Pedidos", icon: Package },
-    { to: "/marel", label: "Marel", icon: Sparkles },
+    { to: "/marel", label: "Marel", icon: MarelNavIcon },
     ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: ShieldCheck }] : []),
   ];
 
