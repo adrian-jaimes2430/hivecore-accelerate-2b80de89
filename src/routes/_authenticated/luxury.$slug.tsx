@@ -150,17 +150,20 @@ function LuxuryProduct() {
               <LuxuryOrderDialog product={product} selectedVariations={selectedVariations} />
             )}
             {user && !quoteOnly && onlinePaymentOnly && (
-              <PublicCheckoutDialog
-                productKind="luxury"
-                slug={product.slug}
-                productName={product.name}
-                unitPrice={finalPrice}
-                ctaLabel="Pagar ahora"
-                ref={user.id}
-                variations={summarizeVariations(selectedVariations) || null}
-                onlinePaymentOnly
-                triggerClassName="shop-btn-accent h-12 w-full text-base"
-              />
+              <div className="space-y-2">
+                <PublicCheckoutDialog
+                  productKind="luxury"
+                  slug={product.slug}
+                  productName={product.name}
+                  unitPrice={finalPrice}
+                  ctaLabel="Pagar ahora"
+                  ref={user.id}
+                  variations={summarizeVariations(selectedVariations) || null}
+                  onlinePaymentOnly
+                  triggerClassName="shop-btn-accent h-12 w-full text-base"
+                />
+                <p className="text-xs text-muted-foreground">Este producto requiere pago anticipado y no admite pedidos contra entrega.</p>
+              </div>
             )}
             {quoteOnly && (
               <p className="text-xs text-muted-foreground">

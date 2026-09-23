@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,6 +68,10 @@ export function PublicCheckoutDialog({
   });
   const [errors, setErrors] = useState<CheckoutFieldErrors>({});
 
+  useEffect(() => {
+    if (onlinePaymentOnly) setMethod("online");
+  }, [onlinePaymentOnly]);
+
 
   const priceModel: BundlePricing = pricing ?? { price: unitPrice };
   const comboEnabled = Boolean(
@@ -111,7 +115,13 @@ export function PublicCheckoutDialog({
       });
       if (!res?.ok) {
         if (res?.error === "wompi_not_configured") {
-          toast.error("El pago en línea aún no está habilitado. Elige pago contra entrega.");
+          toast.error(
+            onlinePaymentOnly
+              ? "El pago en línea no está disponible temporalmente. Intenta de nuevo más tarde."
+              : "El pago en línea aún no está habilitado. Elige pago contra entrega.",
+          );
+        } else if (res?.error === "online_payment_required") {
+          toast.error("Este producto requiere pago anticipado.");
         } else {
           toast.error("No se pudo registrar el pedido. Intenta de nuevo.");
         }
