@@ -7,4 +7,4 @@
 - [x] Reduce and frame the public Luxury banner, with a compact mobile layout
 - [x] Add per-product online-payment-only mode to Luxury admin and checkout
 - [x] Show full uncropped product images across base and Luxury catalogs
-- [ ] Validate both payment modes and responsive product imagery
+- [x] Validate both payment modes and responsive product imagery
