@@ -65,11 +65,17 @@ export async function createPublicOrder(input: PublicOrderInput) {
   } else {
     const { data: p } = await supabaseAdmin
       .from("luxury_products")
-      .select("id,name,price,suggested_retail_price")
+      .select("id,name,price,suggested_retail_price,attributes")
       .eq("slug", input.slug)
       .eq("is_active", true)
       .maybeSingle();
     if (!p) return { ok: false as const, error: "product_not_found" };
+    const attributes = p.attributes && typeof p.attributes === "object" && !Array.isArray(p.attributes)
+      ? p.attributes as Record<string, unknown>
+      : {};
+    if (attributes.online_payment_only === true && input.payment_method !== "online") {
+      return { ok: false as const, error: "online_payment_required" };
+    }
     luxuryProductId = p.id;
     productName = p.name;
     const retail = p.suggested_retail_price != null ? Number(p.suggested_retail_price) : 0;

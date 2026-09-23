@@ -299,7 +299,7 @@ function PublicCard({ p, brand, index, refQs, onQuickView }: { p: Product; brand
               loading={index < 3 ? "eager" : "lazy"}
               decoding="async"
               fetchPriority={index < 3 ? "high" : "low"}
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+              className="absolute inset-0 h-full w-full object-contain p-2 transition-transform duration-700 group-hover:scale-[1.03]"
             />
 
           ) : (
@@ -347,7 +347,7 @@ function QuickPreview({ p, brand, refQs }: { p: Product; brand?: string; refQs: 
         {imgs.length === 0 ? (
           <div className="col-span-2 flex aspect-square items-center justify-center rounded-md bg-zinc-900 font-display text-6xl opacity-20">{p.name.charAt(0)}</div>
         ) : imgs.slice(0, 4).map((u, i) => (
-          <img key={u} src={u} alt="" className={`rounded-md object-cover ${i === 0 ? "col-span-2 aspect-[4/3]" : "aspect-square"}`} />
+          <img key={u} src={u} alt="" className={`rounded-md bg-black/30 object-contain ${i === 0 ? "col-span-2 aspect-[4/3]" : "aspect-square"}`} />
         ))}
       </div>
       <div className="space-y-3">

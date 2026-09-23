@@ -386,7 +386,7 @@ function ProductCard({ p, brand, index = 0, onQuickView }: { p: LuxProduct; bran
       <Link to="/luxury/$slug" params={{ slug: p.slug }} className="block">
         <div className="shop-media relative m-1.5 aspect-[4/5] sm:m-2">
           {cover ? (
-            <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+            <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-contain p-2 transition-transform duration-700 group-hover:scale-[1.03]" />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center font-display text-5xl font-bold opacity-15">{p.name.charAt(0)}</div>
           )}
@@ -451,7 +451,7 @@ function QuickView({ p, brand }: { p: LuxProduct; brand?: string }) {
         {imgs.length === 0 ? (
           <div className="col-span-2 flex aspect-square items-center justify-center rounded-md bg-zinc-900 font-display text-6xl opacity-20">{p.name.charAt(0)}</div>
         ) : imgs.slice(0, 4).map((u, i) => (
-          <img key={u} src={u} alt="" className={`rounded-md object-cover ${i === 0 ? "col-span-2 aspect-[4/3]" : "aspect-square"}`} />
+          <img key={u} src={u} alt="" className={`rounded-md bg-black/30 object-contain ${i === 0 ? "col-span-2 aspect-[4/3]" : "aspect-square"}`} />
         ))}
       </div>
       <div className="space-y-3">

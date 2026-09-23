@@ -49,7 +49,7 @@ export function MediaGallery({
             className="h-full w-full object-contain bg-black"
           />
         ) : (
-          <img key={item.url} src={item.url} alt="" className="h-full w-full object-cover animate-fade-in" />
+          <img key={item.url} src={item.url} alt="" className="h-full w-full object-contain animate-fade-in" />
         )}
       </div>
       {media.length > 1 && (
@@ -64,13 +64,13 @@ export function MediaGallery({
             >
               {m.type === "video" ? (
                 <>
-                  <video src={m.url} muted className="h-full w-full object-cover" preload="metadata" />
+                  <video src={m.url} muted className="h-full w-full object-contain" preload="metadata" />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                     <Play className="h-4 w-4 text-white" />
                   </div>
                 </>
               ) : (
-                <img src={m.url} alt="" className="h-full w-full object-cover" />
+                <img src={m.url} alt="" className="h-full w-full object-contain" />
               )}
             </button>
           ))}

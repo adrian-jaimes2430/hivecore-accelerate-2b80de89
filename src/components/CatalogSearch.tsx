@@ -175,7 +175,7 @@ export function CatalogSearch() {
                           >
                             <span className="h-11 w-11 shrink-0 overflow-hidden rounded-xl bg-white/5">
                               {img ? (
-                                <img src={img} alt="" loading="lazy" className="h-full w-full object-cover" />
+                                 <img src={img} alt="" loading="lazy" className="h-full w-full object-contain" />
                               ) : (
                                 <span className="flex h-full w-full items-center justify-center text-sm font-bold opacity-30">
                                   {r.name.charAt(0)}

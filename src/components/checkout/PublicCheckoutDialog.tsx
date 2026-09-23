@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +36,7 @@ export function PublicCheckoutDialog({
   ctaLabel = "Comprar ahora",
   ref: refId,
   variations,
+  onlinePaymentOnly = false,
   triggerClassName = "shop-btn-accent h-12 border-0 px-6 text-base",
 }: {
   productKind: "funnel" | "luxury";
@@ -47,13 +48,14 @@ export function PublicCheckoutDialog({
   ctaLabel?: string;
   ref?: string | null;
   variations?: string | null;
+  onlinePaymentOnly?: boolean;
   triggerClassName?: string;
 }) {
   const submit = useServerFn(submitPublicOrder);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<{ code: string; method: "cod" | "online" } | null>(null);
-  const [method, setMethod] = useState<"cod" | "online">("cod");
+  const [method, setMethod] = useState<"cod" | "online">(onlinePaymentOnly ? "online" : "cod");
   const [form, setForm] = useState({
     client_name: "",
     client_phone: "",
@@ -65,6 +67,10 @@ export function PublicCheckoutDialog({
     notes: "",
   });
   const [errors, setErrors] = useState<CheckoutFieldErrors>({});
+
+  useEffect(() => {
+    if (onlinePaymentOnly) setMethod("online");
+  }, [onlinePaymentOnly]);
 
 
   const priceModel: BundlePricing = pricing ?? { price: unitPrice };
@@ -98,7 +104,7 @@ export function PublicCheckoutDialog({
 
           notes: form.notes || null,
           variations: variations || null,
-          payment_method: method,
+          payment_method: onlinePaymentOnly ? "online" : method,
           ref: refId || null,
           origin: typeof window !== "undefined" ? window.location.search.slice(0, 200) : null,
           fbp: readCookie("_fbp"),
@@ -109,7 +115,13 @@ export function PublicCheckoutDialog({
       });
       if (!res?.ok) {
         if (res?.error === "wompi_not_configured") {
-          toast.error("El pago en línea aún no está habilitado. Elige pago contra entrega.");
+          toast.error(
+            onlinePaymentOnly
+              ? "El pago en línea no está disponible temporalmente. Intenta de nuevo más tarde."
+              : "El pago en línea aún no está habilitado. Elige pago contra entrega.",
+          );
+        } else if (res?.error === "online_payment_required") {
+          toast.error("Este producto requiere pago anticipado.");
         } else {
           toast.error("No se pudo registrar el pedido. Intenta de nuevo.");
         }
@@ -201,25 +213,27 @@ export function PublicCheckoutDialog({
           </div>
         ) : (
           <form onSubmit={onSubmit} noValidate className="space-y-4">
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setMethod("cod")}
-                className={`rounded-lg border p-3 text-left text-sm transition ${
-                  method === "cod"
-                    ? "border-hive bg-hive/10"
-                    : "border-border/60 bg-white/5 hover:border-hive/40"
-                }`}
-              >
-                <Truck className="mb-1 h-4 w-4 text-hive" />
-                <span className="block font-semibold">Pago contra entrega</span>
-                <span className="block text-xs text-muted-foreground">Pagas al recibir</span>
-              </button>
+            <div className={`grid gap-2 ${onlinePaymentOnly ? "grid-cols-1" : "grid-cols-2"}`}>
+              {!onlinePaymentOnly && (
+                <button
+                  type="button"
+                  onClick={() => setMethod("cod")}
+                  className={`rounded-lg border p-3 text-left text-sm transition ${
+                    method === "cod"
+                      ? "border-hive bg-hive/10"
+                      : "border-border/60 bg-white/5 hover:border-hive/40"
+                  }`}
+                >
+                  <Truck className="mb-1 h-4 w-4 text-hive" />
+                  <span className="block font-semibold">Pago contra entrega</span>
+                  <span className="block text-xs text-muted-foreground">Pagas al recibir</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => setMethod("online")}
                 className={`rounded-lg border p-3 text-left text-sm transition ${
-                  method === "online"
+                  method === "online" || onlinePaymentOnly
                     ? "border-hive bg-hive/10"
                     : "border-border/60 bg-white/5 hover:border-hive/40"
                 }`}
@@ -370,14 +384,14 @@ export function PublicCheckoutDialog({
             <Button type="submit" disabled={busy} className="hive-btn-primary h-11 w-full border-0">
               {busy ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
-              ) : method === "online" ? (
+              ) : method === "online" || onlinePaymentOnly ? (
                 "Ir a pagar"
               ) : (
                 "Confirmar pedido contra entrega"
               )}
             </Button>
             <p className="text-center text-xs text-muted-foreground">
-              {method === "online"
+              {method === "online" || onlinePaymentOnly
                 ? "Serás redirigido a la pasarela segura de Wompi."
                 : "Sin pago anticipado: pagas cuando recibas tu producto."}
             </p>
