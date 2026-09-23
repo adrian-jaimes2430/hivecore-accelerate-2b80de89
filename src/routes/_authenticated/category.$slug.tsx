@@ -60,7 +60,7 @@ function CategoryPage() {
             <Link key={p.id} to="/product/$slug" params={{ slug: p.slug }} className="hive-card group overflow-hidden">
               <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-hive/20 via-ao-red/10 to-anma-orange/15">
                 {cover ? (
-                  <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.03]" />
                 ) : (
                   <>
                     <div className="absolute inset-0 hive-grid-bg opacity-40" />

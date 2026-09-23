@@ -141,6 +141,7 @@ function PublicProduct() {
                   ctaLabel="Comprar ahora"
                   ref={ref ?? null}
                   variations={variantSummary || null}
+                  onlinePaymentOnly={product.attributes?.online_payment_only === true}
                   triggerClassName="shop-btn-accent h-12 w-full text-base"
                 />
               )}

@@ -215,7 +215,7 @@ function Dashboard() {
                           return (
                             <Link key={p.id} to="/product/$slug" params={{ slug: p.slug }} className="shop-tile group block">
                               {imgs[0] ? (
-                                <img src={imgs[0]} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.07]" />
+                                <img src={imgs[0]} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-contain p-1 transition-transform duration-700 group-hover:scale-[1.03]" />
                               ) : (
                                 <div className="absolute inset-0 flex items-center justify-center font-display text-3xl font-bold opacity-20">{p.name.charAt(0)}</div>
                               )}
@@ -278,7 +278,7 @@ function ProductCardWithQuick({ p, showCommission = false }: { p: Product; showC
         <Link to="/product/$slug" params={{ slug: p.slug }} className="block">
           <div className="shop-media relative m-2 aspect-[4/5] w-[calc(100%-1rem)]">
             {cover ? (
-              <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]" />
+              <img src={cover} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-contain p-2 transition-transform duration-700 group-hover:scale-[1.03]" />
             ) : (
               <>
                 <div className="absolute inset-0 hive-grid-bg opacity-40" />
@@ -336,7 +336,7 @@ function QuickView({ p }: { p: Product }) {
       <div>
         <div className="shop-media relative aspect-[4/5] overflow-hidden">
           {cover ? (
-            <img src={cover} alt={p.name} className="absolute inset-0 h-full w-full object-cover" />
+            <img src={cover} alt={p.name} className="absolute inset-0 h-full w-full object-contain p-2" />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center font-display text-6xl font-bold opacity-20">{p.name.charAt(0)}</div>
           )}
@@ -350,7 +350,7 @@ function QuickView({ p }: { p: Product }) {
                 onClick={() => setActive(i)}
                 className={`h-16 w-16 shrink-0 overflow-hidden rounded-xl border transition ${i === active ? "border-hive" : "border-white/10 opacity-70 hover:opacity-100"}`}
               >
-                <img src={u} alt="" className="h-full w-full object-cover" loading="lazy" />
+                <img src={u} alt="" className="h-full w-full object-contain" loading="lazy" />
               </button>
             ))}
           </div>

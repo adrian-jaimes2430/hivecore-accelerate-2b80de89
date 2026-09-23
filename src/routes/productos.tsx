@@ -94,7 +94,7 @@ function ProductIndex() {
                 alt={item.name}
                 loading="lazy"
                 decoding="async"
-                className="aspect-square w-full object-cover"
+                className="aspect-square w-full bg-black/30 object-contain p-2"
               />
             )}
             <div className="p-4">

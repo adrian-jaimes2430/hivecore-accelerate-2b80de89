@@ -128,7 +128,11 @@ function ProductsTab() {
       stock_quantity: Number(editing.stock_quantity ?? 0),
       is_active: editing.is_active ?? true,
       is_featured: editing.is_featured ?? false,
-      attributes: { ...(editing.attributes ?? {}), is_quote_only: quoteOnly },
+      attributes: {
+        ...(editing.attributes ?? {}),
+        is_quote_only: quoteOnly,
+        online_payment_only: editing.attributes?.online_payment_only === true,
+      },
     };
     const { error } = editing.id
       ? await supabase.from("luxury_products").update(payload as never).eq("id", editing.id)
@@ -168,7 +172,7 @@ function ProductsTab() {
   return (
     <div className="mt-6 space-y-6">
       <div className="flex justify-end">
-        <Button onClick={() => setEditing({ images: [], videos: [], variations: [], stock_status: "in_stock", is_active: true, show_impulsador_price: true, attributes: { is_quote_only: false } })} className="hive-btn-primary">
+        <Button onClick={() => setEditing({ images: [], videos: [], variations: [], stock_status: "in_stock", is_active: true, show_impulsador_price: true, attributes: { is_quote_only: false, online_payment_only: false } })} className="hive-btn-primary">
           <Plus className="mr-1 h-4 w-4" /> Nuevo producto
         </Button>
       </div>
@@ -212,6 +216,39 @@ function ProductsTab() {
               </div>
             </div>
           </div>
+
+          {!quoteOnly && (
+            <div className="rounded-md border border-border/60 bg-white/[0.02] p-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold">Modalidad de pago</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {editing.attributes?.online_payment_only === true
+                      ? "El cliente deberá pagar en línea antes de recibir el producto."
+                      : "El cliente podrá pagar en línea o contra entrega."}
+                  </p>
+                </div>
+                <div className="grid shrink-0 grid-cols-2 gap-1 rounded-md border border-border/60 bg-background/70 p-1">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={editing.attributes?.online_payment_only !== true ? "default" : "ghost"}
+                    onClick={() => setEditing({ ...editing, attributes: { ...(editing.attributes ?? {}), online_payment_only: false } })}
+                  >
+                    Ambas opciones
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={editing.attributes?.online_payment_only === true ? "default" : "ghost"}
+                    onClick={() => setEditing({ ...editing, attributes: { ...(editing.attributes ?? {}), online_payment_only: true } })}
+                  >
+                    Solo pagar ahora
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="grid gap-3 sm:grid-cols-2">
             <Input placeholder="Nombre" value={editing.name ?? ""} onChange={(e) => setEditing({ ...editing, name: e.target.value })} />
@@ -386,14 +423,14 @@ function ProductsTab() {
             <div key={p.id} className="hive-card flex flex-wrap items-center justify-between gap-3 p-4">
               <div className="flex items-center gap-3">
                 {imgs[0] ? (
-                  <img src={imgs[0]} className="h-12 w-12 rounded-md object-cover" alt="" />
+                  <img src={imgs[0]} className="h-12 w-12 rounded-md bg-black/30 object-contain" alt="" />
                 ) : (
                   <div className="h-12 w-12 rounded-md bg-zinc-900" />
                 )}
                 <div>
                   <p className="font-medium">{p.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {p.sku && <>{p.sku} · </>}{p.attributes?.is_quote_only === true || Number(p.suggested_retail_price || p.price) <= 0 ? "Precio por confirmar" : formatCOP(Number(p.price))} · {p.stock_status}
+                    {p.sku && <>{p.sku} · </>}{p.attributes?.is_quote_only === true || Number(p.suggested_retail_price || p.price) <= 0 ? "Precio por confirmar" : formatCOP(Number(p.price))} · {p.attributes?.online_payment_only === true ? "solo pago anticipado" : "pago anticipado o contra entrega"} · {p.stock_status}
                     {vidCount > 0 && <> · 🎬 {vidCount}</>}
                     {p.is_featured && <> · ⭐</>}
                     {!p.is_active && <> · inactivo</>}

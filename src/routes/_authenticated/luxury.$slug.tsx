@@ -21,6 +21,7 @@ import { sendOrderNotification } from "@/lib/order-email.functions";
 import { forwardOrderToIntegrations } from "@/lib/integrations.functions";
 import type { Variation } from "@/components/admin/VariationsEditor";
 import { formatCOP, isQuoteOnly } from "@/lib/pricing";
+import { PublicCheckoutDialog } from "@/components/checkout/PublicCheckoutDialog";
 
 export const Route = createFileRoute("/_authenticated/luxury/$slug")({
   component: LuxuryProductGate,
@@ -80,6 +81,7 @@ function LuxuryProduct() {
   const showImp = product.show_impulsador_price !== false;
   const finalPrice = Number(product.suggested_retail_price || product.price);
   const quoteOnly = isQuoteOnly(finalPrice) || product.attributes?.is_quote_only === true;
+  const onlinePaymentOnly = product.attributes?.online_payment_only === true;
 
   const publicUrl = user ? `${SITE_URL}/catalogo/${product.slug}?ref=${user.id}` : `${SITE_URL}/catalogo/${product.slug}`;
 
@@ -144,8 +146,21 @@ function LuxuryProduct() {
 
           <div className="space-y-2">
             <StockBadge status={product.stock_status} qty={product.stock_quantity} />
-            {user && !quoteOnly && (
+            {user && !quoteOnly && !onlinePaymentOnly && (
               <LuxuryOrderDialog product={product} selectedVariations={selectedVariations} />
+            )}
+            {user && !quoteOnly && onlinePaymentOnly && (
+              <PublicCheckoutDialog
+                productKind="luxury"
+                slug={product.slug}
+                productName={product.name}
+                unitPrice={finalPrice}
+                ctaLabel="Pagar ahora"
+                ref={user.id}
+                variations={summarizeVariations(selectedVariations) || null}
+                onlinePaymentOnly
+                triggerClassName="shop-btn-accent h-12 w-full text-base"
+              />
             )}
             {quoteOnly && (
               <p className="text-xs text-muted-foreground">
