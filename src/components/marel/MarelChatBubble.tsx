@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { X, Send, MessageCircle, Loader2 } from "lucide-react";
 import { askMarelGuest } from "@/lib/marel-public.functions";
-import marelAvatar from "@/assets/marel-avatar.png";
+import { MarelAvatar } from "./MarelAvatar";
 
 const BubbleCanvas = lazy(() => import("./MarelBubble3DCanvas"));
 
@@ -72,7 +72,7 @@ export function MarelChatBubble({ refId }: { refId?: string | null }) {
       {open && (
         <div className="marel-panel animate-scale-in">
           <header className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
-            <img src={marelAvatar} alt="Marel" className="h-9 w-9 rounded-full object-cover" />
+            <MarelAvatar className="h-10 w-10 rounded-full border border-hive/30 object-cover object-top" />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold">Marel</p>
               <p className="text-[11px] text-muted-foreground">Asesora AnMa Luxury · en línea</p>

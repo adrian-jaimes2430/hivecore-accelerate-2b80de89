@@ -1007,12 +1007,25 @@ html { scroll-behavior: smooth; }
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle at 30% 25%, color-mix(in oklab, var(--hive) 85%, white), color-mix(in oklab, var(--hive) 60%, black));
-    box-shadow: 0 18px 42px -14px rgba(0, 0, 0, 0.85);
+    border: 1px solid color-mix(in oklab, var(--hive) 42%, transparent);
+    background: radial-gradient(circle at 50% 42%, color-mix(in oklab, var(--hive) 18%, var(--surface-elevated)), var(--background) 72%);
+    box-shadow: 0 18px 42px -14px rgba(0, 0, 0, 0.85), 0 0 22px color-mix(in oklab, var(--hive) 18%, transparent);
     transition: transform var(--dur-fast) var(--ease-spring);
   }
   .marel-bubble-btn:hover { transform: scale(1.08); }
   .marel-bubble-btn:active { transform: scale(0.95); }
+
+  .marel-nav-icon {
+    display: inline-flex;
+    height: 24px;
+    width: 24px;
+    flex: none;
+    overflow: hidden;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--hive) 45%, transparent);
+    background: var(--background);
+  }
+  .marel-nav-icon img { height: 100%; width: 100%; object-fit: cover; object-position: top; }
 
   .marel-panel {
     position: fixed;

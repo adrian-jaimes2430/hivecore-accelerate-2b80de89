@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Plus, Send, Sparkles, Trash2, MessagesSquare } from "lucide-react";
 import { toast } from "sonner";
-import marelAvatar from "@/assets/marel-avatar.png";
+import { MarelAvatar } from "@/components/marel/MarelAvatar";
 import { useAuth } from "@/lib/auth";
 import { LEVEL_LABEL } from "@/lib/levels";
 import {
@@ -150,13 +150,7 @@ function MarelPage() {
       {/* Chat */}
       <section className="flex min-h-[70vh] flex-1 flex-col">
         <header className="flex items-center gap-3">
-          <img
-            src={marelAvatar}
-            alt="Marel"
-            width={512}
-            height={512}
-            className="h-11 w-11 rounded-full bg-hive/10 p-1"
-          />
+          <MarelAvatar className="h-11 w-11 rounded-full border border-hive/30 object-cover object-top" />
           <div className="min-w-0">
             <h1 className="font-display text-xl font-bold tracking-[-0.02em]">Marel</h1>
             <p className="truncate text-xs text-muted-foreground">
@@ -227,7 +221,7 @@ function MarelPage() {
           {pending && <Bubble role="user" content={pending} />}
           {mutation.isPending && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <img src={marelAvatar} alt="" width={512} height={512} className="h-7 w-7 rounded-full bg-hive/10 p-0.5" />
+              <MarelAvatar decorative className="h-7 w-7 rounded-full border border-hive/20 object-cover object-top" />
               <span className="flex gap-1">
                 <Dot /> <Dot delay="150ms" /> <Dot delay="300ms" />
               </span>
@@ -284,14 +278,7 @@ function Bubble({ role, content }: { role: "user" | "assistant"; content: string
   return (
     <div className={`flex gap-2 ${mine ? "justify-end" : "justify-start"}`}>
       {!mine && (
-        <img
-          src={marelAvatar}
-          alt=""
-          width={512}
-          height={512}
-          loading="lazy"
-          className="mt-1 h-7 w-7 shrink-0 rounded-full bg-hive/10 p-0.5"
-        />
+        <MarelAvatar decorative className="mt-1 h-7 w-7 shrink-0 rounded-full border border-hive/20 object-cover object-top" />
       )}
       <div
         className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-relaxed ${

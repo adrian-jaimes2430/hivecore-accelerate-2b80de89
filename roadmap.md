@@ -8,3 +8,4 @@
 - [x] Add per-product online-payment-only mode to Luxury admin and checkout
 - [x] Show full uncropped product images across base and Luxury catalogs
 - [x] Validate both payment modes and responsive product imagery
+- [x] Replace Marel's chat bubble with the provided 3D model and update her portrait across both chats and navigation
