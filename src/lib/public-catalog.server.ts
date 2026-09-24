@@ -1,4 +1,4 @@
-export const SITE_URL = "https://hivecore-shop.ayoecosystem.com";
+export const SITE_URL = "https://hivecore.ayoecosystem.com";
 
 export interface FeedItem {
   id: string;

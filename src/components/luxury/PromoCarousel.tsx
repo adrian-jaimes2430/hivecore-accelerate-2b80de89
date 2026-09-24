@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 
-const APP_HOSTS = new Set(["hivecore-shop.lovable.app", "hivecore-accelerate.lovable.app", "hivecore-shop.ayoecosystem.com"]);
+const APP_HOSTS = new Set(["hivecore-shop.lovable.app", "hivecore-accelerate.lovable.app", "hivecore.ayoecosystem.com"]);
 
 function promoHref(link: string | null) {
   if (!link) return null;
   try {
-    const origin = typeof window === "undefined" ? "https://hivecore-shop.ayoecosystem.com" : window.location.origin;
+    const origin = typeof window === "undefined" ? "https://hivecore.ayoecosystem.com" : window.location.origin;
     const parsed = new URL(link, origin);
     return APP_HOSTS.has(parsed.hostname) ? `${parsed.pathname}${parsed.search}${parsed.hash}` : parsed.href;
   } catch {
