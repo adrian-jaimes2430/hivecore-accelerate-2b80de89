@@ -7,7 +7,8 @@ export interface PublicTurn {
 
 /** Catálogo público (funnels + luxury) en texto para el contexto de Marel. */
 export async function buildPublicCatalog() {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { createPublicClient } = await import("@/lib/public-client.server");
+  const supabaseAdmin = createPublicClient();
 
   const [{ data: funnels }, { data: luxury }] = await Promise.all([
     supabaseAdmin
@@ -42,13 +43,10 @@ export async function buildPublicCatalog() {
 /** Teléfono de atención: el impulsador del enlace o el número oficial AnMa. */
 export async function resolveHandoff(ref?: string | null) {
   if (ref) {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data } = await supabaseAdmin
-      .from("profiles")
-      .select("id, full_name, phone, status")
-      .eq("id", ref)
-      .eq("status", "approved")
-      .maybeSingle();
+    const { createPublicClient } = await import("@/lib/public-client.server");
+    const supabase = createPublicClient();
+    const { data: rows } = await supabase.rpc("get_public_impulsador", { _id: ref });
+    const data = rows?.[0];
     if (data?.phone) {
       return { name: data.full_name ?? "tu asesor", phone: data.phone };
     }

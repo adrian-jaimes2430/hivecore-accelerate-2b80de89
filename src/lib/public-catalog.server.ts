@@ -51,7 +51,8 @@ export async function loadPublicCatalog(): Promise<{
   count: number;
   items: FeedItem[];
 }> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { createPublicClient } = await import("@/lib/public-client.server");
+  const supabaseAdmin = createPublicClient();
 
   const [{ data: products }, { data: luxury }, { data: categories }, { data: luxCategories }, { data: brands }] =
     await Promise.all([
