@@ -28,7 +28,7 @@ export const publicOrderSchema = z.object({
 
 export type PublicOrderInput = z.infer<typeof publicOrderSchema>;
 
-const SITE_URL = "https://hivecore.ayoecosystem.com";
+const SITE_URL = "https://hivecore-shop.lovable.app";
 
 /** Orders coming from this account's public links are treated as paid traffic. */
 const PAID_TRAFFIC_EMAILS = ["studio.ayosoluciones@gmail.com"];

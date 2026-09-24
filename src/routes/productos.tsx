@@ -4,7 +4,7 @@ import { listPublicCatalog } from "@/lib/public-catalog.functions";
 import { formatCOP } from "@/lib/pricing";
 import { ANMA_WHATSAPP } from "@/lib/whatsapp";
 
-const SITE_URL = "https://hivecore.ayoecosystem.com";
+const SITE_URL = "https://hivecore-shop.lovable.app";
 
 export const Route = createFileRoute("/productos")({
   loader: () => listPublicCatalog(),

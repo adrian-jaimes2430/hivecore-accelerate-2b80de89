@@ -61,7 +61,7 @@ function LuxuryCatalog() {
   const navigate = useNavigate({ from: "/luxury/" });
   const { user } = useAuth();
   const [quickView, setQuickView] = useState<LuxProduct | null>(null);
-  const SITE_URL = "https://hivecore.ayoecosystem.com";
+  const SITE_URL = "https://hivecore-shop.lovable.app";
   const myCatalogUrl = user ? `${SITE_URL}/catalogo?ref=${user.id}` : `${SITE_URL}/catalogo`;
 
   const { data: categories = [] } = useQuery({

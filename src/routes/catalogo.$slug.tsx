@@ -14,7 +14,7 @@ import { waHref, productOrderMessage, ANMA_WHATSAPP } from "@/lib/whatsapp";
 import { formatCOP, isQuoteOnly } from "@/lib/pricing";
 import { MetaViewContent } from "@/components/marketing/MetaPixel";
 
-const SITE_URL = "https://hivecore.ayoecosystem.com";
+const SITE_URL = "https://hivecore-shop.lovable.app";
 
 const searchSchema = z.object({
   ref: fallback(z.string().optional(), undefined).optional(),
