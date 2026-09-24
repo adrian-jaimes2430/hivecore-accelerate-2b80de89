@@ -1179,6 +1179,85 @@ ALTER TABLE ONLY public.user_roles
 
 --
 -- Name: orders Admins delete orders; Type: POLICY; Schema: public; Owner: -
+-- ===== Esquema app_private (usado por políticas RLS y storage) =====
+--
+-- PostgreSQL database dump
+--
+
+
+-- Dumped from database version 17.6
+-- Dumped by pg_dump version 17.9
+
+
+--
+-- Name: app_private; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA app_private;
+
+
+--
+-- Name: has_role(uuid, public.app_role); Type: FUNCTION; Schema: app_private; Owner: -
+--
+
+CREATE FUNCTION app_private.has_role(_user_id uuid, _role public.app_role) RETURNS boolean
+    LANGUAGE sql STABLE SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.user_roles
+    WHERE user_id = _user_id
+      AND role = _role
+  )
+$$;
+
+
+--
+-- Name: is_approved(uuid); Type: FUNCTION; Schema: app_private; Owner: -
+--
+
+CREATE FUNCTION app_private.is_approved(_user_id uuid) RETURNS boolean
+    LANGUAGE sql STABLE SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.profiles
+    WHERE id = _user_id
+      AND status = 'approved'
+  )
+$$;
+
+
+--
+-- Name: SCHEMA app_private; Type: ACL; Schema: -; Owner: -
+--
+
+GRANT USAGE ON SCHEMA app_private TO authenticated;
+
+
+--
+-- Name: FUNCTION has_role(_user_id uuid, _role public.app_role); Type: ACL; Schema: app_private; Owner: -
+--
+
+GRANT ALL ON FUNCTION app_private.has_role(_user_id uuid, _role public.app_role) TO authenticated;
+
+
+--
+-- Name: FUNCTION is_approved(_user_id uuid); Type: ACL; Schema: app_private; Owner: -
+--
+
+GRANT ALL ON FUNCTION app_private.is_approved(_user_id uuid) TO authenticated;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+
+
+
 --
 
 CREATE POLICY "Admins delete orders" ON public.orders FOR DELETE TO authenticated USING ((app_private.has_role(auth.uid(), 'super_admin'::public.app_role) OR app_private.has_role(auth.uid(), 'collaborator'::public.app_role)));
