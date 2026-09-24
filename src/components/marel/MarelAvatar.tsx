@@ -1,4 +1,4 @@
-import marelAvatarAsset from "@/assets/marel-avatar-new.png.asset.json";
+const marelAvatarAsset = { url: "/assets/marel-avatar.png" };
 
 type MarelAvatarProps = {
   className?: string;

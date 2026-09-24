@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
-import beeModel from "@/assets/hivecore-bee.glb.asset.json";
+const beeModel = { url: "/assets/hivecore-bee.glb" };
 
 /**
  * Escena three.js de la historia: el logo HIVECORE en 3D flotando dentro de
