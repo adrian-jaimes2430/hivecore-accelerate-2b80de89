@@ -1,3 +1,5 @@
+> **Actualización 2026-09-24:** `00_schema_completo.sql` se regeneró desde el backend actual. Cambios desde la auditoría: cola interna de correo (`pgmq`, `pg_cron`, `email_queue_*`) retirada y reemplazada por envío gestionado; columnas `impulsador_deleted_*` en `orders` para conservar historial al borrar impulsadores; esquema `app_private` con `has_role`/`is_approved` usado por las políticas; 794 objetos en storage. Totales actuales: 17 tablas, 34 políticas RLS en public + 4 en storage, 11 funciones public, 14 triggers public + 1 en auth.users.
+
 # Informe de auditoría de migración — HIVECORE
 
 Fecha de ejecución: 2026-08-26 · Alcance: FASE 1 completa + saneamiento del paquete de migración.

@@ -43,7 +43,7 @@ from information_schema.triggers
 where trigger_schema = 'public'
 order by 1, 2;
 
--- 6) Extensiones requeridas (pg_net, pg_cron, pgmq, supabase_vault, pgcrypto)
+-- 6) Extensiones requeridas (pg_net, supabase_vault, pgcrypto)
 select extname from pg_extension order by extname;
 
 -- 7) Buckets de storage
