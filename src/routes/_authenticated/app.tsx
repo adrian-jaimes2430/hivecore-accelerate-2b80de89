@@ -51,7 +51,7 @@ const COMMISSION_RATE = 0.2;
 function Dashboard() {
   const { profile, user, canLuxury, level } = useAuth();
   const [tag, setTag] = useState<TagKey>("all");
-  const SITE_URL = "https://hivecore-shop.ayoecosystem.com";
+  const SITE_URL = "https://hivecore.ayoecosystem.com";
   const myCatalogUrl = user ? `${SITE_URL}/catalogo?ref=${user.id}` : `${SITE_URL}/catalogo`;
 
   const { data: products = [] } = useQuery({

@@ -49,7 +49,7 @@ function LuxuryProduct() {
   const { slug } = Route.useParams();
   const { user } = useAuth();
   const [selectedVariations, setSelectedVariations] = useState<Record<string, string>>({});
-  const SITE_URL = "https://hivecore-shop.ayoecosystem.com";
+  const SITE_URL = "https://hivecore.ayoecosystem.com";
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["luxury-product", slug],

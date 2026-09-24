@@ -27,7 +27,7 @@ import { bundleTotal, formatCOP} from "@/lib/pricing";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 
-const SITE_URL = "https://hivecore-shop.ayoecosystem.com";
+const SITE_URL = "https://hivecore.ayoecosystem.com";
 
 const searchSchema = z.object({
   ref: fallback(z.string().optional(), undefined).optional(),
