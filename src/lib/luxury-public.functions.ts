@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 
 const serverClient = async () => {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  return supabaseAdmin;
+  const { createPublicClient } = await import("@/lib/public-client.server");
+  return createPublicClient();
 };
 
 export const listLuxuryCatalog = createServerFn({ method: "GET" }).handler(async () => {
@@ -63,12 +63,8 @@ export const getImpulsadorRef = createServerFn({ method: "GET" })
   .inputValidator((d: { ref: string }) => d)
   .handler(async ({ data }) => {
     const supabase = await serverClient();
-    const { data: row } = await supabase
-      .from("profiles")
-      .select("id,full_name,phone,status")
-      .eq("id", data.ref)
-      .eq("status", "approved")
-      .maybeSingle();
+    const { data: rows } = await supabase.rpc("get_public_impulsador", { _id: data.ref });
+    const row = rows?.[0];
     if (!row) return null;
     return { id: row.id, name: row.full_name, phone: row.phone };
   });
