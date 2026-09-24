@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import marelModel from "@/assets/marel-chat-model.glb.asset.json";
+const marelModel = { url: "/assets/marel-chat-model.glb" };
 
 /** Modelo 3D flotante de Marel que conserva los materiales del archivo original. */
 export function MarelBubble3DCanvas() {
