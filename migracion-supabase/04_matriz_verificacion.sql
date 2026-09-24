@@ -41,7 +41,7 @@ FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
 JOIN pg_namespace n ON n.oid = c.relnamespace
 WHERE n.nspname = 'public' AND NOT t.tgisinternal;
 
--- Esperado: pg_cron, pg_net, pgcrypto, pgmq, plpgsql, supabase_vault, uuid-ossp
+-- Esperado mínimo: pg_net, pgcrypto, plpgsql, supabase_vault, uuid-ossp (pgmq/pg_cron ya no se usan)
 SELECT 'extension' AS componente, extname FROM pg_extension ORDER BY extname;
 
 -- Esperado: app_role, user_status, order_status, impulsor_level

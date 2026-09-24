@@ -39,14 +39,14 @@ Guarda también, por si acaso, la lista de `id` de `profiles`: los enlaces públ
 En [supabase.com](https://supabase.com) → New project.
 
 - **Región**: elige la más cercana a Colombia (`us-east-1` o `sa-east-1`) para bajar latencia en checkout.
-- **Plan**: la app usa `pg_net`, `pg_cron`, `pgmq` y `supabase_vault`. Todas están disponibles en el plan Free, pero `pg_cron` con jobs frecuentes y el volumen de storage de video conviene revisarlo en Pro.
+- **Plan**: la app usa `pg_net` y `supabase_vault` (la cola `pgmq`/`pg_cron` se retiró). Todas están disponibles en el plan Free, pero `pg_cron` con jobs frecuentes y el volumen de storage de video conviene revisarlo en Pro.
 - Guarda la contraseña de base de datos: la necesitarás para `psql` en el paso 4.
 
 ## Paso 3 — Reconstruir el esquema
 
 En el SQL Editor de tu proyecto nuevo, ejecuta `00_schema_completo.sql` **completo y de una sola vez**, sin reordenar. Contiene, en orden:
 
-- Extensiones: `pgcrypto`, `pg_net`, `pg_cron`, `pgmq`, `supabase_vault`.
+- Extensiones: `pgcrypto`, `pg_net`, `supabase_vault`.
 - Enums: `app_role`, `impulsor_level`, estados de pedido y de pago.
 - Tablas: `profiles`, `user_roles`, `categories`, `products`, `luxury_categories`, `luxury_brands`, `luxury_products`, `luxury_promos`, `orders`, `integrations`, `notification_settings`, `marel_threads`, `marel_messages` y las 4 de infraestructura de correo.
 - Funciones `security definer`: `has_role`, `is_approved`, generación de `order_code` y de SKU `LUX-XXXXXXXX`, `update_updated_at_column`.

@@ -26,8 +26,8 @@ Antes de ejecutar, reemplazar los placeholders:
 Comprobar primero que el destino esté vacío:
 `SELECT count(*) FROM information_schema.tables WHERE table_schema='public';`
 
-Si `pgmq` o `pg_cron` no están disponibles en el plan del destino, **parar y reportar**: la
-cola de correo y el wake programado dependen de ellas y no tienen sustituto equivalente.
+`pgmq` y `pg_cron` ya no son necesarias: la cola interna de correo se retiró (el envío es gestionado).
+Requeridas: `pgcrypto`, `pg_net`, `supabase_vault`. Crear en vault el secreto `order_notify_secret`.
 
 ## Paso 2 — Auth
 
@@ -42,7 +42,7 @@ durante la carga) → `04_matriz_verificacion.sql`.
 
 ## Paso 4 — Storage
 
-Crear el bucket `product-images` como **público** y copiar los 747 objetos preservando la ruta
+Crear el bucket `product-images` como **público** y copiar los 794 objetos preservando la ruta
 exacta (`bucket_id` + `name`). Solo cambia el host en las URLs guardadas en base de datos:
 
 ```sql
@@ -61,14 +61,14 @@ Todos por gestión de secretos, nunca en código ni en SQL versionado:
 `WOMPI_PUBLIC_KEY`, `WOMPI_PRIVATE_KEY`, `WOMPI_INTEGRITY_SECRET`, `WOMPI_EVENTS_SECRET`,
 `META_CAPI_ACCESS_TOKEN`, `TELEGRAM_API_KEY`, `AOCORE_INBOUND_SECRET`,
 `ORDER_NOTIFY_SECRET` (**rotar**), `LOVABLE_API_KEY` (Marel),
-y en `vault`: `order_notify_secret`, `email_queue_service_role_key`.
+y en `vault`: `order_notify_secret`.
 
 `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY` y las variantes
 `VITE_` las genera la conexión: no escribirlas a mano.
 
 ## Paso 6 — Jobs de cron
 
-Recrear el job de `email_queue_wake` en el destino (`cron.schedule`). No viaja en el dump.
+Ninguno: la cola de correo interna (y su job de cron) se retiró.
 
 ## Paso 7 — URLs y webhooks a reapuntar (solo en el cutover)
 
