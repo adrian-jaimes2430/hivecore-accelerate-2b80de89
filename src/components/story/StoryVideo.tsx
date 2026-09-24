@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import storyVideo from "@/assets/story.mp4.asset.json";
-import storyPoster from "@/assets/story-poster.jpg.asset.json";
+const storyVideo = { url: "/assets/story.mp4" };
+const storyPoster = { url: "/assets/story-poster.jpg" };
 
 /**
  * Capa de video a pantalla completa que actúa como lienzo de toda la

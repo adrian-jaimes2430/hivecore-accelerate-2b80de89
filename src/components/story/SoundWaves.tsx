@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Volume2, VolumeX } from "lucide-react";
-import music from "@/assets/story-music.mp3.asset.json";
+const music = { url: "/assets/story-music.mp3" };
 
 /**
  * Música de fondo + ondas de sonido en la parte inferior.
