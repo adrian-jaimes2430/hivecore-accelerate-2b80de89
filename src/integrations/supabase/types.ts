@@ -784,6 +784,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_public_impulsador: {
+        Args: { _id: string }
+        Returns: {
+          full_name: string
+          id: string
+          phone: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

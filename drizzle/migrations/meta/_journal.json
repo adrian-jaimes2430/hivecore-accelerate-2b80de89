@@ -8,6 +8,13 @@
       "when": 1789797875771,
       "tag": "0000_preserve_deleted_impulsador_order_history",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790288056199,
+      "tag": "0001_public_catalog_readonly_access",
+      "breakpoints": true
     }
   ]
 }
